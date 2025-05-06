@@ -1,0 +1,40 @@
+inherit_settings: True
+
+zone_system: 2
+
+skim_dict_factory: NumpyArraySkimFactory
+#skim_dict_factory: MemMapSkimFactory
+
+# read cached skims (using numpy memmap) from output directory (memmap is faster than omx )
+read_skim_cache: False
+# write memmapped cached skims to output directory after reading from omx, for use in subsequent runs
+write_skim_cache: False
+
+# series15
+taz_skims:
+  - traffic_skims*.omx
+  - transit_skims*.omx
+  - dest_pmsa.omx
+  - dest_poi.omx
+
+maz: land_use.csv   # mgra.csv
+
+maz_to_maz:
+  tables:
+    - maz_maz_walk.csv
+    - maz_maz_bike.csv
+  # maz_to_maz blending distance (missing or 0 means no blending)
+  max_blend_distance: 2
+
+
+skim_time_periods:
+    time_window: 1440
+    period_minutes: 30
+    periods: [0, 6, 12, 25, 32, 48]  # time periods to match documentation
+    labels: &skim_time_period_labels ['EA', 'AM', 'MD', 'PM', 'EV']
+
+demographic_segments: &demographic_segments
+  - &low_income_segment_id 0
+  - &high_income_segment_id 1
+
+
