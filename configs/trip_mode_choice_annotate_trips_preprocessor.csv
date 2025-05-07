@@ -11,7 +11,6 @@ Description,Target,Expression
 ,cost_sensitivity,"np.maximum(df.income,1000).pow(income_exponent)"
 # ivt coef,,
 ,time_factor,"np.where(df.tour_type=='work', df.time_factor_work, df.time_factor_nonwork)"
-#time_factor placeholder,time_factor,1
 ,c_ivt,coef_ivt * time_factor
 ,origin,df.origin if 'origin' in df.columns else df.home_zone_id
 ,destination,df.destination if 'destination' in df.columns else df.alt_dest

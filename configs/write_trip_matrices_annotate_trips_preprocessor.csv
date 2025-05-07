@@ -475,10 +475,10 @@ Description,Target,Expression
 ,trip_veh_body,"reindex(tours.selected_vehicle.str.split('_').str[0], trips.tour_id)"
 ,_trip_veh_age,"reindex(tours.selected_vehicle.str.split('_').str[1], trips.tour_id)"
 ,_trip_veh_age,"_trip_veh_age.replace('hh', -9)"
-,trip_veh_age,"_trip_veh_age.fillna(-9)"
+,trip_veh_age,"_trip_veh_age.fillna(-9).astype(int)"
 ,trip_veh_fueltype,"reindex(tours.selected_vehicle.str.split('_').str[2], trips.tour_id)"
 #,,
-,origin_purpose," ""null"""
+,origin_purpose,"""null"""
 ,origin_purpose,"np.where(trips.trip_count == 1, 'home', origin_purpose)"
 ,origin_purpose,"np.where(trips.trip_count == 1 & (trips.primary_purpose == 'atwork'), 'work', origin_purpose)"
 ,origin_purpose,"np.where((trips.trip_count > 1) & (trips.trip_num==1) & (trips.outbound), 'home', origin_purpose)"

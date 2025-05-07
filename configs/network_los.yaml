@@ -14,8 +14,8 @@ write_skim_cache: False
 taz_skims:
   - traffic_skims*.omx
   - transit_skims*.omx
-  - dest_pmsa.omx
-  - dest_poi.omx
+  # - dest_pmsa.omx
+  # - dest_poi.omx
 
 maz: land_use.csv   # mgra.csv
 
@@ -23,8 +23,13 @@ maz_to_maz:
   tables:
     - maz_maz_walk.csv
     - maz_maz_bike.csv
+  
   # maz_to_maz blending distance (missing or 0 means no blending)
-  max_blend_distance: 2
+  # max_blend_distance:
+  #   DIST: 5
+  #   # blend distance of 0 means no blending
+  #   DISTBIKE: 0
+  #   DISTWALK: 1
 
 
 skim_time_periods:
