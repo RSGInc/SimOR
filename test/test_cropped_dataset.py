@@ -1,35 +1,24 @@
 import subprocess
 import sys
+import os
 
 def test_cropped_example():
-    try:
-        # Command to run the cropped example
-        command = [
-            "python",  # Path to the Python interpreter
-            "simulation.py",  # Script to run
+    file_path = os.path.join(os.path.dirname(__file__), "../simulation.py")
+
+    subprocess.run(
+        [
+            "coverage",  # Command to run coverage
+            "run",  # Command to run the script
+            "-a",  # Append coverage data
+            file_path,  # Path to the script
             "-c", "configs",  # Config directory
             "-d", "model_data/cropped_data",  # Input data directory
             "-o", "outputs/test"  # Output directory
-        ]
+        ], 
+        check=True, capture_output=True, text=True)
+    
+    return True
 
-        # Run the command and capture the output
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
-
-        # Print the output for debugging purposes
-        print("STDOUT:", result.stdout)
-        print("STDERR:", result.stderr)
-
-        print("Cropped example ran successfully.")
-        return True
-
-    except subprocess.CalledProcessError as e:
-        # Print error details if the command fails
-        print("Error: Cropped example failed to run.")
-        print("Return Code:", e.returncode)
-        print("STDOUT:", e.stdout)
-        print("STDERR:", e.stderr)
-        return False
 
 if __name__ == "__main__":
-    success = test_cropped_example()
-    sys.exit(0 if success else 1)
+    test_cropped_example()
