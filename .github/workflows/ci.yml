@@ -23,11 +23,18 @@ jobs:
       with:
         python-version: '3.10'  # Specify the Python version
 
-    # Install dependencies
-    - name: Install dependencies
+    # Clone and install ActivitySim from the main branch
+    - name: Clone and install ActivitySim
       run: |
+        git clone --branch main https://github.com/ActivitySim/activitysim.git
+        cd activitysim
         python -m pip install --upgrade pip
-        pip install activitysim  # Install the latest version of activitysim
+        pip install -e .  # Install ActivitySim in editable mode
+        cd ..
+
+    # Install other dependencies
+    - name: Install additional dependencies
+      run: |
         pip install -r requirements.txt || true  # Install other dependencies if a requirements.txt exists
 
     # Run the test
