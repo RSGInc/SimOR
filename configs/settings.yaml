@@ -141,6 +141,8 @@ models:
   ### mp_accessibility
   - compute_accessibility
   ### mp_households
+  # - license_holding_status
+  # - bike_comfort
   - av_ownership
   - auto_ownership_simulate
   - work_from_home
@@ -148,10 +150,10 @@ models:
   - external_workplace_location
   - school_location
   - workplace_location
-  - transit_pass_subsidy
-  - transit_pass_ownership
   - vehicle_type_choice
   - adjust_auto_operating_cost
+  - transit_pass_subsidy
+  - transit_pass_ownership
   - free_parking
   - telecommute_frequency
   - cdap_simulate
