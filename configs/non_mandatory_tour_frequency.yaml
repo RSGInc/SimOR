@@ -18,14 +18,11 @@ SPEC_SEGMENTS:
   - NAME: PTYPE_RETIRED
     PTYPE: 5
     COEFFICIENTS: non_mandatory_tour_frequency_coefficients_PTYPE_RETIRED.csv
-  - NAME: PTYPE_DRIVING
-    PTYPE: 6
-    COEFFICIENTS: non_mandatory_tour_frequency_coefficients_PTYPE_DRIVING.csv
   - NAME: PTYPE_SCHOOL
-    PTYPE: 7
+    PTYPE: 6
     COEFFICIENTS: non_mandatory_tour_frequency_coefficients_PTYPE_SCHOOL.csv
   - NAME: PTYPE_PRESCHOOL
-    PTYPE: 8
+    PTYPE: 7
     COEFFICIENTS: non_mandatory_tour_frequency_coefficients_PTYPE_PRESCHOOL.csv
 
 annotate_persons:
@@ -41,14 +38,3 @@ preprocessor:
     - tours
     - households
     - joint_tour_participants
-#    - accessibility
-
-CONSTANTS:
-  PTYPE_FULL: 1
-  PTYPE_PART: 2
-  PTYPE_UNIVERSITY: 3
-  PTYPE_NONWORK: 4
-  PTYPE_RETIRED: 5
-  PTYPE_DRIVING: 6
-  PTYPE_SCHOOL: 7
-  PTYPE_PRESCHOOL: 8

@@ -32,7 +32,7 @@ join joint tour participants with tour purpose,_JOINT_TOURS_PERSONS,"pd.merge(jo
 ,num_university_students_not_self,"np.where(df.ptype == PTYPE_UNIVERSITY, df.num_university_students-1, df.num_university_students)"
 ,num_non_workers_not_self,"np.where(df.ptype == PTYPE_NONWORK, df.num_nonworker_adults - 1, df.num_nonworker_adults)"
 ,num_retirees_not_self,"np.where(df.ptype == PTYPE_RETIRED, df.num_retired_adults-1, df.num_retired_adults)"
-,num_driving_age_students_not_self,"np.where(df.ptype == PTYPE_DRIVING, df.num_children_16_to_17 - 1, df.num_children_16_to_17)"
+,num_driving_age_students_not_self,"np.where((df.ptype == PTYPE_SCHOOL) & (df.age >= 16), df.num_children_16_to_17 - 1, df.num_children_16_to_17)"
 ,num_pre_driving_age_school_kids_not_self,"np.where(df.ptype == PTYPE_SCHOOL, df.num_predrive_child - 1, df.num_predrive_child)"
 ,num_pre_school_kids_not_self,"np.where(df.ptype == PTYPE_PRESCHOOL, df.num_young_children - 1, df.num_young_children)"
 ,retiredHh,"np.where(df.num_retired_adults == df.hhsize, 1, 0)"

@@ -781,7 +781,6 @@ persons:
     - has_non_worker
     - has_retiree
     - has_preschool_kid
-    - has_driving_kid
     - has_school_kid
     - has_full_time
     - has_part_time
