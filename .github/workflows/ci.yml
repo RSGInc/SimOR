@@ -35,6 +35,7 @@ jobs:
     # Install other dependencies
     - name: Install additional dependencies
       run: |
+        pip install coverage  # Install coverage for testing
         pip install -r requirements.txt || true  # Install other dependencies if a requirements.txt exists
 
     # Run the test
