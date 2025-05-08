@@ -15,7 +15,8 @@ def test_cropped_example():
             "-d", "model_data/cropped_data",  # Input data directory
             "-o", "outputs/test"  # Output directory
         ], 
-        check=True, capture_output=True, text=True)
+        check=True
+    )
     
     return True
 
