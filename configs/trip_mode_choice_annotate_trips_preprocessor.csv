@@ -37,13 +37,10 @@ Description,Target,Expression
 #,sr2_auto_op_cost,"np.where(sr2_auto_op_cost.isna() | (pd.Series(sr2_veh_option, df.index) == 'non_hh_veh'), costPerMile, sr2_auto_op_cost)"
 #,sr3p_auto_op_cost,"reindex(vehicles.groupby('vehicle_type')['auto_operating_cost'].mean(), pd.Series(sr3p_veh_option, df.index)) if 'vehicle_occup_3.5' in df.columns else np.nan"
 #,sr3p_auto_op_cost,"np.where(sr3p_auto_op_cost.isna() | (pd.Series(sr3p_veh_option, df.index) == 'non_hh_veh'), costPerMile, sr3p_auto_op_cost)"
-#Result of transponder ownership model (1=owns," 0=not)""",ownsTransponder
-#household Variable transponder_ownership,,
-Transponder ownership model,ownsTransponder,df.transponder_ownership
 #vot-indexed skims,,
-DA skim based on Transponder ownership,da_dist_skims,"(np.where(ownsTransponder==1, odt_skims['SOV_TR_L_DIST'], odt_skims['SOV_NT_L_DIST']) * (_vot_bin_da == 1)) + (np.where(ownsTransponder==1, odt_skims['SOV_TR_M_DIST'], odt_skims['SOV_NT_M_DIST']) * (_vot_bin_da == 2)) + (np.where(ownsTransponder==1, odt_skims['SOV_TR_H_DIST'], odt_skims['SOV_NT_H_DIST']) * (_vot_bin_da == 3))"
-,da_cost_skims,"(np.where(ownsTransponder==1, odt_skims['SOV_TR_L_TOLLCOST'], odt_skims['SOV_NT_L_TOLLCOST']) * (_vot_bin_da == 1)) + (np.where(ownsTransponder==1, odt_skims['SOV_TR_M_TOLLCOST'], odt_skims['SOV_NT_M_TOLLCOST']) * (_vot_bin_da == 2)) + (np.where(ownsTransponder==1, odt_skims['SOV_TR_H_TOLLCOST'], odt_skims['SOV_NT_H_TOLLCOST']) * (_vot_bin_da == 3))"
-,da_time_skims,"(np.where(ownsTransponder==1, odt_skims['SOV_TR_L_TIME'], odt_skims['SOV_NT_L_TIME']) * (_vot_bin_da == 1)) + (np.where(ownsTransponder==1, odt_skims['SOV_TR_M_TIME'], odt_skims['SOV_NT_M_TIME']) * (_vot_bin_da == 2)) + (np.where(ownsTransponder==1, odt_skims['SOV_TR_H_TIME'], odt_skims['SOV_NT_H_TIME']) * (_vot_bin_da == 3))"
+,da_dist_skims,"(odt_skims['SOV_NT_L_DIST'] * (_vot_bin_da == 1)) + (odt_skims['SOV_NT_M_DIST'] * (_vot_bin_da == 2)) + (odt_skims['SOV_NT_H_DIST'] * (_vot_bin_da == 3))"
+,da_cost_skims,"(odt_skims['SOV_NT_L_TOLLCOST'] * (_vot_bin_da == 1)) + (odt_skims['SOV_NT_M_TOLLCOST'] * (_vot_bin_da == 2)) + (odt_skims['SOV_NT_H_TOLLCOST'] * (_vot_bin_da == 3))"
+,da_time_skims,"(odt_skims['SOV_NT_L_TIME'] * (_vot_bin_da == 1)) + (odt_skims['SOV_NT_M_TIME'] * (_vot_bin_da == 2)) + (odt_skims['SOV_NT_H_TIME'] * (_vot_bin_da == 3))"
 ,da_rel_skims,(((odt_skims['SOV_NT_L_REL']) * (_vot_bin_da == 1)) + ((odt_skims['SOV_NT_M_REL']) * (_vot_bin_da == 2)) + ((odt_skims['SOV_NT_H_REL']) * (_vot_bin_da == 3)))
 ,s2_dist_skims,(((odt_skims['HOV2_L_DIST']) * (_vot_bin_s2 == 1)) + ((odt_skims['HOV2_M_DIST']) * (_vot_bin_s2 == 2)) + ((odt_skims['HOV2_H_DIST']) * (_vot_bin_s2 == 3)))
 ,s2_cost_skims,(((odt_skims['HOV2_L_TOLLCOST']) * (_vot_bin_s2 == 1)) + ((odt_skims['HOV2_M_TOLLCOST']) * (_vot_bin_s2 == 2)) + ((odt_skims['HOV2_H_TOLLCOST']) * (_vot_bin_s2 == 3)))

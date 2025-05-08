@@ -1,23 +1,14 @@
 trips:
   remove_columns:
-    - DRIVEALONE_NOTR_EA_LOW
-    - SHARED2_NOTR_EA_LOW
-    - SHARED3_NOTR_EA_LOW
-    - DRIVEALONE_TR_EA_LOW
-    - SHARED2_TR_EA_LOW
-    - SHARED3_TR_EA_LOW
-    - DRIVEALONE_NOTR_EA_MED
-    - SHARED2_NOTR_EA_MED
-    - SHARED3_NOTR_EA_MED
-    - DRIVEALONE_TR_EA_MED
-    - SHARED2_TR_EA_MED
-    - SHARED3_TR_EA_MED
-    - DRIVEALONE_NOTR_EA_HIGH
-    - SHARED2_NOTR_EA_HIGH
-    - SHARED3_NOTR_EA_HIGH
-    - DRIVEALONE_TR_EA_HIGH
-    - SHARED2_TR_EA_HIGH
-    - SHARED3_TR_EA_HIGH
+    - DRIVEALONE_EA_LOW
+    - SHARED2_EA_LOW
+    - SHARED3_EA_LOW
+    - DRIVEALONE_EA_MED
+    - SHARED2_EA_MED
+    - SHARED3_EA_MED
+    - DRIVEALONE_EA_HIGH
+    - SHARED2_EA_HIGH
+    - SHARED3_EA_HIGH
     - WALK_LOC_EA
     - WALK_PRM_EA
     - WALK_MIX_EA
@@ -41,24 +32,15 @@ trips:
     - TNC_MIXIN_EA
     - BIKE_EA
     - WALK_EA
-    - DRIVEALONE_NOTR_AM_LOW
-    - SHARED2_NOTR_AM_LOW
-    - SHARED3_NOTR_AM_LOW
-    - DRIVEALONE_TR_AM_LOW
-    - SHARED2_TR_AM_LOW
-    - SHARED3_TR_AM_LOW
-    - DRIVEALONE_NOTR_AM_MED
-    - SHARED2_NOTR_AM_MED
-    - SHARED3_NOTR_AM_MED
-    - DRIVEALONE_TR_AM_MED
-    - SHARED2_TR_AM_MED
-    - SHARED3_TR_AM_MED
-    - DRIVEALONE_NOTR_AM_HIGH
-    - SHARED2_NOTR_AM_HIGH
-    - SHARED3_NOTR_AM_HIGH
-    - DRIVEALONE_TR_AM_HIGH
-    - SHARED2_TR_AM_HIGH
-    - SHARED3_TR_AM_HIGH
+    - DRIVEALONE_AM_LOW
+    - SHARED2_AM_LOW
+    - SHARED3_AM_LOW
+    - DRIVEALONE_AM_MED
+    - SHARED2_AM_MED
+    - SHARED3_AM_MED
+    - DRIVEALONE_AM_HIGH
+    - SHARED2_AM_HIGH
+    - SHARED3_AM_HIGH
     - WALK_LOC_AM
     - WALK_PRM_AM
     - WALK_MIX_AM
@@ -82,24 +64,15 @@ trips:
     - TNC_MIXIN_AM
     - BIKE_AM
     - WALK_AM
-    - DRIVEALONE_NOTR_MD_LOW
-    - SHARED2_NOTR_MD_LOW
-    - SHARED3_NOTR_MD_LOW
-    - DRIVEALONE_TR_MD_LOW
-    - SHARED2_TR_MD_LOW
-    - SHARED3_TR_MD_LOW
-    - DRIVEALONE_NOTR_MD_MED
-    - SHARED2_NOTR_MD_MED
-    - SHARED3_NOTR_MD_MED
-    - DRIVEALONE_TR_MD_MED
-    - SHARED2_TR_MD_MED
-    - SHARED3_TR_MD_MED
-    - DRIVEALONE_NOTR_MD_HIGH
-    - SHARED2_NOTR_MD_HIGH
-    - SHARED3_NOTR_MD_HIGH
-    - DRIVEALONE_TR_MD_HIGH
-    - SHARED2_TR_MD_HIGH
-    - SHARED3_TR_MD_HIGH
+    - DRIVEALONE_MD_LOW
+    - SHARED2_MD_LOW
+    - SHARED3_MD_LOW
+    - DRIVEALONE_MD_MED
+    - SHARED2_MD_MED
+    - SHARED3_MD_MED
+    - DRIVEALONE_MD_HIGH
+    - SHARED2_MD_HIGH
+    - SHARED3_MD_HIGH
     - WALK_LOC_MD
     - WALK_PRM_MD
     - WALK_MIX_MD
@@ -123,24 +96,15 @@ trips:
     - TNC_MIXIN_MD
     - BIKE_MD
     - WALK_MD
-    - DRIVEALONE_NOTR_PM_LOW
-    - SHARED2_NOTR_PM_LOW
-    - SHARED3_NOTR_PM_LOW
-    - DRIVEALONE_TR_PM_LOW
-    - SHARED2_TR_PM_LOW
-    - SHARED3_TR_PM_LOW
-    - DRIVEALONE_NOTR_PM_MED
-    - SHARED2_NOTR_PM_MED
-    - SHARED3_NOTR_PM_MED
-    - DRIVEALONE_TR_PM_MED
-    - SHARED2_TR_PM_MED
-    - SHARED3_TR_PM_MED
-    - DRIVEALONE_NOTR_PM_HIGH
-    - SHARED2_NOTR_PM_HIGH
-    - SHARED3_NOTR_PM_HIGH
-    - DRIVEALONE_TR_PM_HIGH
-    - SHARED2_TR_PM_HIGH
-    - SHARED3_TR_PM_HIGH
+    - DRIVEALONE_PM_LOW
+    - SHARED2_PM_LOW
+    - SHARED3_PM_LOW
+    - DRIVEALONE_PM_MED
+    - SHARED2_PM_MED
+    - SHARED3_PM_MED
+    - DRIVEALONE_PM_HIGH
+    - SHARED2_PM_HIGH
+    - SHARED3_PM_HIGH
     - WALK_LOC_PM
     - WALK_PRM_PM
     - WALK_MIX_PM
@@ -164,24 +128,15 @@ trips:
     - TNC_MIXIN_PM
     - BIKE_PM
     - WALK_PM
-    - DRIVEALONE_NOTR_EV_LOW
-    - SHARED2_NOTR_EV_LOW
-    - SHARED3_NOTR_EV_LOW
-    - DRIVEALONE_TR_EV_LOW
-    - SHARED2_TR_EV_LOW
-    - SHARED3_TR_EV_LOW
-    - DRIVEALONE_NOTR_EV_MED
-    - SHARED2_NOTR_EV_MED
-    - SHARED3_NOTR_EV_MED
-    - DRIVEALONE_TR_EV_MED
-    - SHARED2_TR_EV_MED
-    - SHARED3_TR_EV_MED
-    - DRIVEALONE_NOTR_EV_HIGH
-    - SHARED2_NOTR_EV_HIGH
-    - SHARED3_NOTR_EV_HIGH
-    - DRIVEALONE_TR_EV_HIGH
-    - SHARED2_TR_EV_HIGH
-    - SHARED3_TR_EV_HIGH
+    - DRIVEALONE_EV_LOW
+    - SHARED2_EV_LOW
+    - SHARED3_EV_LOW
+    - DRIVEALONE_EV_MED
+    - SHARED2_EV_MED
+    - SHARED3_EV_MED
+    - DRIVEALONE_EV_HIGH
+    - SHARED2_EV_HIGH
+    - SHARED3_EV_HIGH
     - WALK_LOC_EV
     - WALK_PRM_EV
     - WALK_MIX_EV
@@ -472,39 +427,6 @@ trips:
     - c_walk_time
     - c_xfers_pnr
     - cost_per_mile
-
-  rename_columns:
-    distance: distance_total
-    weightTrip: weight_trip
-    weightPersonTrip: weight_person_trip
-    weightPerson_trip: weight_person_trip
-    timeDrive: time_drive
-    ownsTransponder: owns_transponder
-    distanceDrive: distance_drive
-    distanceDriveTransit: distance_drive_transit
-    timeTransitInVehicle: time_transit_in_vehicle
-    timeRapidTransitInVehicle: time_rapid_transit_in_vehicle
-    timeExpressBusTransitInVehicle: time_express_bus_transit_in_vehicle
-    timeLightRailTransitInVehicle: time_light_rail_transit_in_vehicle
-    timeCommuterRailTransitInVehicle: time_commuter_rail_transit_in_vehicle
-    timeTransitInitialWait: time_transit_initial_wait
-    timeBike: time_bike
-    timeLocalBusTransitInVehicle: time_local_bus_transit_in_vehicle
-    timeWalk: time_walk
-    timeTotal: time_total
-    costTollDrive: cost_toll_drive
-    costOperatingDrive: cost_operating_drive
-    costFareTransit: cost_fare_transit
-    costTotal: cost_total
-    transfersTransit: transfers_transit
-    microtransit_mix_access_available_out: microtransit_access_available_out
-    nev_mix_access_available_out: nev_access_available_out
-    microtransit_mix_egress_available_out: microtransit_egress_available_out
-    nev_mix_egress_available_out: nev_egress_available_out
-    microtransit_mix_access_available_in: microtransit_access_available_in
-    nev_mix_access_available_in: nev_access_available_in
-    microtransit_mix_egress_available_in: microtransit_egress_available_in
-    nev_mix_egress_available_in: nev_egress_available_in
 
 households:
   remove_columns:
