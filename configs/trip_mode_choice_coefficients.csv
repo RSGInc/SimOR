@@ -8,10 +8,6 @@ coef_nest_MICROMOBILITY,0.5,T
 coef_nest_TRANSIT,0.5,T
 coef_nest_RIDEHAIL,0.5,T
 coef_nest_SCHOOL_BUS,0.5,T
-coef_nest_TRANSIT_WALKACCESS,0.5,T
-coef_nest_TRANSIT_PNRACCESS,0.5,T
-coef_nest_TRANSIT_KNRACCESS,0.5,T
-coef_nest_TRANSIT_TNCACCESS,0.5,T
 coef_unavailable,-999.0,T
 #,0.0,
 coef_ivt_work,-0.032,F

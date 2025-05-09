@@ -25,32 +25,12 @@ NESTS:
           - EBIKE
           - ESCOOTER
       - name: TRANSIT
-        coefficient: coef_nest_TRANSIT
+        coefficient:  coef_nest_TRANSIT
         alternatives:
-           - name: WALKACCESS
-             coefficient: coef_nest_TRANSIT_WALKACCESS
-             alternatives:
-             - WALK_LOC
-             - WALK_PRM
-             - WALK_MIX
-           - name: PNRACCESS
-             coefficient: coef_nest_TRANSIT_PNRACCESS
-             alternatives:
-             - PNR_LOC
-             - PNR_PRM
-             - PNR_MIX
-           - name: KNRACCESS
-             coefficient: coef_nest_TRANSIT_KNRACCESS
-             alternatives:
-             - KNR_LOC
-             - KNR_PRM
-             - KNR_MIX
-           - name: TNCACCESS
-             coefficient: coef_nest_TRANSIT_TNCACCESS
-             alternatives:
-             - TNC_LOC
-             - TNC_PRM
-             - TNC_MIX
+          - WALK_TRANSIT
+          - PNR_TRANSIT
+          - KNR_TRANSIT
+          - BIKE_TRANSIT
       - name: RIDEHAIL
         coefficient: coef_nest_RIDEHAIL
         alternatives:
@@ -77,13 +57,6 @@ preprocessor:
     - vehicles
     - households
     - persons
-
-annotate_trips:
-  SPEC: trip_mode_choice_annotate_trips
-  DF: trips_merged
-  TABLES:
-    - tours
-    - land_use
 
 # to reduce memory needs filter chooser table to these fields
 TOURS_MERGED_CHOOSER_COLUMNS:
@@ -149,50 +122,18 @@ CHOOSER_COLS_TO_KEEP:
   - nev_available
   - nev_time
   - microtransit_local_access_available_out
-  - microtransit_prm_access_available_out
-  - microtransit_mix_access_available_out
   - nev_local_access_available_out
-  - nev_prm_access_available_out
-  - nev_mix_access_available_out
   - microtransit_local_egress_available_out
-  - microtransit_prm_egress_available_out
-  - microtransit_mix_egress_available_out
   - nev_local_egress_available_out
-  - nev_prm_egress_available_out
-  - nev_mix_egress_available_out
   - microtransit_local_access_available_in
-  - microtransit_prm_access_available_in
-  - microtransit_mix_access_available_in
   - nev_local_access_available_in
-  - nev_prm_access_available_in
-  - nev_mix_access_available_in
   - microtransit_local_egress_available_in
-  - microtransit_prm_egress_available_in
-  - microtransit_mix_egress_available_in
   - nev_local_egress_available_in
-  - nev_prm_egress_available_in
-  - nev_mix_egress_available_in
   - microtransit_local_access_time_out
-  - microtransit_prm_access_time_out
-  - microtransit_mix_access_time_out
   - nev_local_access_time_out
-  - nev_prm_access_time_out
-  - nev_mix_access_time_out
   - microtransit_local_egress_time_out
-  - microtransit_prm_egress_time_out
-  - microtransit_mix_egress_time_out
   - nev_local_egress_time_out
-  - nev_prm_egress_time_out
-  - nev_mix_egress_time_out
   - microtransit_local_access_time_in
-  - microtransit_prm_access_time_in
-  - microtransit_mix_access_time_in
   - nev_local_access_time_in
-  - nev_prm_access_time_in
-  - nev_mix_access_time_in
   - microtransit_local_egress_time_in
-  - microtransit_prm_egress_time_in
-  - microtransit_mix_egress_time_in
   - nev_local_egress_time_in
-  - nev_prm_egress_time_in
-  - nev_mix_egress_time_in
