@@ -23,10 +23,11 @@ jobs:
       with:
         python-version: '3.10'  # Specify the Python version
 
-    # Clone and install ActivitySim from the main branch
+    # Clone and install ActivitySim from estimation_enhancements branch
+    # This is a temporary workaround until the PR is merged into the main branch
     - name: Clone and install ActivitySim
       run: |
-        git clone --branch main https://github.com/ActivitySim/activitysim.git
+        git clone --branch estimation_enhancements https://github.com/RSGInc/activitysim.git
         cd activitysim
         python -m pip install --upgrade pip
         pip install -e .  # Install ActivitySim in editable mode
