@@ -8,8 +8,6 @@ coef_eating_out_tour,-17.102175352222606,F
 coef_total_indNM_tours_is_0_prior_tours,3.24758823306399,F
 coef_total_indNM_tours_is_1,2.4595057378149705,F
 coef_total_indNM_tours_is_2p,2.679341375562811,F
-coef_total_indNM_tours_2016_is_1,0.6894544279565437,F
-coef_total_indNM_tours_2016_is_2p,0.49280442041251626,F
 coef_num_children_escort,0.3449608531280371,F
 coef_num_full_time_workers_social,-0.7989076159896628,F
 coef_hhsize_othdiscr,0.10761055792559372,F

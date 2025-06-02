@@ -6,7 +6,7 @@ SIMULATE_CHOOSER_COLUMNS:
   - school_segment
   - household_id
   - ptype
-  - collegeenroll
+  - ENROLL_COLL
   - income
   - age
 

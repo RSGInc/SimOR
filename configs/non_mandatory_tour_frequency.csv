@@ -13,12 +13,6 @@ util_total_indNM_tours_is_2p,Total individual NM Tours >= 2,(_total_indNM_tours 
 util_total_indNM_tours_is_3,Total individual NM Tours = 3,(_total_indNM_tours == 3),coef_total_indNM_tours_is_3,,,,coef_total_indNM_tours_is_3,,
 util_total_indNM_tours_is_3p,Total individual NM Tours >= 3,(_total_indNM_tours >= 3),,coef_total_indNM_tours_is_3p,coef_total_indNM_tours_is_3p,coef_total_indNM_tours_is_3p,,,
 util_total_indNM_tours_is_4,Total individual NM Tours = 4,(_total_indNM_tours >= 4),coef_total_indNM_tours_is_4p,,,,coef_total_indNM_tours_is_4p,,
-util_total_indNM_tours_2016_is_1,Total individual NM Tours = 1,(pre_covid == 1) & (_total_indNM_tours == 1),coef_total_indNM_tours_2016_is_1,coef_total_indNM_tours_2016_is_1,,coef_total_indNM_tours_2016_is_1,coef_total_indNM_tours_2016_is_1,,coef_total_indNM_tours_2016_is_1
-util_total_indNM_tours_2016_is_2,Total individual NM Tours = 2,(pre_covid == 1) & (_total_indNM_tours == 2),coef_total_indNM_tours_2016_is_2,coef_total_indNM_tours_2016_is_2,,,coef_total_indNM_tours_2016_is_2,,
-util_total_indNM_tours_2016_is_2p,Total individual NM Tours >= 2,(pre_covid == 1) & (_total_indNM_tours >= 2),,,coef_total_indNM_tours_2016_is_2p,coef_total_indNM_tours_2016_is_2p,,coef_total_indNM_tours_2016_is_2p,coef_total_indNM_tours_2016_is_2p
-util_total_indNM_tours_2016_is_3,Total individual NM Tours = 3,(pre_covid == 1) & (_total_indNM_tours == 3),,coef_total_indNM_tours_2016_is_3,,,,,
-util_total_indNM_tours_2016_is_3p,Total individual NM Tours >= 3,(pre_covid == 1) & (_total_indNM_tours >= 3),coef_total_indNM_tours_2016_is_3p,,,,coef_total_indNM_tours_2016_is_3p,,
-util_total_indNM_tours_2016_is_4,Total individual NM Tours = 4,(pre_covid == 1) & (_total_indNM_tours >= 4),,coef_total_indNM_tours_2016_is_4p,,,,,
 util_has_mandatory_tours_and_iNM_tour_freq_1,One or more Mandatory tour & tour frequency =1,(num_mandatory_tours > 0) & (_total_indNM_tours == 1),coef_has_mandatory_tours_and_iNM_tour_freq_1,,,,,,
 util_has_mandatory_tours_and_iNM_tour_freq_2p,One or more Mandatory tour & tour frequency =2p,(num_mandatory_tours > 0) & (_total_indNM_tours >= 2),coef_has_mandatory_tours_and_iNM_tour_freq_2p,,,,,,
 util_has_joint_tours_and_iNM_tour_freq_1,One or more Joint tour & tour frequency =1,(num_person_joint_tours > 0) & (_total_indNM_tours == 1),coef_has_joint_tours_and_iNM_tour_freq_1,coef_has_joint_tours_and_iNM_tour_freq_1,,coef_has_joint_tours_and_iNM_tour_freq_1,coef_has_joint_tours_and_iNM_tour_freq_1,coef_has_joint_tours_and_iNM_tour_freq_1,

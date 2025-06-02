@@ -65,9 +65,9 @@ util_non_family_non_worker_under_65,non family non_worker under 65,@(df.non_fami
 util_non_family_retiree_65_and_plus,non family retiree 65 and plus,@(df.non_family==1)*(df.ptype==5),,,,,
 util_non_familyschool_child_16_17,non familyschool child 16_17,@(df.non_family==1)*(df.ptype==6),coef_driving_age_child_nonfamily_work2,,,,coef_driving_age_child_nonfamily_work_and_school
 util_non_familyschool_child_6_15,non familyschool child 6_15,@(df.non_family==1)*(df.ptype==7),,,,,
-util_mid_and_high_household_income_full_time_worker,mid and high household income_ full time worker,@(df.income_in_thousands>=60000)*(df.ptype==1),,,,,
-util_mid_and_high_household_income_part_time_worker,mid and high household income_ part time worker,@(df.income_in_thousands>=60000)*(df.ptype==2),,,,,
-util_mid_and_high_household_income_university_student,mid and high household income_ university student,@(df.income_in_thousands>=60000)*(df.ptype==3),coef_univ_midhighincome_work1,,,,
+util_mid_and_high_household_income_full_time_worker,mid and high household income_ full time worker,@(df.income>=60000)*(df.ptype==1),,,,,
+util_mid_and_high_household_income_part_time_worker,mid and high household income_ part time worker,@(df.income>=60000)*(df.ptype==2),,,,,
+util_mid_and_high_household_income_university_student,mid and high household income_ university student,@(df.income>=60000)*(df.ptype==3),coef_univ_midhighincome_work1,,,,
 #,,,,,,,
 util_alternative_specific_constant_adjustment_for_full_time_work,alternative specific constant adjustment for full_time work,@df.ptype==1,,0.1423726,,,
 util_alternative_specific_constant_adjustment_for_part_time_work,alternative specific constant adjustment for part_time work,@df.ptype==2,,0.2684171,,,

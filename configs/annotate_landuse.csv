@@ -1,11 +1,18 @@
 Description,Target,Expression
 #,, annotate landuse table after import
-household_density,household_density,land_use.hh / land_use.acres.clip(lower=1)
-population_density,population_density,land_use['pop'] / land_use.acres.clip(lower=1)
-,is_cbd,land_use.pseudomsa == 1
-total college enrollment for mandatory constraint target,tot_collegeenroll,land_use.collegeenroll + land_use.othercollegeenroll
-preschool target for mandatory constraint - sum of all size terms,preschool_target,land_use['pop'] + land_use.emp_bus_svcs + land_use.emp_educ + land_use.emp_fin_res_mgm + land_use.emp_gov + land_use.emp_hlth + land_use.emp_mil + land_use.emp_oth
-Is a zone with parking,is_parking_zone,(land_use.parking_type == 1)
-Total Employment excluding non-salaried workers,total_emp_revised,land_use['emp_total'] - land_use['emp_non_ws_wfh'] - land_use['emp_non_ws_oth']
-employment_density,employment_density,(land_use['emp_total'] / land_use.acres.clip(lower=1)).clip(upper=500)
+household_density,household_density,land_use.TOTHHS / land_use.ACRES.clip(lower=1)
+population_density,population_density,land_use['TOTPOP'] / land_use.ACRES.clip(lower=1)
+# FIXME pseudomsa is used in a few places but there is no equivalent in Metro landuse,,
+,pseudomsa,0
+# FIXME need to decide on what the preschool target looks like,,
+preschool target for mandatory constraint - sum of all size terms,preschool_target,land_use['TOTPOP'] + land_use.EMP_TOT
+Is a zone with parking,is_parking_zone,"np.where(land_use.PRKSPACES > 0, True, False)"
+employment_density,employment_density,(land_use['EMP_TOT'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
 density_index,density_index,(household_density *employment_density) / (household_density + employment_density).clip(lower=1)
+# FIXME not sure what the mapping between parking_type in the sandag model is and our current parkingConstrainedArea
+temporary parking type,parking_type,land_use['PARKAREA']
+# FIXME temporary density calculation -- again I don't think this calculation matches what's in sandag,,
+dwelling unit density,duden,(land_use['TOTHHS'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
+population density,popden,(land_use['TOTPOP'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
+employment unit density,empden,(land_use['EMP_TOT'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
+retail employment density,retempden,(land_use['EMP_RET'] / land_use.ACRES.clip(lower=1)).clip(upper=500)

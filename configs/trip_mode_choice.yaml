@@ -73,7 +73,7 @@ TOURS_MERGED_CHOOSER_COLUMNS:
   - free_parking_at_work
   - income_segment
   - income
-  - sex
+  - SEX
   - time_factor_work
   - time_factor_nonwork
   - ptype

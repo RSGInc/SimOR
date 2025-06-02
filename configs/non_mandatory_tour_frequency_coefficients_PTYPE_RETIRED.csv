@@ -9,9 +9,6 @@ coef_total_indNM_tours_is_1,6.00131407260292,F
 coef_total_indNM_tours_is_2,5.883565852357907,F
 coef_total_indNM_tours_is_3,5.828445878907544,F
 coef_total_indNM_tours_is_4p,5.934428647072386,F
-coef_total_indNM_tours_2016_is_1,0.1698266383749659,F
-coef_total_indNM_tours_2016_is_2,0.32372516555726744,F
-coef_total_indNM_tours_2016_is_3p,0.2964915370362205,F
 coef_has_joint_tours_and_iNM_tour_freq_1,-5.7952837722578465,F
 coef_has_joint_tours_and_iNM_tour_freq_2p,-5.76,F
 coef_unavailable,-999.0,T

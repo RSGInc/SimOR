@@ -3,7 +3,6 @@ SIMULATE_CHOOSER_COLUMNS:
   - age
   - female
   - ptype
-  - is_university
   - is_income_less25K
   - is_income_25K_to_60K
   - is_income_60K_to_120K

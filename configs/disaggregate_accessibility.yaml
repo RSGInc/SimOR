@@ -7,7 +7,7 @@ DESTINATION_SAMPLE_SIZE: 10
 ORIGIN_SAMPLE_SIZE: 100
 
 # select origin zones weighted by population (or another landuse variable)
-ORIGIN_WEIGHTING_COLUMN: pop
+ORIGIN_WEIGHTING_COLUMN: TOTPOP
 
 # Specify the tables to be created and  their variables.
 # Single values are constants
@@ -59,19 +59,15 @@ CREATE_TABLES:
     PROTO_PERSONS:
         index_col: proto_person_id
         VARIABLES:
-            pnum: [1, 2]                # Person number
-            military: 4                 # Not military
-            pstudent: 3                 # Not attending school
-            educ: 13                    # Bachelor's
-            grade: 0                    # Not attending
-            timeFactorWork: 1           # mean
-            timeFactorNonWork: 1        # mean
+            PERSON_NUM: [1, 2]                # Person number
+            MIL: 4                 # Not military
+            SCHG: -1               # Not attending school
         mapped_fields:
-            pnum:
+            PERSON_NUM:
                 age:
                     1: 35
                     2: 55
-                sex: # Female male
+                SEX: # Female male
                     1: 2
                     2: 1
                 ptype: # Person type, full-time and non-working adult
@@ -80,18 +76,22 @@ CREATE_TABLES:
                 pemploy: # Full-time and unemployed
                     1: 1
                     2: 3
-                weeks: # 50-52 weeks, none
+                WKW: # 50-52 weeks, none
                     1: 1
                     2: 0
-                hours: # Hours per week
+                WKHP: # Hours per week
                     1: 35
                     2: 0
+                ESR: # Employment code, employed and unemployed
+                    1: 1
+                    2: 3
                 DAP: # Mandatory, Non-mandatory
                     1: "M"
                     2: "N"
-                soc2: #occupation codes
-                    1: 11   # Management Occupations
-                    2: 0    # Non-worker
+                # FIXME this should be updated when occupation_xwalk is updated
+                OCCCAT: # occupation codes
+                    1: 1   # Management Occupations
+                    2: -1    # Non-worker
 
     PROTO_TOURS:
         index_col: proto_tour_id
@@ -100,7 +100,7 @@ CREATE_TABLES:
             purpose: [1, 2, 3]
         mapped_fields:
             purpose:
-                person_num: # In this case it was easier to map the person number directly to the purposez
+                person_num: # In this case it was easier to map the person number directly to the purposes
                     1: 1
                     2: 2
                     3: 2
@@ -115,7 +115,7 @@ CREATE_TABLES:
         filter_rows: # list any matching conditions as pandas expression
             - ~((df.tour_type == "work") & (df.person_num == 1))
         JOIN_ON:
-            person_num: pnum            # Specifies which person variable to join the tours on
+            person_num: PERSON_NUM            # Specifies which person variable to join the tours on
 
 # Merge on variables
 # will merge onto the persons table

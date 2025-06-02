@@ -39,14 +39,7 @@ annotate_persons:
   TABLES:
     - land_use
 
-annotate_households:
-  SPEC: annotate_households_workplace
-  DF: households
-  TABLES:
-    - persons
-
 # - shadow pricing
-
 
 # income_segment is in households, but we want to count persons
 CHOOSER_TABLE_NAME: persons_merged

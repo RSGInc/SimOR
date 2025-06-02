@@ -13,7 +13,8 @@
             "console": "integratedTerminal",
             "args": [
                 "-c", "configs",
-                "-d", "model_data/cropped_data",
+                "-d", "model_data/metro_data_cropped",
+                "-d", "model_data/sandag_data_cropped",
                 "-o", "outputs/test",
             ]
         }

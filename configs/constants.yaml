@@ -90,32 +90,18 @@ escooterSpeed: 6.70
 driveSpeed: 25.00
 indivTour: 1.00000
 
-### Crosswalk between SOC codes and SANDAG occupation classification
-soc_occupation_xwalk:
-  11: mngt_busi_scic_arts # 11 - Management Occupations
-  13: mngt_busi_scic_arts # 13 - Business and Financial Operations Occupations
-  15: mngt_busi_scic_arts # 15 - Computer and Mathematical Occupations
-  17: mngt_busi_scic_arts # 17 - Architecture and Engineering Occupations
-  19: mngt_busi_scic_arts # 19 - Life, Physical, and Social Science Occupations
-  21: mngt_busi_scic_arts # 21 - Community and Social Service Occupations
-  23: mngt_busi_scic_arts # 23 - Legal Occupations
-  25: services  # 25 - Educational Instruction and Library Occupations
-  27: mngt_busi_scic_arts # 27 - Arts, Design, Entertainment, Sports, and Media Occupations
-  29: health  # 29 - Healthcare Practitioners and Technical Occupations
-  31: health # 31 - Healthcare Support Occupations
-  33: services  # 33 - Protective Service Occupations
-  35: services # 35 - Food Preparation and Serving Related Occupations
-  37: services # 37 - Building and Grounds Cleaning and Maintenance Occupations
-  39: services # 39 - Personal Care and Service Occupations
-  41: sales_office  # 41 - Sales and Related Occupations
-  43: sales_office # 43 - Office and Administrative Support Occupations
-  45: constr_maint  # 45 - Farming, Fishing, and Forestry Occupations
-  47: constr_maint # 47 - Construction and Extraction Occupations
-  49: constr_maint # 49 - Installation, Maintenance, and Repair Occupations
-  51: prod_trans_move  # 51 - Production Occupations
-  53: prod_trans_move # 53 - Transportation and Material Moving Occupations
-  55: military  # 55 - Military Specific Occupations
-  99:  # 99 -  Non-workers, Code not part of SOC system
+### Crosswalk between OCCCAT and size terms
+# FIXME -- this xwalk is completely made up!! Needs to be updated with real data.
+occupation_xwalk:
+  1: mngt_busi_scic_arts
+  2: services 
+  3: health
+  4: services 
+  5: sales_office
+  6: constr_maint 
+  7: prod_trans_move
+  999: military 
+  -1:    # no occupation
 
 # RIDEHAIL Settings
 Taxi_baseFare: 3.00
@@ -262,3 +248,10 @@ SanYsidro_maz_id: 9279
 OtayMesa_maz_id: 9387
 Tecate_maz_id: 22324
 OtayMesaEast_maz_id: 7123
+
+# dispersion parameters used for accessibility calculations
+dispersion_parameter_automobile: -0.05
+dispersion_parameter_transit: -0.05
+dispersion_parameter_walk: -1.00
+# perceived minute of in-vehicle time for every minute of out-of-vehicle time
+out_of_vehicle_time_weight: 2.0

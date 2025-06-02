@@ -3,41 +3,47 @@ Description,Target,Expression
 age_16_to_19,age_16_to_19,"persons.age.between(16, 19)"
 age_16_p,age_16_p,persons.age >= 16
 adult,adult,persons.age >= 18
-male,male,persons.sex == 1
-female,female,persons.sex == 2
-presence of non_worker other than self in household,has_non_worker,"other_than(persons.household_id, persons.ptype == PTYPE_NONWORK)"
-presence of retiree other than self in household,has_retiree,"other_than(persons.household_id, persons.ptype == PTYPE_RETIRED)"
-presence of preschooler other than self in household,has_preschool_kid,"other_than(persons.household_id, persons.ptype == PTYPE_PRESCHOOL)"
-presence of school_kid other than self in household,has_school_kid,"other_than(persons.household_id, persons.ptype == PTYPE_SCHOOL)"
-presence of full_time worker other than self in household (independent of person type),has_full_time,"other_than(persons.household_id, persons.pemploy==PEMPLOY_FULL)"
-presence of part_time worker other than self in household (independent of person type),has_part_time,"other_than(persons.household_id, persons.pemploy==PEMPLOY_PART)"
-presence of university student other than self in household,has_university,"other_than(persons.household_id, persons.ptype == PTYPE_UNIVERSITY)"
-student_is_employed,student_is_employed,"(persons.ptype.isin([PTYPE_UNIVERSITY, PTYPE_SCHOOL]) & persons.pemploy.isin([PEMPLOY_FULL, PEMPLOY_PART]))"
-nonstudent_to_school,nonstudent_to_school,"(persons.ptype.isin([PTYPE_FULL, PTYPE_PART, PTYPE_NONWORK, PTYPE_RETIRED]) & persons.pstudent.isin([PSTUDENT_GRADE_OR_HIGH, PSTUDENT_UNIVERSITY]))"
-#,,
-#,, FIXME - if person is a university student but has school age student category value then reset student category value
-,pstudent,"persons.pstudent.where(persons.ptype!=PTYPE_UNIVERSITY, PSTUDENT_UNIVERSITY)"
-#,, FIXME if person is a student of any kind but has full-time employment status then reset student category value to non-student
-,pstudent,"pstudent.where(persons.ptype!=PTYPE_FULL, PSTUDENT_NOT)"
-#,, FIXME if student category is non-student and employment is student then reset student category value to student
-,pstudent,"pstudent.where(persons.ptype!=PTYPE_SCHOOL, PSTUDENT_GRADE_OR_HIGH)"
-,pstudent,"pstudent.where(persons.ptype!=PTYPE_PRESCHOOL,  PSTUDENT_GRADE_OR_HIGH)"
-#,,
-is_student,is_student,"pstudent.isin([PSTUDENT_GRADE_OR_HIGH, PSTUDENT_UNIVERSITY])"
-preschool age can go to preschool,is_student,"is_student.where(persons.age > GRADE_SCHOOL_MIN_AGE, True)"
-preschool age can go to preschool,pstudent,"pstudent.where(persons.age > GRADE_SCHOOL_MIN_AGE, PSTUDENT_GRADE_OR_HIGH)"
-is_preschool,is_preschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age <= GRADE_SCHOOL_MIN_AGE)
-is_gradeschool,is_gradeschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age <= GRADE_SCHOOL_MAX_AGE) & (persons.age > GRADE_SCHOOL_MIN_AGE)
-is_highschool,is_highschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age > GRADE_SCHOOL_MAX_AGE)
+# FIXME --are these SEX categories correct?,,
+male,male,persons.SEX == 1
+female,female,persons.SEX == 2
+employment status type,pemploy,"pd.Series(np.zeros(len(persons)), index=persons.index)"
+,pemploy,"np.where(persons.age < 16, PEMPLOY_CHILD, PEMPLOY_PART)"
+,pemploy,"np.where((persons.age >= 16) & ((persons.ESR == 3) | (persons.ESR == 6)), PEMPLOY_NOT, pemploy)"
+,pemploy,"np.where((persons.age>=16) & (persons.ESR != 3) & (persons.ESR != 6) & (persons.WKHP >= 35) & (persons.WKW >= 1) & (persons.WKW <= 4), PEMPLOY_FULL, pemploy)"
+student category,pstudent,"pd.Series(np.zeros(len(persons)), index=persons.index)"
+,pstudent,"np.where((pemploy == 1) & (persons.age >= 16), PSTUDENT_NOT, pstudent)"
+,pstudent,"np.where((pemploy == 1) & (persons.age < 16), PSTUDENT_GRADE_OR_HIGH, pstudent)"
+,pstudent,"np.where((persons.SCHG < 1) & (persons.age >= 16), PSTUDENT_NOT, pstudent)"
+,pstudent,"np.where((persons.SCHG < 1) & (persons.age < 16), PSTUDENT_GRADE_OR_HIGH, pstudent)"
+,pstudent,"np.where((persons.SCHG >= 15) & (persons.age >= 16) & (pemploy != 1), PSTUDENT_UNIVERSITY, pstudent)"
+,pstudent,"np.where((persons.SCHG >= 15) & (persons.age < 16) & (pemploy != 1), PSTUDENT_GRADE_OR_HIGH, pstudent)"
+,pstudent,"np.where((persons.age <= 19) & (pemploy != 1) & (persons.SCHG >=1) & (persons.SCHG<=14), PSTUDENT_GRADE_OR_HIGH, pstudent)"
+,pstudent,"np.where((persons.age > 19) & (pemploy != 1) & (persons.SCHG >=1) & (persons.SCHG<=14),  PSTUDENT_UNIVERSITY, pstudent)"
+,pstudent,"np.where(pstudent == 0, 3, pstudent)"
+person type,ptype,"pd.Series(np.zeros(len(persons)), index=persons.index)"
+,ptype,"np.where((pemploy == 1),  PTYPE_FULL, PTYPE_NONWORK)"
+,ptype,"np.where((pstudent == 3) & (pemploy == 2), PTYPE_PART, ptype)"
+,ptype,"np.where((pstudent == 3) & (persons.age >= 65) & ((pemploy == 3) | (pemploy == 4)), PTYPE_RETIRED, ptype)"
+,ptype,"np.where((pstudent == 3) & (persons.age < 6) & ((pemploy == 3) | (pemploy == 4)), PTYPE_PRESCHOOL, ptype)"
+,ptype,"np.where((pstudent == 3) & (persons.age >= 6) & (persons.age <= 64) & ((pemploy == 3) | (pemploy == 4)), PTYPE_NONWORK, ptype)"
+,ptype,"np.where((pstudent == 2)  & ((pemploy == 2)  | (pemploy == 3) | (pemploy == 4)), PTYPE_UNIVERSITY, ptype)"
+,ptype,"np.where((pstudent == 1) & (persons.age < 6)  & ((pemploy == 2)  | (pemploy == 3) | (pemploy == 4)), PTYPE_PRESCHOOL, ptype)"
+,ptype,"np.where((pstudent == 1) & (persons.age >= 6)  & ((pemploy == 2)  | (pemploy == 3) | (pemploy == 4)), PTYPE_SCHOOL, ptype)"
+# FIXME are these rules for preschoolers still wanted?,,
+is_student,is_student,"np.isin(pstudent, [PSTUDENT_GRADE_OR_HIGH, PSTUDENT_UNIVERSITY])"
+preschool age can go to preschool,is_student,"np.where(persons.age > GRADE_SCHOOL_MIN_AGE, is_student, True)"
+preschool age can go to preschool,pstudent,"np.where(persons.age > GRADE_SCHOOL_MIN_AGE, pstudent, PSTUDENT_GRADE_OR_HIGH)"
+is_preschool,_is_preschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age <= GRADE_SCHOOL_MIN_AGE)
+is_gradeschool,_is_gradeschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age <= GRADE_SCHOOL_MAX_AGE) & (persons.age > GRADE_SCHOOL_MIN_AGE)
+is_highschool,_is_highschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age > GRADE_SCHOOL_MAX_AGE)
+# is_university is actually hard coded in mandatory scheduling(!) so need it here,, 
 is_university,is_university,pstudent == PSTUDENT_UNIVERSITY
-school_segment preschool,school_segment,"np.where(is_preschool, SCHOOL_SEGMENT_PREK, SCHOOL_SEGMENT_NONE)"
-school_segment gradeschool,school_segment,"np.where(is_gradeschool, SCHOOL_SEGMENT_GRADE, school_segment)"
-school_segment highschool,school_segment,"np.where(is_highschool, SCHOOL_SEGMENT_HIGH, school_segment)"
+school_segment preschool,school_segment,"np.where(_is_preschool, SCHOOL_SEGMENT_PREK, SCHOOL_SEGMENT_NONE)"
+school_segment gradeschool,school_segment,"np.where(_is_gradeschool, SCHOOL_SEGMENT_GRADE, school_segment)"
+school_segment highschool,school_segment,"np.where(_is_highschool, SCHOOL_SEGMENT_HIGH, school_segment)"
 school_segment university,school_segment,"np.where(is_university, SCHOOL_SEGMENT_UNIV, school_segment).astype(np.int8)"
 #,,
-is_worker,is_worker,"persons.pemploy.isin([PEMPLOY_FULL, PEMPLOY_PART])"
-is_fulltime_worker,is_fulltime_worker,persons.pemploy == 1
-is_parttime_worker,is_parttime_worker,persons.pemploy == 2
+is_worker,is_worker,"np.isin(pemploy, [PEMPLOY_FULL, PEMPLOY_PART])"
 #extrnal model variable initialization treating everyone as internal initially,,
 ,is_internal_worker,is_worker
 ,is_external_worker,0
@@ -54,7 +60,9 @@ home_zone_id,home_zone_id,"reindex(households.home_zone_id, persons.household_id
 travel time sensitivity factor for work travel,time_factor_work,"np.minimum(_max_time_factor, np.maximum(rng.lognormal_for_df(persons, mu=_mean_work, sigma=_stddev_work, scale=True), _min_time_factor))"
 travel time sensitivity factor for non-work travel,time_factor_nonwork,"np.minimum(_max_time_factor, np.maximum(rng.lognormal_for_df(persons, mu=_mean_nonwork, sigma=_stddev_nonwork, scale=True), _min_time_factor))  "
 #,,
+# FIXME need naics and SOC codes ,,
 ,_naics_code,"np.where(persons.naics2_original_code=='3M', 3000, np.where(persons.naics2_original_code=='4M', 4000, np.where(persons.naics2_original_code=='MIL',9000, persons.naics2_original_code))) if 'naics2_original_code' in persons.columns else 0"
 ,naics_code,_naics_code.astype('int') if all(_naics_code!=0) else 0
 #,,
-occupation category based on SOC codes,occupation,persons.soc2.map(soc_occupation_xwalk)
+# FIXME does filling with -1 make sense here? depends on what the missing values mean,,
+occupation categories mapped to workplace segments,occupation,persons.OCCCAT.fillna(-1).map(occupation_xwalk)

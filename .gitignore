@@ -1,2 +1,4 @@
 outputs/*
 *__pycache__*
+.vscode/*
+model_data/metro_data/*

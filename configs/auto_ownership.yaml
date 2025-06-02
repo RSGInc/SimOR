@@ -8,6 +8,8 @@ preprocessor:
   SPEC: auto_ownership_preprocessor
   DF: choosers
   TABLES:
+    - persons
+    - households
     - persons_merged
 
 annotate_households:

@@ -50,8 +50,9 @@ Description,Target,Expression
 ,walk_transit_available,_walk_transit_origin & _walk_transit_destination
 ,drive_transit_available,"np.where(df.outbound, _walk_transit_destination, _walk_transit_origin) & (df.auto_ownership > 0)"
 # RIDEHAIL,,
-household_density calculated in annotate_landuse in acres and is converted to sq miles here,_origin_density_measure,"reindex(land_use.PopEmpDenPerMi, df[orig_col_name])"
-employment_density calculated in annotate_landuse in acres and is converted to sq miles here,_dest_density_measure,"reindex(land_use.PopEmpDenPerMi, df[dest_col_name])"
+# FIXME population_density replaced PopDenPerSqMi which may not be calculated the same,,
+household_density calculated in annotate_landuse in acres and is converted to sq miles here,_origin_density_measure,"reindex(land_use.population_density, df[orig_col_name])"
+employment_density calculated in annotate_landuse in acres and is converted to sq miles here,_dest_density_measure,"reindex(land_use.population_density, df[dest_col_name])"
 ,origin_density,"pd.cut(_origin_density_measure, bins=[-np.inf, 500, 2000, 5000, 15000, np.inf], labels=[5, 4, 3, 2, 1]).astype(int)"
 ,dest_density,"pd.cut(_dest_density_measure, bins=[-np.inf, 500, 2000, 5000, 15000, np.inf], labels=[5, 4, 3, 2, 1]).astype(int)"
 Origin MGRA Dwelling Unit Density,oMGRADUDen,"reindex(land_use.duden,df.origin)"
@@ -90,7 +91,7 @@ Household autos,autos,df.auto_ownership
 Number of adults (age 18+) in household,adults,df.num_adults
 Household size (number of persons),hhSize,df.hhsize
 Person age,age,df.age
-Person is female,female,(df.sex == 2)
+Person is female,female,(df.SEX == 2)
 # Auto operating costs,,
 ,selected_tour_vehicle,"reindex(tours.selected_vehicle, df.tour_id)"
 ,auto_op_cost,"reindex(vehicles.groupby('vehicle_type')['auto_operating_cost'].mean(), pd.Series(selected_tour_vehicle, df.index))"
@@ -137,9 +138,9 @@ person has free on-site parking at workplace,freeOnsite,"(free_parking_available
 new reimbursement amount,reimburseProportion,0
 tour primary destination,tour_dest,"reindex(tours.destination, df.tour_id)"
 half tour duration,tourDuration,"reindex(tours.duration, df.tour_id)/2"
-new daily parking cost with reimbursement,parkingCostDayDollars,"reindex(land_use.exp_daily, tour_dest)"
-new hourly parking cost with reimbursement,parkingCostHourDollars,"reindex(land_use.exp_hourly, tour_dest)"
-new monthly parking cost with reimbursement,parkingCostMonthDollars,"reindex(land_use.exp_monthly, tour_dest)"
+new daily parking cost with reimbursement,parkingCostDayDollars,"reindex(land_use.PRKCST_DAY, tour_dest)"
+new hourly parking cost with reimbursement,parkingCostHourDollars,"reindex(land_use.PRKCST_HR, tour_dest)"
+new monthly parking cost with reimbursement,parkingCostMonthDollars,"reindex(land_use.PRKCST_MNTH, tour_dest)"
 Parking area,parkingConstrainedArea,"np.where(reindex(land_use.parking_type, tour_dest) == 1, 1, 0)"
 daily cost converted to cents,parkingCostDay,parkingCostDayDollars*100
 hourly cost converted to cents,parkingCostHour,parkingCostHourDollars*100
@@ -156,16 +157,16 @@ Total trips on tour,totalTrips,totStops+2
 Indicator for trip origin is tour prim. Destination,tripOrigIsTourDest,~df.outbound*df.trip_num==1
 Indicator for trip destination is tour prim. Destination,tripDestIsTourDest,df.outbound*df.trip_num==df.trip_count
 Contribution to trip parking cost from primary destination,parkCostTourDestContrib,parkingCostPrimDest/(totalTrips+2)
-Hourly parking cost at trip origin,parkCostTripOrig,"reindex(land_use.exp_hourly, origin)*100"
-Hourly parking cost at trip destination,parkCostTripDest,"reindex(land_use.exp_hourly, destination)*100"
+Hourly parking cost at trip origin,parkCostTripOrig,"reindex(land_use.PRKCST_HR, origin)*100"
+Hourly parking cost at trip destination,parkCostTripDest,"reindex(land_use.PRKCST_HR, destination)*100"
 Contribution to trip parking cost from trip origin,parkCostTripOrigContrib,parkCostTripOrig*(1-firstTrip)*(1-tripOrigIsTourDest)
 Contribution to trip parking cost from trip origin,parkCostTripOrigContrib,parkingCostPrimDest/(totalTrips+2) * tripOrigIsTourDest
 Contribution to trip parking cost from trip destination,parkCostTripDestContrib,parkCostTripDest * (1-lastTrip)*(1-tripDestIsTourDest)
 Contribution to trip parking cost from trip destination,parkCostTripDestContrib,parkingCostPrimDest/(totalTrips+2) * tripDestIsTourDest
 Final parking cost,parkingCost,parkCostTourDestContrib + parkCostTripOrigContrib + parkCostTripDestContrib
 #,,
-Origin Terminal Time,oTermTime,"reindex(land_use.terminal_time,origin)"
-Destination Terminal Time,dTermTime,"reindex(land_use.terminal_time,destination)"
+Origin Terminal Time,oTermTime,"reindex(land_use.TERMTIME,origin)"
+Destination Terminal Time,dTermTime,"reindex(land_use.TERMTIME,destination)"
 #,,
 bike logsum,bikeLS,od_skims['BIKE_LOGSUM']
 bike time inbound,bike_time,od_skims['BIKE_TIME']
