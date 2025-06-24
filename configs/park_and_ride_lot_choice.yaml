@@ -14,7 +14,9 @@ preprocessor:
 
 LANDUSE_PNR_SPACES_COLUMN: park_and_ride_spaces
 
-# will check the tour destination to make sure 
+# will check the tour destination to make sure transit access is available
+# if no transit access, then no PNR lot will be available and could get 
+# zero probabilities error
 TRANSIT_SKIMS_FOR_ELIGIBILITY:
   - WALK_LOC_TOTALIVTT__PM
 
