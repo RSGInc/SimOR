@@ -26,42 +26,39 @@ def prtskim_postprocessing(mtx_dseg):
         # Set
         h.SetMatrixRaw(Visum, {"CODE": "DIS"     , "DSegCode": mtx_dseg}, dis_wlk)
 
-    elif mtx_dseg == 'amsov':                                                       # Run Auto distance and time processing
+    else:                                                                           # Run Auto distance, time, and tolls processing
         # Pull
-        dis      = h.GetMatrixRaw(Visum, {"CODE": "DIS" , "DSegCode": mtx_dseg})        # Auto Distance
+        dis      = h.GetMatrixRaw(Visum, {"CODE": "DIS" , "DSegCode": mtx_dseg})                # Distance
+        time     = h.GetMatrixRaw(Visum, {"CODE": "AD1" , "DSegCode": mtx_dseg})                # Time
+        toll     = h.GetMatrixRaw(Visum, {"CODE": "TOL" , "DSegCode": mtx_dseg})                # Tolls
         # Process
-        np.fill_diagonal(dis, intrdist)                                             
+        np.fill_diagonal(dis, intrdist)                                                         # Distance
+        np.fill_diagonal(time, intrtime)                                                        # Time                                                 
+        time = np.where(time == 9999.00, 9999.00, time / 60)        # Seconds to Minutes
+        np.fill_diagonal(toll, 0)                                                               # Tolls
         # Set
         h.SetMatrixRaw(Visum, {"CODE": "DIS"     , "DSegCode": mtx_dseg}, dis)
+        h.SetMatrixRaw(Visum, {"CODE": "AD1"     , "DSegCode": mtx_dseg}, time)
+        h.SetMatrixRaw(Visum, {"CODE": "TOL"     , "DSegCode": mtx_dseg}, toll)
 
-        # Pull
-        ad1      = h.GetMatrixRaw(Visum, {"CODE": "AD1" , "DSegCode": mtx_dseg})        # Auto Congested Travel Time
-        # Process
-        ad1 = np.where(ad1 == 9999.00, 9999.00, ad1 / 60)                         
-        np.fill_diagonal(ad1, intrtime)                                           
-        # Set
-        h.SetMatrixRaw(Visum, {"CODE": "AD1"     , "DSegCode": mtx_dseg}, ad1)
 
-    else:                                                                           # Run Auto time processing only
-        # Pull
-        ad1      = h.GetMatrixRaw(Visum, {"CODE": "AD1" , "DSegCode": mtx_dseg})        # Auto Congested Travel Time
-        # Process
-        ad1 = np.where(ad1 == 9999.00, 9999.00, ad1 / 60)                           
-        np.fill_diagonal(ad1, intrtime)                                             
-        # Set
-        h.SetMatrixRaw(Visum, {"CODE": "AD1"     , "DSegCode": mtx_dseg}, ad1)
+
+
 
 # Read user inputs from Visum
 proj_dir = Visum.GetPath(2)
 
-# Pull "Code" field from procedure sequence containing Code, DSegCode, and filename
-procedure_code = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like -> '[["mfamsov","PuT","AM2_SOV.omx"],["mfmdMpe","PuT","MD1_MPE.omx"]]'
-procedure_codes = eval(procedure_code)   # Example: outputs a list of lists like -> [["mfamsov","PuT","AM2_SOV.omx"],["mfmdMpe","PuT","MD1_MPE.omx"]]
+dseg = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like 'AM' from AM in the code box
+prtskim_postprocessing(dseg)
 
-# Loop thru each matrix set in the "Code" field and export
-for x in range(len(procedure_codes)):
-    #code     = procedure_codes[x][0]
-    dsegcode = procedure_codes[x][0]
 
-    prtskim_postprocessing(dsegcode)
+## Pull "Code" field from procedure sequence containing Code, DSegCode, and filename
+#procedure_code = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like -> '[["mfamsov","PuT","AM2_SOV.omx"],["mfmdMpe","PuT","MD1_MPE.omx"]]'
+#procedure_codes = eval(procedure_code)   # Example: outputs a list of lists like -> [["mfamsov","PuT","AM2_SOV.omx"],["mfmdMpe","PuT","MD1_MPE.omx"]]
+#
+## Loop thru each matrix set in the "Code" field and export
+#for x in range(len(procedure_codes)):
+#    dsegcode = procedure_codes[x][0]
+#
+#    prtskim_postprocessing(dsegcode)
 

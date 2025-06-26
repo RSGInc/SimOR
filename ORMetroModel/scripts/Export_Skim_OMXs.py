@@ -11,16 +11,37 @@ import openmatrix as omx
 
 
 
-def omx_export(mtx_code, mtx_dseg, omx_fn): #mtx_num, mtx_code):
-    omx_file = omx.open_file(omx_fn, 'w')
+def omx_export(mtx_code, corename, mtx_dseg, omx_fn):
+
+    # Grab zone ID list for omx matrix labels
+    zones = np.array(h.GetMulti(Visum.Net.Zones,r"NO", activeOnly = True))
+
+    omx_file = omx.open_file(omx_fn, 'a')
     # Pull matrix out but close .omx file if there is an error
     try:
         mx = h.GetMatrixRaw(Visum, {"CODE": mtx_code , "DSegCode": mtx_dseg})
     except Exception as e:
         print(f"Error getting matrix for CODE={mtx_code}, DSegCode={mtx_dseg}: {e}")
         omx_file.close()
-    core_name = mtx_code
-    omx_file[core_name] = mx
+
+    core_name = corename
+    # Delete the core if it already exists
+    if core_name in omx_file:
+        del omx_file[core_name]
+
+
+    #num_zones = len(zones)  # Assumes square matrix
+    ## Create new labels starting from 1
+    #new_labels = np.arange(1, num_zones + 1)
+    #try:
+    #    # Check for Mapping and overwrite it
+    #    omx_file.mapping('zone_ids')[:] = new_labels
+    #except KeyError:
+    #    # Mapping doesn't exist yet — create it
+    #    omx_file.createMapping('zone_ids', new_labels)   # Just this line worked, but now that the mapping exists it breaks
+
+    omx_file[core_name] = mx.astype(np.float32)
+
     omx_file.close()
 
 
@@ -31,12 +52,19 @@ proj_dir = Visum.GetPath(2)
 procedure_code = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like -> '[["mfamsov","PuT","AM2_SOV.omx"],["mfmdMpe","PuT","MD1_MPE.omx"]]'
 procedure_codes = eval(procedure_code)   # Example: outputs a list of lists like -> [["mfamsov","PuT","AM2_SOV.omx"],["mfmdMpe","PuT","MD1_MPE.omx"]]
 
+# Delete omx file if it exists
+filename = procedure_codes[0][3]
+if os.path.exists(filename):
+    os.remove(filename)
+
+
 # Loop thru each matrix set in the "Code" field and export
 for x in range(len(procedure_codes)):
     code     = procedure_codes[x][0]
-    dsegcode = procedure_codes[x][1]
-    filename = procedure_codes[x][2]
+    core     = procedure_codes[x][1]
+    dsegcode = procedure_codes[x][2]
+    filename = procedure_codes[x][3]
 
 
-    omx_export(code, dsegcode, proj_dir + "outputs\\skims\\" + filename)
+    omx_export(code, core, dsegcode, proj_dir + "outputs\\skims\\" + filename)
 

@@ -10,7 +10,7 @@ import VisumPy.helpers as h
 import openmatrix as omx
 
 
-def put_skim_setup(period):
+def skim_setup(period):
 
     def ismode():  # isbrt, isscr, islrt, & iswes
 
@@ -338,12 +338,12 @@ def put_skim_setup(period):
         return transit_time
 
     def runtime(period):
-        if period == 'AM' or period == 'PM':  # Peak
-            tpitems = Visum.Net.TimeProfileItems.GetMultipleAttributes(["LINEROUTEITEM\\EMME_TTFINDEX", "SUM:USEDLINEROUTEITEMS\\OUTLINK\\AddVal1","SUM:USEDLINEROUTEITEMS\\POSTLENGTH", 
+        tpitems = Visum.Net.TimeProfileItems.GetMultipleAttributes(["LINEROUTEITEM\\EMME_TTFINDEX", "SUM:USEDLINEROUTEITEMS\\OUTLINK\\"+period+"_TTC","SUM:USEDLINEROUTEITEMS\\POSTLENGTH", 
                                                                     "LINEROUTEITEM\\EMME_DATA1"])
-        else:                                 # Off-Peak
-            tpitems = Visum.Net.TimeProfileItems.GetMultipleAttributes(["LINEROUTEITEM\\EMME_TTFINDEX", "SUM:USEDLINEROUTEITEMS\\OUTLINK\\AddVal2","SUM:USEDLINEROUTEITEMS\\POSTLENGTH", 
-                                                                    "LINEROUTEITEM\\EMME_DATA1"])
+        
+        #else: 
+        #    tpitems = Visum.Net.TimeProfileItems.GetMultipleAttributes(["LINEROUTEITEM\\EMME_TTFINDEX", "SUM:USEDLINEROUTEITEMS\\OUTLINK\\AddVal3","SUM:USEDLINEROUTEITEMS\\POSTLENGTH", 
+        #                                                            "LINEROUTEITEM\\EMME_DATA1"])
         result  = []
 
         default_speed = 30
@@ -391,6 +391,6 @@ def put_skim_setup(period):
     combinerundwelltimes()
 
 
-procedure_code = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like 'AM' from AM in the code box
-put_skim_setup(procedure_code)
+per = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like 'AM' from AM in the code box
+skim_setup(per)
 
