@@ -7,9 +7,8 @@ preprocessor:
   DF: df
   TABLES:
     - land_use
-    - persons
-    - tours
     - vehicles
+    - tours
 
 
 LANDUSE_PNR_SPACES_COLUMN: park_and_ride_spaces

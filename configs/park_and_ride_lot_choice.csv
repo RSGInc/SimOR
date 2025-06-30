@@ -10,7 +10,7 @@ util_xfer_wait,transfer wait time,@(ldt_skims['WALK_LOC_XFERWAIT'] + dlt_skims['
 util_walk_time,walk time,@(ldt_skims['WALK_LOC_XFERWALK'] + dlt_skims['WALK_LOC_XFERWALK']),coef_xwalk_work
 util_ivtt,in vehcile transit time,@(ldt_skims['WALK_LOC_TOTALIVTT'] + dlt_skims['WALK_LOC_TOTALIVTT']),coef_ivt_work
 util_xfer_penalty,transfer penalty,"@(-23+23*np.exp(0.414*np.clip(ldt_skims['WALK_LOC_XFERS'], a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(dlt_skims['WALK_LOC_XFERS'], a_min=None,a_max=4)))",coef_xfer_work
-util_fare,transit fare,"@np.where(df.transit_pass_ownership | df.transit_pass_subsidy, 0, odt_skims['WALK_LOC_FARE'] + dot_skims['WALK_LOC_FARE'])*100*df.num_participants/df.cost_sensitivity",coef_income_work
+util_fare,transit fare,"@df.transitSubsidyPassDiscount * (odt_skims['WALK_LOC_FARE'] + dot_skims['WALK_LOC_FARE']) * 100*df.num_participants/df.cost_sensitivity",coef_income_work
 # Size Term,,,
 util_size_variable,Size variable,@df['park_and_ride_spaces'].apply(np.log1p),1
 #util_sp_utility_adjustment,shadow price utility adjustment,@df['shadow_price_utility_adjustment'],1
