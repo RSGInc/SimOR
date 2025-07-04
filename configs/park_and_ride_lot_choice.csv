@@ -1,0 +1,16 @@
+Label,Description,Expression,coefficient
+# Driving utilities,,,
+util_drive_time,drive time from origin to lot,@(olt_skims['SOV_NT_M_TIME'] + lot_skims['SOV_NT_M_TIME']),coef_ivt_work
+util_drive_cost,auto operating cost,@df.sov_auto_op_cost * (olt_skims['SOV_NT_M_TIME'] + lot_skims['SOV_NT_M_DIST']) / df.cost_sensitivity,coef_income_work
+util_drive_rel_out,reliability outbound,"@olt_skims['SOV_NT_M_REL'] / np.minimum(olt_skims['SOV_NT_M_DIST'], 0.1)",coef_rel_out_work
+util_drive_rel_inb,reliability inbound,"@lot_skims['SOV_NT_M_REL'] / np.minimum(olt_skims['SOV_NT_M_DIST'], 0.1)",coef_rel_inb_work
+# Transit utilties,,,
+util_first_wait,first wait time,@(ldt_skims['WALK_LOC_FIRSTWAIT'] + dlt_skims['WALK_LOC_FIRSTWAIT']),coef_wait_work
+util_xfer_wait,transfer wait time,@(ldt_skims['WALK_LOC_XFERWAIT'] + dlt_skims['WALK_LOC_XFERWAIT']),coef_xwait_work
+util_walk_time,walk time,@(ldt_skims['WALK_LOC_XFERWALK'] + dlt_skims['WALK_LOC_XFERWALK']),coef_xwalk_work
+util_ivtt,in vehcile transit time,@(ldt_skims['WALK_LOC_TOTALIVTT'] + dlt_skims['WALK_LOC_TOTALIVTT']),coef_ivt_work
+util_xfer_penalty,transfer penalty,"@(-23+23*np.exp(0.414*np.clip(ldt_skims['WALK_LOC_XFERS'], a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(dlt_skims['WALK_LOC_XFERS'], a_min=None,a_max=4)))",coef_xfer_work
+util_fare,transit fare,"@df.transitSubsidyPassDiscount * (odt_skims['WALK_LOC_FARE'] + dot_skims['WALK_LOC_FARE']) * 100*df.num_participants/df.cost_sensitivity",coef_income_work
+# Size Term,,,
+util_size_variable,Size variable,@df['park_and_ride_spaces'].apply(np.log1p),1
+#util_sp_utility_adjustment,shadow price utility adjustment,@df['shadow_price_utility_adjustment'],1

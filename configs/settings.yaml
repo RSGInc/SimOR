@@ -118,6 +118,7 @@ models:
   - external_non_mandatory_destination
   - non_mandatory_tour_scheduling
   - vehicle_allocation
+  - park_and_ride_lot_choice
   - tour_mode_choice_simulate
   - atwork_subtour_frequency
   - atwork_subtour_destination

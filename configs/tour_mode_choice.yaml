@@ -43,6 +43,9 @@ SPEC: tour_mode_choice.csv
 COEFFICIENTS: tour_mode_choice_coefficients.csv
 COEFFICIENT_TEMPLATE: tour_mode_choice_coefficients_template.csv
 
+include_explicit_pnr: True
+include_pnr_for_logsums: True
+
 # so far, we can use the same spec as for non-joint tours
 preprocessor:
   SPEC: tour_mode_choice_annotate_choosers_preprocessor
