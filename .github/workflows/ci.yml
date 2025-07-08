@@ -26,9 +26,7 @@ jobs:
     - name: Set up Miniforge
       uses: conda-incubator/setup-miniconda@v3
       with:
-        miniforge-variant: Mambaforge
         miniforge-version: latest
-        use-mamba: true
         channels: conda-forge
         activate-environment: asim-test
         python-version: 3.10
