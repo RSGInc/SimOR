@@ -9,39 +9,54 @@ on:
       - '**'
 
 jobs:
-  test:
+  oregon_metro_mini_example:
+    env:
+      conda-env-prefix: /usr/share/miniconda3/envs/conda-abm_dev
+      label: linux-64
+    strategy:
+      matrix:
+        region:
+          - oregon_metro
+        python-version:
+          - "3.10"
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.region }}-py${{ matrix.python-version }}
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    # Clone ActivitySim from SimOR_pnr branch
-    - name: Clone ActivitySim
-      run: |
-        git clone --branch SimOR_pnr https://github.com/RSGInc/activitysim.git
+      # Clone ActivitySim from SimOR_pnr branch
+      - name: Clone ActivitySim
+        run: |
+          git clone --branch SimOR_pnr https://github.com/RSGInc/activitysim.git
 
-    # Set up Miniforge and create conda environment from ActivitySim's github-actions-tests.yml
-    - name: Set up Miniforge
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        miniforge-version: latest
-        channels: conda-forge
-        activate-environment: asim-test
-        python-version: "3.10"
-        environment-file: activitysim/conda-environments/github-actions-tests.yml
+      - name: Setup Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          miniforge-version: latest
+          mamba-version: "2.0.5"
+          conda-solver: classic
+          conda-remove-defaults: true
+          environment-file: activitysim/conda-environments/github-actions-test.yml
+          activate-environment: asim-test
+          python-version: ${{ matrix.python-version }}
 
-    # Install cloned fork of ActivitySim
-    - name: Install SimOR in editable mode
-      run: |
-        cd activitysim
-        python -m pip install -e . --no-deps
-        cd ..
-        conda info -a
-        conda list
+      # Install cloned fork of ActivitySim
+      - name: Install SimOR in editable mode
+        run: |
+          cd activitysim
+          python -m pip install -e . --no-deps
+          cd ..
+          conda info -a
+          conda list
 
-    # Run the test
-    - name: Run cropped example test
-      shell: bash -l {0}
-      run: python test/test_cropped_dataset.py
+      # Run the test
+      - name: Run cropped example test
+        shell: bash -l {0}
+        run: python test/test_cropped_dataset.py
