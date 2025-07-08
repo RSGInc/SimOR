@@ -24,7 +24,7 @@ jobs:
 
     # Set up Miniforge and create conda environment from ActivitySim's github-actions-tests.yml
     - name: Set up Miniforge
-      uses: conda-incubator/setup-miniforge@v3
+      uses: conda-incubator/setup-miniconda@v3
       with:
         miniforge-variant: Mambaforge
         miniforge-version: latest
