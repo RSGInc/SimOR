@@ -2,3 +2,11 @@ outputs/*
 *__pycache__*
 .vscode/*
 model_data/metro_data/*
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
