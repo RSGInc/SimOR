@@ -32,6 +32,7 @@ jobs:
         git checkout SimOR_pnr
         python -m pip install --upgrade pip
         pip install -e .  # Install ActivitySim in editable mode
+        pip install coverage  # Install coverage for testing
         cd ..
 
     # Install other dependencies
