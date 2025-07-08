@@ -45,15 +45,15 @@ def determine_closest_external_station(
 
     unique_origin_zones = choosers[origin_col].unique()
     landuse = state.get_table("land_use")
-    ext_zones = landuse[landuse.external_MAZ > 0].index.to_numpy()
+    ext_zones = landuse[landuse.EXTERNAL > 0].index.to_numpy()
 
     choosers["closest_external_zone"] = -1
     choosers["dist_to_external_zone"] = 0.0
 
     for origin_zone in unique_origin_zones:
-        # FIXME in_skim check in skim_dictionary.py requires orig and dests to be the same shape in lookup
+        # in_skim check in skim_dictionary.py requires orig and dests to be the same shape in lookup
         orig_zones = np.full(shape=len(ext_zones), fill_value=origin_zone, dtype=int)
-        zone_distances = skim_dict.lookup(orig_zones, ext_zones, "DIST")
+        zone_distances = skim_dict.lookup(orig_zones, ext_zones, ("SOV_M_DIST", "MD"))
 
         closest_zone_idx = np.argmin(zone_distances)
         closest_zone = int(ext_zones[closest_zone_idx])

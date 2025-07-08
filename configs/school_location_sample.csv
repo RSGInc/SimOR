@@ -1,5 +1,5 @@
 Label,Description,Expression,university,highschool,gradeschool,preschool
-local_dist,,_DIST@skims['DIST'],1,1,1,1
+local_dist,,"_DIST@skims[('SOV_M_DIST', 'MD')]",1,1,1,1
 util_Distance,Distance,@_DIST.clip(upper=50),coef_dist_univ,coef_dist_hsch,coef_dist_gs,coef_dist_ps
 util_log_Distance,log_Distance,@np.log(_DIST.clip(upper=50)+1),coef_lndist_univ,coef_zero,coef_zero,coef_lndist_ps
 util_Squareroot_distance,Squareroot_distance,@_DIST.clip(upper=50)**0.5,coef_sqrtdist_univ,coef_sqrtdist_hsch,coef_sqrtdist_gs,coef_sqrtdist_ps

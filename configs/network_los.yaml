@@ -12,17 +12,15 @@ write_skim_cache: False
 
 # series15
 taz_skims:
-  - traffic_skims*.omx
-  - transit_skims*.omx
-  # - dest_pmsa.omx
-  # - dest_poi.omx
+  - autoSkims*.omx
+  - transitSkims*.omx
+  - walkSkim.omx
 
-maz: land_use.csv   # mgra.csv
+maz: land_use.csv
 
 maz_to_maz:
   tables:
     - maz_maz_walk.csv
-    - maz_maz_bike.csv
   
   # maz_to_maz blending distance (missing or 0 means no blending)
   # max_blend_distance:
@@ -35,8 +33,14 @@ maz_to_maz:
 skim_time_periods:
     time_window: 1440
     period_minutes: 30
-    periods: [0, 6, 12, 25, 32, 48]  # time periods to match documentation
-    labels: &skim_time_period_labels ['EA', 'AM', 'MD', 'PM', 'EV']
+    # Metro time periods:
+    # EA: midnight to 5 AM
+    # AM: 5 AM to 9 AM
+    # MD: 9 AM to 3 PM
+    # PM: 3 PM to 7 PM
+    # EV: 7 PM to midnight
+    periods: [0, 6, 12, 24, 32, 42, 48]  # time periods to match documentation
+    labels: &skim_time_period_labels ['EA', 'AM', 'MD', 'PM', 'EV', 'EA']
 
 demographic_segments: &demographic_segments
   - &low_income_segment_id 0

@@ -9,6 +9,9 @@ ORIGIN_SAMPLE_SIZE: 100
 # select origin zones weighted by population (or another landuse variable)
 ORIGIN_WEIGHTING_COLUMN: TOTPOP
 
+# skim to use to find nearest zone when distributing accessibilities to un-sampled origins
+NEAREST_ZONE_SKIM: SOV_M_DIST__MD
+
 # Specify the tables to be created and  their variables.
 # Single values are constants
 # Lists are varying and will generate the cartesian product (i.e., all possible non-repeating combinations)

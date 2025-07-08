@@ -1,8 +1,8 @@
 Label,Description,Expression,work,univ,school,escort,shopping,othmaint,eatout,social,othdiscr,atwork
-local_dist_od,,_od_DIST@od_skims['DIST'],1,1,1,1,1,1,1,1,1,1
-local_dist_dp,,_dp_DIST@dp_skims['DIST'],1,1,1,1,1,1,1,1,1,1
-loca_dist_op,,_op_DIST@op_skims['DIST'],1,1,1,1,1,1,1,1,1,1
-local_dist_nd,,_nd_DIST@nd_skims['DIST'],1,1,1,1,1,1,1,1,1,1
+local_dist_od,,"_od_DIST@od_skims[('SOV_M_DIST', 'MD')]",1,1,1,1,1,1,1,1,1,1
+local_dist_dp,,"_dp_DIST@dp_skims[('SOV_M_DIST', 'MD')]",1,1,1,1,1,1,1,1,1,1
+loca_dist_op,,"_op_DIST@op_skims[('SOV_M_DIST', 'MD')]",1,1,1,1,1,1,1,1,1,1
+local_dist_nd,,"_nd_DIST@nd_skims[('SOV_M_DIST', 'MD')]",1,1,1,1,1,1,1,1,1,1
 distance_deviation,distance deviation,_dist_dev@(_od_DIST +_dp_DIST - _op_DIST),1,1,1,1,1,1,1,1,1,1
 dist_deviation_logged,logged deviation distance,"_dist_dev_logged@np.where((_dist_dev > 0), np.log(_dist_dev),0)",1,1,1,1,1,1,1,1,1,1
 #,,,,,,,,,,,,
