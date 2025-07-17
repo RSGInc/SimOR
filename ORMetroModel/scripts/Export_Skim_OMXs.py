@@ -13,9 +13,6 @@ import openmatrix as omx
 
 def omx_export(mtx_code, corename, mtx_dseg, omx_fn):
 
-    # Grab zone ID list for omx matrix labels
-    zones = np.array(h.GetMulti(Visum.Net.Zones,r"NO", activeOnly = True))
-
     omx_file = omx.open_file(omx_fn, 'a')
     # Pull matrix out but close .omx file if there is an error
     try:
@@ -30,19 +27,18 @@ def omx_export(mtx_code, corename, mtx_dseg, omx_fn):
         del omx_file[core_name]
 
 
-    #num_zones = len(zones)  # Assumes square matrix
-    ## Create new labels starting from 1
-    #new_labels = np.arange(1, num_zones + 1)
-    #try:
-    #    # Check for Mapping and overwrite it
-    #    omx_file.mapping('zone_ids')[:] = new_labels
-    #except KeyError:
-    #    # Mapping doesn't exist yet — create it
-    #    omx_file.createMapping('zone_ids', new_labels)   # Just this line worked, but now that the mapping exists it breaks
-
     omx_file[core_name] = mx.astype(np.float32)
 
-    omx_file.close()
+    # Create mapping to TAZ numbers
+    zones = np.array(h.GetMulti(Visum.Net.Zones,r"NO", activeOnly = True))
+    taz_equivs = np.arange(1, len(zones) + 1)                  # 1-number of zones inclusive
+
+    try:
+        omx_file.create_mapping('taz', taz_equivs)
+        omx_file.close()
+    except Exception as e:
+        omx_file.close()
+    
 
 
 # Read user inputs from Visum
