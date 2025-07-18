@@ -35,6 +35,7 @@ jobs:
         run: |
           cd ..
           git clone --branch SimOR_pnr https://github.com/RSGInc/activitysim.git
+          tree
 
       - name: Setup Miniforge
         uses: conda-incubator/setup-miniconda@v3
