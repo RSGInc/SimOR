@@ -46,7 +46,7 @@ jobs:
           mamba-version: "2.0.5"
           conda-solver: classic
           conda-remove-defaults: true
-          environment-file: /home/runner/work/SimOR/activitysim/conda-environments/github-actions-tests.yml
+          environment-file: ../activitysim/conda-environments/github-actions-tests.yml
           activate-environment: asim-test
           python-version: ${{ matrix.python-version }}
 
