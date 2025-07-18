@@ -53,7 +53,8 @@ jobs:
       # Install cloned fork of ActivitySim
       - name: Install ActivitySim in editable mode
         run: |
-          cd activitysim
+          pwd
+          cd ../activitysim
           python -m pip install -e . --no-deps
           cd ..
           cd SimOR
