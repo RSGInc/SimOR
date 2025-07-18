@@ -33,6 +33,7 @@ jobs:
       # Clone ActivitySim from SimOR_pnr branch
       - name: Clone ActivitySim
         run: |
+          cd ..
           git clone --branch SimOR_pnr https://github.com/RSGInc/activitysim.git
 
       - name: Setup Miniforge
@@ -52,10 +53,12 @@ jobs:
         run: |
           cd activitysim
           python -m pip install -e . --no-deps
+          cd ..
+          cd SimOR
+          ls
           conda info -a
           conda list
 
       # Run the test
       - name: Run cropped example test
-        shell: bash -l {0}
-        run: python ../test/test_cropped_dataset.py
+        run: python test/test_cropped_dataset.py
