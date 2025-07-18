@@ -1,7 +1,7 @@
 Label,Description,Expression,coefficient
 # Driving utilities,,,
 util_drive_time,drive time from origin to lot,@(olt_skims['SOV_M_TIME'] + lot_skims['SOV_M_TIME']),coef_ivt_work
-util_drive_cost,auto operating cost,@df.sov_auto_op_cost * (olt_skims['SOV_M_TIME'] + lot_skims['SOV_M_DIST']) / df.cost_sensitivity,coef_income_work
+util_drive_cost,auto operating cost,@df.sov_auto_op_cost * (olt_skims['SOV_M_DIST'] + lot_skims['SOV_M_DIST']) / df.cost_sensitivity,coef_income_work
 # Transit utilties,,,
 util_first_wait,first wait time,@(ldt_skims['WTW_FWT'] + dlt_skims['WTW_FWT']),coef_wait_work
 util_xfer_wait,transfer wait time,@(ldt_skims['WTW_XWT'] + dlt_skims['WTW_XWT']),coef_xwait_work
