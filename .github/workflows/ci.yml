@@ -50,9 +50,7 @@ jobs:
       # Install cloned fork of ActivitySim
       - name: Install SimOR in editable mode
         run: |
-          cd activitysim
-          python -m pip install -e . --no-deps
-          cd ..
+          python -m pip install -e activitysim/. --no-deps
           conda info -a
           conda list
 
