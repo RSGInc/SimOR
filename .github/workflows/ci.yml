@@ -37,7 +37,6 @@ jobs:
           git clone --branch SimOR_pnr https://github.com/RSGInc/activitysim.git
           pwd
           tree -L 2
-          cd activitysim
 
       - name: Setup Miniforge
         uses: conda-incubator/setup-miniconda@v3
@@ -47,12 +46,12 @@ jobs:
           mamba-version: "2.0.5"
           conda-solver: classic
           conda-remove-defaults: true
-          environment-file: activitysim/conda-environments/github-actions-tests.yml
+          environment-file: /home/runner/work/SimOR/activitysim/conda-environments/github-actions-tests.yml
           activate-environment: asim-test
           python-version: ${{ matrix.python-version }}
 
       # Install cloned fork of ActivitySim
-      - name: Install SimOR in editable mode
+      - name: Install ActivitySim in editable mode
         run: |
           cd activitysim
           python -m pip install -e . --no-deps
