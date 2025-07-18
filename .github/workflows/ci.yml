@@ -9,35 +9,59 @@ on:
       - '**'
 
 jobs:
-  test:
+  oregon_metro_mini_example:
+    env:
+      conda-env-prefix: /usr/share/miniconda3/envs/conda-abm_dev
+      label: linux-64
+    strategy:
+      matrix:
+        region:
+          - oregon_metro
+        python-version:
+          - "3.10"
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.region }}-py${{ matrix.python-version }}
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    # Set up Python
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'  # Specify the Python version
+      # Clone ActivitySim from SimOR_pnr branch
+      - name: Clone ActivitySim
+        run: |
+          cd ..
+          git clone --branch SimOR_pnr https://github.com/RSGInc/activitysim.git
+          pwd
+          tree -L 2
 
-    # Clone and install ActivitySim from estimation_enhancements branch
-    # This is a temporary workaround until the PR is merged into the main branch
-    - name: Clone and install ActivitySim
-      run: |
-        git clone --branch estimation_enhancements https://github.com/RSGInc/activitysim.git
-        cd activitysim
-        python -m pip install --upgrade pip
-        pip install -e .  # Install ActivitySim in editable mode
-        cd ..
+      - name: Setup Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          miniforge-version: latest
+          mamba-version: "2.0.5"
+          conda-solver: classic
+          conda-remove-defaults: true
+          environment-file: ../activitysim/conda-environments/github-actions-tests.yml
+          activate-environment: asim-test
+          python-version: ${{ matrix.python-version }}
 
-    # Install other dependencies
-    - name: Install additional dependencies
-      run: |
-        pip install -r requirements.txt || true  # Install other dependencies if a requirements.txt exists
+      # Install cloned fork of ActivitySim
+      - name: Install ActivitySim in editable mode
+        run: |
+          pwd
+          cd ../activitysim
+          python -m pip install -e . --no-deps
+          cd ..
+          cd SimOR
+          ls
+          conda info -a
+          conda list
 
-    # Run the test
-    - name: Run cropped example test
-      run: python test/test_cropped_dataset.py
+      # Run the test
+      - name: Run cropped example test
+        run: python test/test_cropped_dataset.py
