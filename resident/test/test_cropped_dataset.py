@@ -8,7 +8,7 @@ def test_cropped_example():
 
     run_args = [
         "-c", "configs",  # Config directory
-        "-d", "model_data/metro_data_cropped",  # Input data directory
+        "-d", "model_data/metro/data_cropped",  # Input data directory
         "-o", "outputs/test"  # Output directory
     ]
 

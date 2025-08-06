@@ -1,7 +1,7 @@
-outputs/*
 *__pycache__*
 .vscode/*
-model_data/metro_data/*
+resident/model_data/metro/data_full/*
+resident/outputs/*
 
 # Unit test / coverage reports
 htmlcov/

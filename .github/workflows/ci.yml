@@ -64,4 +64,4 @@ jobs:
 
       # Run the test
       - name: Run cropped example test
-        run: python test/test_cropped_dataset.py
+        run: python resident/test/test_cropped_dataset.py

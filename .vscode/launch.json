@@ -9,11 +9,12 @@
             "name": "Run Cropped Example",
             "type": "debugpy",
             "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
             "program": "simulation.py",
             "console": "integratedTerminal",
             "args": [
                 "-c", "configs",
-                "-d", "model_data/metro_data_cropped",
+                "-d", "model_data/metro/data_cropped",
                 "-o", "outputs/test",
             ]
         }
