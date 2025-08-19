@@ -11,4 +11,4 @@ htmlcov/
 nosetests.xml
 coverage.xml
 
-ORMetroModel/
+Metro_outputs/
