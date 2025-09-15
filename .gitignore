@@ -12,3 +12,5 @@ nosetests.xml
 coverage.xml
 
 Metro_outputs/
+
+skimming_and_assignment/visum/*.ver
