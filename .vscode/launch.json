@@ -4,7 +4,19 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "name": "Run Full Example",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/metro/data_full",
+                "-o", "outputs/full",
+            ]
+        },
         {
             "name": "Run Cropped Example",
             "type": "debugpy",
@@ -13,7 +25,7 @@
             "program": "simulation.py",
             "console": "integratedTerminal",
             "args": [
-                "-c", "configs",
+                "-c", "configs", // check the settings.yaml file for run settings!
                 "-d", "model_data/metro/data_cropped",
                 "-o", "outputs/test",
             ]
