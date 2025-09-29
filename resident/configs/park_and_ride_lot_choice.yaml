@@ -19,6 +19,16 @@ LANDUSE_PNR_SPACES_COLUMN: park_and_ride_spaces
 TRANSIT_SKIMS_FOR_ELIGIBILITY:
   - WTW_TIV__PM
 
+# Precompute destination eligibility for tours
+# LANDUSE_COL_FOR_PNR_ELIGIBLE_DEST: is_pnr_eligible_destination
+
+ITERATE_WITH_TOUR_MODE_CHOICE: True
+MAX_ITERATIONS: 5
+ACCEPTED_TOLERANCE: 0.95
+RESAMPLE_STRATEGY: latest
+PARK_AND_RIDE_MODES: # should match tour_mode_choice configs
+  - PNR_TRANSIT
+
 compute_settings:
   protect_columns:
   - out_period
