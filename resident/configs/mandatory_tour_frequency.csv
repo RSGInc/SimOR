@@ -10,7 +10,7 @@ util_alternative_specific_constant_for_university_student,alternative specific c
 util_alternative_specific_constant_for_non_worker_U65,alternative specific constant for non_worker U65,@df.ptype==4,coef_zero,,coef_non_worker_school1_asc,coef_zero,
 util_alternative_specific_constant_for_retiree_65,alternative specific constant for retiree 65+,@df.ptype==5,coef_zero,,coef_ret_worker_school1_asc,coef_zero,
 util_alternative_specific_constant_for_school_child_16_17,alternative specific constant for school child 16_17,@df.ptype==6,coef_driving_age_child_work1_asc,,coef_zero,coef_driving_age_child_school2_asc,coef_driving_age_child_work_and_school_asc
-util_alternative_specific_constant_for_school_child_6_15,alternative specific constant for school child 6_15,@df.ptype==7,coef_zero,,coef_zero,coef_pre_driving_age_child_school2_asc,
+util_alternative_specific_constant_for_school_child_6_15,alternative specific constant for school child 6_15,@df.ptype==7,coef_unavailable,coef_unavailable,coef_zero,coef_pre_driving_age_child_school2_asc,coef_unavailable
 #,,,,,,,
 util_person_is_female_full_time_worker,person is female_ full time worker,@(df.female==1)*(df.ptype==1),coef_zero,coef_female_ftworker_work2,coef_female_ftworker_school1,,coef_female_ftworker_work_and_school
 util_person_is_female_part_time_worker,person is female_ part time worker,@(df.female==1)*(df.ptype==2),coef_zero,coef_female_ptworker_work2,coef_female_ptworker_school1,,coef_zero
