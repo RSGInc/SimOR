@@ -16,3 +16,4 @@ dwelling unit density,duden,(land_use['TOTHHS'] / land_use.ACRES.clip(lower=1)).
 population density,popden,(land_use['TOTPOP'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
 employment unit density,empden,(land_use['EMP_TOT'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
 retail employment density,retempden,(land_use['EMP_RET'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
+total park and ride capacity,PNR_CAP_TOTAL,(land_use['PNR_CAP_FORMAL'] + land_use['PNR_CAP_INFORMAL'])
