@@ -11,7 +11,7 @@ preprocessor:
     - tours
 
 
-LANDUSE_PNR_SPACES_COLUMN: park_and_ride_spaces
+LANDUSE_PNR_SPACES_COLUMN: PNR_CAP_TOTAL
 
 # will check the tour destination to make sure transit access is available
 # if no transit access, then no PNR lot will be available and could get 

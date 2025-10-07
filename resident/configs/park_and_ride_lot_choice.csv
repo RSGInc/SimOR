@@ -10,6 +10,7 @@ util_ivtt,in vehcile transit time,@(ldt_skims['WTW_TIV'] + dlt_skims['WTW_TIV'])
 util_xfer_penalty,transfer penalty,"@(-23+23*np.exp(0.414*np.clip(ldt_skims['WTW_XFR'], a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(dlt_skims['WTW_XFR'], a_min=None,a_max=4)))",coef_xfer_work
 # FIXME need fares,,,
 #util_fare,transit fare,"@df.transitSubsidyPassDiscount * (odt_skims['WTW_FARE'] + dot_skims['WTW_FARE']) * 100*df.num_participants/df.cost_sensitivity",coef_income_work
+util_parking_cost,parking cost,@df['PNR_PRKCST'],coef_income_work
 # Size Term,,,
-util_size_variable,Size variable,@df['park_and_ride_spaces'].apply(np.log1p),1
+util_size_variable,Size variable,@df['PNR_CAP_TOTAL'].apply(np.log1p),1
 util_capacity,lot capacity availability,@df['pnr_lot_full'],coef_unavailable
