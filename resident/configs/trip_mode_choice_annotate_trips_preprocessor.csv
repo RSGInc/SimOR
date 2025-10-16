@@ -131,13 +131,10 @@ person has free on-site parking at workplace,freeOnsite,"(free_parking_available
 new reimbursement amount,reimburseProportion,0
 tour primary destination,tour_dest,"reindex(tours.destination, df.tour_id)"
 half tour duration,tourDuration,"reindex(tours.duration, df.tour_id)/2"
-new daily parking cost with reimbursement,parkingCostDayDollars,"reindex(land_use.PRKCST_DAY, tour_dest)"
-new hourly parking cost with reimbursement,parkingCostHourDollars,"reindex(land_use.PRKCST_HR, tour_dest)"
-new monthly parking cost with reimbursement,parkingCostMonthDollars,"reindex(land_use.PRKCST_MNTH, tour_dest)"
+new daily parking cost with reimbursement,parkingCostDay,"reindex(land_use.PRKCST_DAY, tour_dest)"
+new hourly parking cost with reimbursement,parkingCostHour,"reindex(land_use.PRKCST_HR, tour_dest)"
+new monthly parking cost with reimbursement,parkingCostMonth,"reindex(land_use.PRKCST_MNTH, tour_dest)"
 Parking area,parkingConstrainedArea,"np.where(reindex(land_use.parking_type, tour_dest) == 1, 1, 0)"
-daily cost converted to cents,parkingCostDay,parkingCostDayDollars*100
-hourly cost converted to cents,parkingCostHour,parkingCostHourDollars*100
-monthly cost converted to cents,parkingCostMonth,parkingCostMonthDollars*100
 Tour parking cost for full-time workers and university students,_parkingCostBeforeReimb,"df.ptype.isin([1,3]) * is_indiv * np.minimum(parkingCostMonth/22, parkingCostDay)"
 Tour parking cost for full-time workers and university students,_parkingCostBeforeReimb,"df.ptype.isin([1,3]) * is_indiv * np.minimum(_parkingCostBeforeReimb, parkingCostHour * tourDuration)"
 Tour parking cost for other person types,parkingCostBeforeReimb,"np.where((~df.ptype.isin([1,3]) * is_indiv) | (is_joint), np.minimum(parkingCostDay, parkingCostHour * tourDuration), _parkingCostBeforeReimb)"
