@@ -49,23 +49,40 @@ def putskim_postprocessing(mtx_dseg,knr_flag):
     vtc    = h.GetMatrixRaw(Visum, {"CODE": "VTC"     , "DSegCode": mtx_dseg})  # Vehicle type constant
 
     # Process matrices
+    # Set maximum walk time allowed (includes access (origin connector), walk (links), and egress (destination connector))
+    maxwlktime = 20
     # Walk time
     if knr_flag == 'wtw':
         wkt = np.minimum(wkt + act + egt , 9999.00)                     
-        wkt = np.where((wkt < 0.01) | (wkt > 20.0) , 9999.00, wkt)
+        wkt = np.where((wkt < 0.01) | (wkt > maxwlktime) , 9999.00, wkt)
         np.fill_diagonal(wkt, 9999.00)
     elif knr_flag == 'ktw':
         wkt = np.minimum(wkt + egt , 9999.00)                     
-        wkt = np.where((wkt < 0.01) | (wkt > 20.0) , 9999.00, wkt)
+        wkt = np.where((wkt < 0.01) | (wkt > maxwlktime) , 9999.00, wkt)
         np.fill_diagonal(wkt, 9999.00)
     elif knr_flag == 'wtk':
         wkt = np.minimum(wkt + act , 9999.00)                     
-        wkt = np.where((wkt < 0.01) | (wkt > 20.0) , 9999.00, wkt)
+        wkt = np.where((wkt < 0.01) | (wkt > maxwlktime) , 9999.00, wkt)
         np.fill_diagonal(wkt, 9999.00)
 
+    # Set all matrices to have matrix cells = 9999.00 if wkt = 9999.00
+    wowt   = np.where(wkt == 9999.00, 9999.00, wowt)
+    act    = np.where(wkt == 9999.00, 9999.00, act)
+    egt    = np.where(wkt == 9999.00, 9999.00, egt)
+    ntr    = np.where(wkt == 9999.00, 9999.00, ntr)
+    nbr    = np.where(wkt == 9999.00, 9999.00, nbr)
+    wowt   = np.where(wkt == 9999.00, 9999.00, wowt)
+    wtwt   = np.where(wkt == 9999.00, 9999.00, wtwt)
+    ivtt   = np.where(wkt == 9999.00, 9999.00, ivtt)
+    ivtt_a = np.where(wkt == 9999.00, 9999.00, ivtt_a)
+    ivtt_b = np.where(wkt == 9999.00, 9999.00, ivtt_b)
+    ivtt_e = np.where(wkt == 9999.00, 9999.00, ivtt_e)
+    ivtt_l = np.where(wkt == 9999.00, 9999.00, ivtt_l)
+    ivtt_r = np.where(wkt == 9999.00, 9999.00, ivtt_r)
+    pla    = np.where(wkt == 9999.00, 9999.00, pla)
+    stc    = np.where(wkt == 9999.00, 9999.00, stc)
+    vtc    = np.where(wkt == 9999.00, 9999.00, vtc)
 
-    # Weighted origin wait time
-    wowt = np.where(wkt == 9999.00, 9999.00, wowt)
     # Perceived In-vehicle time by Mode
     if mtx_dseg == 'amPuT' or mtx_dseg == 'pmPuT':                      # Peak
         ivtt_a = np.where(ivtt_a == 9999.00, 9999.00, ivtt_a * 0.95)
