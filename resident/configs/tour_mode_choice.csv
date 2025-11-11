@@ -95,6 +95,7 @@ util_PNR_wait_egress_time_(at_attraction_end),PNR_LOC - Egress mt/nev wait time 
 util_PNR_Walk_other_time,PNR_LOC - Walk other time,@df.xfer_walk_pnr * df.time_factor,,,,,,,coef_xwalk,,,,,,,,
 util_PNR_stop_type_constant,PNR_LOC - Stop type constant,@df.stop_type_pnr * df.time_factor,,,,,,,coef_ivt,,,,,,,,
 util_PNR_vehicle_type_constant,PNR_LOC - Vehicle type constant,@df.vehicle_type_pnr * df.time_factor,,,,,,,coef_ivt,,,,,,,,
+util_PNR_parking_cost,PNR_LOC - Parking cost,@df.parking_cost_pnr * 100 / df.cost_sensitivity,,,,,,,coef_income,,,,,,,,
 util_PNR_Fare_and_operating_cost,PNR_LOC - Fare ,@df.transitSubsidyPassDiscount * df.fare_pnr * 100 * df.num_participants / df.cost_sensitivity,,,,,,,coef_income,,,,,,,,
 util_PNR_LOC - Age 16 to 24,PNR_LOC - Age 16 to 24,@(df.age > 15) & (df.age < 25),,,,,,,coef_age1624_tran,,,,,,,,
 util_PNR_LOC - Age 41 to 55,PNR_LOC - Age 41 to 55,@(df.age > 40) & (df.age < 56),,,,,,,coef_age4155_tran,,,,,,,,
