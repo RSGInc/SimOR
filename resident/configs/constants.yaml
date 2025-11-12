@@ -255,3 +255,99 @@ dispersion_parameter_transit: -0.05
 dispersion_parameter_walk: -1.00
 # perceived minute of in-vehicle time for every minute of out-of-vehicle time
 out_of_vehicle_time_weight: 2.0
+
+
+# Visum Script Constants
+
+# Network_Prep.py & KNRConnectors_Setup.py
+SCALEFACTOR: 5280
+Walk_Speed: 3.5
+Connector_Vehicle_Speed: 20
+
+# CostSkim_Setup.py
+SOV_LOW_VOT: 3.39
+SOV_MED_VOT: 7.49
+SOV_HI_VOT:  20.51
+SR2_LOW_VOT: 5.11
+SR2_MED_VOT: 10.92
+SR2_HI_VOT:  27.30
+SR3_LOW_VOT: 7.76
+SR3_MED_VOT: 16.82
+SR3_HI_VOT:  44.04
+
+
+# PuT_Skimming_Setup.py
+  # Stop Type Constants
+    # Peak
+PkSTCabc: 0.1582
+PkSTCd:   0.0531
+PkSTCe:   0.0000
+    # Off-Peak
+OpSTCabc: 0.1075
+OpSTCd:   0.0756
+OpSTCe:   0.0000
+  # Wait Time Perception Factor
+    # Peak
+PkWTPFabc: 0.88
+PkWTPFd:   0.93
+PkWTPFe:   1.00
+    # Off-Peak
+OpWTPFabc: 0.86
+OpWTPFd:   0.94
+OpWTPFe:   1.00
+  # Perceieved IVTT Factors
+    # Peak
+PkIVPFa:    0.95
+PkIVPFl:    0.88
+PkIVPFr:    0.88
+PkIVPFelse: 1.00
+    # Off-Peak
+OpIVPFa:    0.95
+OpIVPFl:    0.86
+OpIVPFr:    0.86
+OpIVPFelse: 1.00
+  # Boarding Penalties (seconds)
+    # Global (added to all)
+BrdPenGlb:   231.0
+    # Peak
+PkBrdPa:     372.0
+PkBrdPe:     372.0
+PkBrdPl:     000.0
+PkBrdPr:     000.0
+PkBrdPelse:  439.8
+    # Off-Peak
+OpBrdPa:     166.8
+OpBrdPe:     166.8
+OpBrdPl:     000.0
+OpBrdPr:     000.0
+OpBrdPelse:  540.6
+  # Calculate TTF (Transit Run Time)
+    # Vehicle Time Multipliers
+ft1:  1.15
+ft2:  1.20
+ft3:  1.00
+ft4:  1.09
+ft11: 1.15
+ft12: 1.30
+ft13: 1.00
+ft14: 1.09
+ft21: 1.05
+ft22: 1.03
+  # Runtime Function
+DefaultTransitSpeed: 30 #mph
+
+# PuTSkim_PostProcessing.py
+  # Walk Constants
+Max_Walk_Time: 20
+#Max_Walk_Distance: 1
+  # Vehicle Type Constants
+    # Peak
+PkVTCa: 0.0557
+PkVTCe: 0.0000
+PkVTCl: 0.1858
+PkVTCr: 0.1858
+    # Off-Peak
+OpVTCa: 0.0432
+OpVTCe: 0.0984
+OpVTCl: 0.1442
+OpVTCr: 0.1442

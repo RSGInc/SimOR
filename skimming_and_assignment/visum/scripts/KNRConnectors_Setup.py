@@ -9,13 +9,41 @@ import csv
 import os
 import VisumPy.helpers as h
 import pandas as pd
+import yaml
+
+
+# YAML file constants management
+# Get the folder where this script lives
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up directories to reach SimOR directory
+folder_a = script_dir
+while True:
+    if os.path.basename(folder_a) == "SimOR":
+        break
+    parent = os.path.dirname(folder_a)
+    if parent == folder_a:  # reached root directory
+        raise FileNotFoundError("Folder 'SimOR' not found in parent hierarchy.")
+    folder_a = parent
+
+# Read the path from the pointer file
+with open(os.path.join(folder_a, 'path_config.txt'), 'r') as f:
+    yaml_relative_path = f.read().strip()
+
+# Build the absolute path to the YAML file
+yaml_path = os.path.join(folder_a, yaml_relative_path)
+
+# Pull constants from the YAML file
+with open(yaml_path, 'r') as file:
+    config_data = yaml.safe_load(file)
+
+
 PRIO = 20480
-
-
 _TABLE = "KnRConstraints"
-SCALEFACTOR = 5280
+SCALEFACTOR = config_data['SCALEFACTOR']  # 5280
+CON_VEH_SPEED = config_data['Connector_Vehicle_Speed'] # 20 mph
+CON_WLK_SPEED = config_data['Walk_Speed'] # 3.5 mph
 
-CONSPEED = 30 #mph
 # FN = os.path.join(Visum.GetPath(2), "taz_connectors.json")
 FN = os.path.join(Visum.GetPath(2), "connectors_knr.net")
 
@@ -167,7 +195,7 @@ def set_connector_properties(knrdirection):
             if direction == 1: # Origin, leaving a zone
                 if typeno in [7, 10]:
                     connector_tsys.append("i")
-                    connector_time.append([3600*distance/CONSPEED, 999999])
+                    connector_time.append([3600*distance/CON_VEH_SPEED, 999999])
                 else:
                     connector_tsys.append("")
                     connector_time.append([999999, 999999])
@@ -181,12 +209,12 @@ def set_connector_properties(knrdirection):
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
                     connector_tsys.append(tsys_hold)
-                    connector_time.append([999999, 3600*distance/2.5])
+                    connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
         elif knrdirection == "WTK":    
             if direction == 2: # Destination, entering a zone
                 if typeno in [7, 10]:
                     connector_tsys.append("i")
-                    connector_time.append([3600*distance/CONSPEED, 999999])
+                    connector_time.append([3600*distance/CON_VEH_SPEED, 999999])
                 else:
                     connector_tsys.append("")
                     connector_time.append([999999, 999999])
@@ -199,10 +227,10 @@ def set_connector_properties(knrdirection):
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
                     connector_tsys.append(tsys_hold)
-                    connector_time.append([999999, 3600*distance/2.5])
+                    connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
         elif knrdirection == "WTW":
             connector_tsys.append(tsys_hold)
-            connector_time.append([999999, 3600*distance/2.5])
+            connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
     
     h.SetMulti(Visum.Net.Connectors, "TSysSet", connector_tsys)
     Visum.Net.Connectors.SetMultipleAttributes(["T0_TSYS(I)", "T0_TSYS(W)"], connector_time)

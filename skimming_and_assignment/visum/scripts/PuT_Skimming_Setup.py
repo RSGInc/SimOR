@@ -8,9 +8,36 @@ import pandas as pd
 import os
 import VisumPy.helpers as h
 import openmatrix as omx
+import yaml
 
 
-def skim_setup(period):
+# YAML file constants management
+# Get the folder where this script lives
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up directories to reach SimOR directory
+folder_a = script_dir
+while True:
+    if os.path.basename(folder_a) == "SimOR":
+        break
+    parent = os.path.dirname(folder_a)
+    if parent == folder_a:  # reached root directory
+        raise FileNotFoundError("Folder 'SimOR' not found in parent hierarchy.")
+    folder_a = parent
+
+# Read the path from the pointer file
+with open(os.path.join(folder_a, 'path_config.txt'), 'r') as f:
+    yaml_relative_path = f.read().strip()
+
+# Build the absolute path to the YAML file
+yaml_path = os.path.join(folder_a, yaml_relative_path)
+
+# Pull constants from the YAML file
+with open(yaml_path, 'r') as file:
+    config_data = yaml.safe_load(file)
+
+
+def put_skim_setup(period):
 
     def ismode():  # isbrt, isscr, islrt, & iswes
 
@@ -146,18 +173,18 @@ def skim_setup(period):
         for y in range(len(df)):
             if period == 'AM' or period == 'PM':  # Peak
                 if df.at[y,'sa_sttyp'] == 'A,B,C':
-                    df.at[y,'sa_stcon'] = 0.1582
+                    df.at[y,'sa_stcon'] = config_data['PkSTCabc']
                 elif df.at[y,'sa_sttyp'] == 'D':
-                    df.at[y,'sa_stcon'] = 0.0531
+                    df.at[y,'sa_stcon'] = config_data['PkSTCd']
                 elif df.at[y,'sa_sttyp'] == 'E':
-                    df.at[y,'sa_stcon'] = 0.0000   
+                    df.at[y,'sa_stcon'] = config_data['PkSTCe']   
             else:                                 # Off-Peak
                 if df.at[y,'sa_sttyp'] == 'A,B,C':
-                    df.at[y,'sa_stcon'] = 0.1075
+                    df.at[y,'sa_stcon'] = config_data['OpSTCabc']
                 elif df.at[y,'sa_sttyp'] == 'D':
-                    df.at[y,'sa_stcon'] = 0.0756
+                    df.at[y,'sa_stcon'] = config_data['OpSTCd']
                 elif df.at[y,'sa_sttyp'] == 'E':
-                    df.at[y,'sa_stcon'] = 0.0000
+                    df.at[y,'sa_stcon'] = config_data['OpSTCe']
 
         # Set fields back in Visum
         h.SetMulti(Visum.Net.StopAreas ,r"sttyp", df['sa_sttyp'])
@@ -180,18 +207,18 @@ def skim_setup(period):
         for y in range(len(df)):
             if period == 'AM' or period == 'PM':  # Peak
                 if df.at[y,'sa_sttyp'] == 'A,B,C':
-                    df.at[y,'sa_wtpf'] = 0.88
+                    df.at[y,'sa_wtpf'] = config_data['PkWTPFabc']
                 elif df.at[y,'sa_sttyp'] == 'D':
-                    df.at[y,'sa_wtpf'] = 0.93
+                    df.at[y,'sa_wtpf'] = config_data['PkWTPFd']
                 elif df.at[y,'sa_sttyp'] == 'E':
-                    df.at[y,'sa_wtpf'] = 1.00   
+                    df.at[y,'sa_wtpf'] = config_data['PkWTPFe'] 
             else:                                 # Off-Peak
                 if df.at[y,'sa_sttyp'] == 'A,B,C':
-                    df.at[y,'sa_wtpf'] = 0.86
+                    df.at[y,'sa_wtpf'] = config_data['OpWTPFabc']
                 elif df.at[y,'sa_sttyp'] == 'D':
-                    df.at[y,'sa_wtpf'] = 0.94
+                    df.at[y,'sa_wtpf'] = config_data['OpWTPFd']
                 elif df.at[y,'sa_sttyp'] == 'E':
-                    df.at[y,'sa_wtpf'] = 1.00
+                    df.at[y,'sa_wtpf'] = config_data['OpWTPFe']
 
         # Set fields back in Visum
         h.SetMulti(Visum.Net.StopAreas ,r"wtpf", df['sa_wtpf'])
@@ -213,18 +240,22 @@ def skim_setup(period):
         for y in range(len(df)):
             if period == 'AM' or period == 'PM':  # Peak
                 if df.at[y,'tp_tsyscode'] == 'a':
-                    df.at[y,'tp_ivpf'] = 0.95
-                elif ((df.at[y,'tp_tsyscode'] == 'l') or (df.at[y,'tp_tsyscode'] == 'r')):
-                    df.at[y,'tp_ivpf'] = 0.88
+                    df.at[y,'tp_ivpf'] = config_data['PkIVPFa']
+                elif df.at[y,'tp_tsyscode'] == 'l':
+                    df.at[y,'tp_ivpf'] = config_data['PkIVPFl']
+                elif df.at[y,'tp_tsyscode'] == 'r':
+                    df.at[y,'tp_ivpf'] = config_data['PkIVPFr']
                 else:
-                    df.at[y,'tp_ivpf'] = 1.00   
+                    df.at[y,'tp_ivpf'] = config_data['PkIVPFelse']
             else:                                 # Off-Peak
                 if df.at[y,'tp_tsyscode'] == 'a':
-                    df.at[y,'tp_ivpf'] = 0.95
-                elif ((df.at[y,'tp_tsyscode'] == 'l') or (df.at[y,'tp_tsyscode'] == 'r')):
-                    df.at[y,'tp_ivpf'] = 0.86
+                    df.at[y,'tp_ivpf'] = config_data['OpIVPFa']
+                elif df.at[y,'tp_tsyscode'] == 'l':
+                    df.at[y,'tp_ivpf'] = config_data['OpIVPFl']
+                elif df.at[y,'tp_tsyscode'] == 'r':
+                    df.at[y,'tp_ivpf'] = config_data['OpIVPFr']
                 else:
-                    df.at[y,'tp_ivpf'] = 1.00
+                    df.at[y,'tp_ivpf'] = config_data['OpIVPFelse']
 
         # Set fields back in Visum
         h.SetMulti(Visum.Net.TimeProfiles ,r"ivpf", df['tp_ivpf'])
@@ -245,23 +276,31 @@ def skim_setup(period):
         # Calculate field
         for y in range(len(df)):
             if period == 'AM' or period == 'PM':  # Peak
-                if ((df.at[y,'tp_tsyscode'] == 'l') or (df.at[y,'tp_tsyscode'] == 'r')):
-                    df.at[y,'tp_brdpen'] = 000.0
-                elif ((df.at[y,'tp_tsyscode'] == 'a') or (df.at[y,'tp_tsyscode'] == 'e')):
-                    df.at[y,'tp_brdpen'] = 372.0
+                if df.at[y,'tp_tsyscode'] == 'l':
+                    df.at[y,'tp_brdpen'] = config_data['PkBrdPl']
+                elif df.at[y,'tp_tsyscode'] == 'r':
+                    df.at[y,'tp_brdpen'] = config_data['PkBrdPr']
+                elif df.at[y,'tp_tsyscode'] == 'a':
+                    df.at[y,'tp_brdpen'] = config_data['PkBrdPa']
+                elif df.at[y,'tp_tsyscode'] == 'e':
+                    df.at[y,'tp_brdpen'] = config_data['PkBrdPe']
                 else:
-                    df.at[y,'tp_brdpen'] = 439.8
+                    df.at[y,'tp_brdpen'] = config_data['PkBrdPelse']
             else:                                 # Off-Peak
-                if ((df.at[y,'tp_tsyscode'] == 'l') or (df.at[y,'tp_tsyscode'] == 'r')):
-                    df.at[y,'tp_brdpen'] = 000.0
-                elif ((df.at[y,'tp_tsyscode'] == 'a') or (df.at[y,'tp_tsyscode'] == 'e')):
-                    df.at[y,'tp_brdpen'] = 166.8
+                if df.at[y,'tp_tsyscode'] == 'l':
+                    df.at[y,'tp_brdpen'] = config_data['OpBrdPl']
+                elif df.at[y,'tp_tsyscode'] == 'r':
+                    df.at[y,'tp_brdpen'] = config_data['OpBrdPr']
+                elif df.at[y,'tp_tsyscode'] == 'a':
+                    df.at[y,'tp_brdpen'] = config_data['OpBrdPa']
+                elif df.at[y,'tp_tsyscode'] == 'e':
+                    df.at[y,'tp_brdpen'] = config_data['OpBrdPe']
                 else:
-                    df.at[y,'tp_brdpen'] = 540.6
+                    df.at[y,'tp_brdpen'] = config_data['OpBrdPelse']
 
         # Add global boarding penalty
         for y in range(len(df)):
-            df.at[y,'tp_brdpen'] = df.at[y,'tp_brdpen'] + 231
+            df.at[y,'tp_brdpen'] = df.at[y,'tp_brdpen'] + config_data['BrdPenGlb']
 
         # Set fields back in Visum
         h.SetMulti(Visum.Net.TimeProfiles ,r"brdpen", df['tp_brdpen'])
@@ -305,33 +344,33 @@ def skim_setup(period):
 
             if timau < 999:
                 if ft == 1:
-                    transit_time = timau * 1.15
+                    transit_time = timau * config_data['ft1']
                 elif ft == 2:
-                    transit_time = timau * 1.20
+                    transit_time = timau * config_data['ft2']
                 elif ft == 3:
-                    transit_time = timau
+                    transit_time = timau * config_data['ft3']
                 elif ft == 4:
-                    transit_time = timau * 1.09
+                    transit_time = timau * config_data['ft4']
                 elif ft == 5:
                     transit_time = 60* (60 * length / us1)
                 elif ft == 6:
                     transit_time = 60* (60 * length / us1 + 60 * length / 180)
                 elif ft ==11:
-                    transit_time = timau * 1.15
+                    transit_time = timau * config_data['ft11']
                 elif ft ==12:
-                    transit_time = timau * 1.30
+                    transit_time = timau * config_data['ft12']
                 elif ft ==13:
-                    transit_time = timau
+                    transit_time = timau * config_data['ft13']
                 elif ft ==14:
-                    transit_time =timau * 1.09
+                    transit_time = timau * config_data['ft14']
                 elif ft == 15:
                     transit_time = 60* (60 * length / us1)
                 elif ft == 16:
                     transit_time = 60* (60 * length / us1 + 60 * length / 180)
                 elif ft == 21:
-                    transit_time = timau * 1.05
+                    transit_time = timau * config_data['ft21']
                 elif ft == 22:
-                    transit_time = timau * 1.03
+                    transit_time = timau * config_data['ft22']
         else:
             transit_time = 1
 
@@ -346,7 +385,7 @@ def skim_setup(period):
         #                                                            "LINEROUTEITEM\\EMME_DATA1"])
         result  = []
 
-        default_speed = 30
+        default_speed = config_data['DefaultTransitSpeed'] # 30mph
         for ft, timau, length, us1 in tpitems:
             haul_time = calc_ttf(ft, timau, length, us1, default_speed)
             result.append([haul_time, ])
@@ -392,5 +431,5 @@ def skim_setup(period):
 
 
 per = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like 'AM' from AM in the code box
-skim_setup(per)
+put_skim_setup(per)
 
