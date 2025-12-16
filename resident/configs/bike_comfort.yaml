@@ -3,5 +3,3 @@ SPEC: bike_comfort.csv
 COEFFICIENTS: bike_comfort_coefficients.csv
 
 LOGIT_TYPE: MNL
-
-COMFORT_LEVEL:
