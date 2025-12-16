@@ -23,8 +23,8 @@ class LicenseHoldingStatusSettings(LogitComponentSettings, extra = "forbid"):
     """ 
     Settings for the 'license_holding_status' model.
     """
-    DRIVING_STATUS: int
-    """Value that specifies if the person can drive."""
+    LICENSE_STATUS_ALT: str
+    """Value that specifies if the person has a driver's license (can drive)."""
     
     CHOOSE_FILTER_COLUMN_NAME: str = "adult" 
     """Column name in the dataframe to filter persons eligible for license holding status model.""" 
@@ -91,8 +91,8 @@ def license_holding_status(
         compute_settings=model_settings.compute_settings,
     )
     
-    can_drive = model_settings.DRIVING_STATUS
-    choices = choices == can_drive
+    has_license = model_settings.LICENSE_STATUS_ALT
+    choices = choices == has_license
 
     if estimator:
         estimator.write_choices(choices)

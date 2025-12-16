@@ -1,7 +1,7 @@
 SPEC: license_holding_status.csv
 COEFFICIENTS: license_holding_status_coeff.csv
 
-DRIVING_STATUS: 0
+LICENSE_STATUS_ALT: has_license
 
 LOGIT_TYPE: MNL
 
