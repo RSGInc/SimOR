@@ -110,7 +110,7 @@ def bike_comfort(
     state.add_table("persons", persons)
 
     tracing.print_summary(
-        "bike_comfort", persons.telecommute_frequency, value_counts=True
+        "bike_comfort", persons.bike_comfort, value_counts=True
     )
 
     if state.settings.trace_hh_id:
