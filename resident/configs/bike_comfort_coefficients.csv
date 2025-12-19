@@ -1,7 +1,7 @@
 coefficient_name,value,constrain
-coef_age_strong,0,F
-coef_age_enthused,0,F
-coef_age_concerned,0,F
+coef_age_strong,1,F
+coef_age_enthused,1,F
+coef_age_concerned,1,F
 coef_female_strong,0,F
 coef_female_enthused,0,F
 coef_female_concerned,0,F

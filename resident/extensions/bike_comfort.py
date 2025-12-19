@@ -26,7 +26,7 @@ class BikeComfortSettings(LogitComponentSettings, extra = "forbid"):
     CHOOSE_FILTER_COLUMN_NAME: str = "adult" 
     """Column name in the dataframe to filter persons eligible for license holding status model."""
 
-@workflow.steps
+@workflow.step
 def bike_comfort(
     state: workflow.State,
     persons_merged: pd.DataFrame,
@@ -55,8 +55,8 @@ def bike_comfort(
     
     constants = config.get_model_constants(model_settings)
     
-     # - processor
-    expressions.annotate_preprocesors(
+     # - preprocessor
+    expressions.annotate_preprocessors(
         state,
         df=choosers,
         locals_dict=constants,
