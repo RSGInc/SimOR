@@ -261,7 +261,7 @@ out_of_vehicle_time_weight: 2.0
 
 # Network_Prep.py & KNRConnectors_Setup.py
 SCALEFACTOR: 5280
-Walk_Speed: 3.5
+Walk_Speed: 3.0
 Connector_Vehicle_Speed: 20
 
 # CostSkim_Setup.py
@@ -339,7 +339,7 @@ DefaultTransitSpeed: 30 #mph
 # PuTSkim_PostProcessing.py
   # Walk Constants
 Max_Walk_Time: 20
-#Max_Walk_Distance: 1
+Max_Walk_Distance: 1
   # Vehicle Type Constants
     # Peak
 PkVTCa: 0.0557

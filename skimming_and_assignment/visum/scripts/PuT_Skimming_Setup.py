@@ -57,7 +57,7 @@ def put_skim_setup(period):
         # Break out 'DISTINCT:LINEROUTES\TSYSCODE' field to separate by commas into individual columns	
         df[['sp_lrtsyscode']] = df[['sp_lrtsyscode']].astype(str)																													
         df = pd.concat([df,df['sp_lrtsyscode'].str.split(',', expand = True)], axis = 1)
-        # Change Screenline field names	
+        # Fill empty fields with None
         if 1 not in df:
             df[1] = None
         if 2 not in df:
@@ -83,27 +83,30 @@ def put_skim_setup(period):
     def headway(period): # Headway and Headway_Halved
 
         # Pull attributes
-        tp_emmeheadway   = h.GetMulti(Visum.Net.TimeProfiles,r"Emme_Headway", activeOnly = True)
         tp_headwayhalved = h.GetMulti(Visum.Net.TimeProfiles,r"Headway_Halved", activeOnly = True)
-        
-        if period == 'AM' or period == 'PM':
-            tp_periodheadway = h.GetMulti(Visum.Net.TimeProfiles,r"LINEROUTE\EMME_DATA1", activeOnly = True)
-        else:
-            tp_periodheadway = h.GetMulti(Visum.Net.TimeProfiles,r"LINEROUTE\EMME_DATA2", activeOnly = True)
+
+        if period == 'EA':
+            tp_periodheadway = h.GetMulti(Visum.Net.TimeProfiles,r"LINEROUTE\NT5", activeOnly = True)
+        elif period == 'AM':
+            tp_periodheadway = h.GetMulti(Visum.Net.TimeProfiles,r"LINEROUTE\AM4", activeOnly = True)
+        elif period == 'MD':
+            tp_periodheadway = h.GetMulti(Visum.Net.TimeProfiles,r"LINEROUTE\MD6", activeOnly = True)
+        elif period == 'PM':
+            tp_periodheadway = h.GetMulti(Visum.Net.TimeProfiles,r"LINEROUTE\PM4", activeOnly = True)
+        elif period == 'EV':
+            tp_periodheadway = h.GetMulti(Visum.Net.TimeProfiles,r"LINEROUTE\EV5", activeOnly = True)
 
         # Make Visum list with link data
-        att_list = [tp_emmeheadway,tp_periodheadway,tp_headwayhalved]
+        att_list = [tp_headwayhalved,tp_periodheadway]
     
 	    # Put Visum link list into dataframe
-        df = pd.DataFrame(np.column_stack(att_list), columns = ['tp_emmeheadway','tp_periodheadway','tp_headwayhalved'])
+        df = pd.DataFrame(np.column_stack(att_list), columns = ['tp_headwayhalved','tp_periodheadway'])
 
         # Calculate fields
-        df['tp_emmeheadway']   = df['tp_periodheadway'] * 60
-        df['tp_headwayhalved'] = df['tp_emmeheadway'] / 2
+        df['tp_headwayhalved'] = (df['tp_periodheadway'] * 60) / 2  # Need to divide by 2 for Optimal Strategies to work (Headway = Wait Time)
     
         # Set fields back in Visum
-        h.SetMulti(Visum.Net.TimeProfiles ,r"Emme_Headway", df['tp_emmeheadway'])
-        h.SetMulti(Visum.Net.TimeProfiles ,r"Headway_Halved", df['tp_headwayhalved'])
+        h.SetMulti(Visum.Net.TimeProfiles ,r"HEADWAY(AP)",    df['tp_headwayhalved']) # For Optimal Strategies, need headway = wait time
 
 
     def op_bushr(): # op_bushr on lineroutes and stopareas
@@ -111,7 +114,7 @@ def put_skim_setup(period):
         # Line Routes
         # Pull attributes
         lr_opbushr   = h.GetMulti(Visum.Net.LineRoutes,r"op_bushr", activeOnly = True)
-        lr_opheadway = h.GetMulti(Visum.Net.LineRoutes,r"EMME_DATA2", activeOnly = True)
+        lr_opheadway = h.GetMulti(Visum.Net.LineRoutes,r"MD6", activeOnly = True)
 
         # Make Visum list with link data
         att_list = [lr_opbushr,lr_opheadway]
@@ -379,10 +382,6 @@ def put_skim_setup(period):
     def runtime(period):
         tpitems = Visum.Net.TimeProfileItems.GetMultipleAttributes(["LINEROUTEITEM\\EMME_TTFINDEX", "SUM:USEDLINEROUTEITEMS\\OUTLINK\\"+period+"_TTC","SUM:USEDLINEROUTEITEMS\\POSTLENGTH", 
                                                                     "LINEROUTEITEM\\EMME_DATA1"])
-        
-        #else: 
-        #    tpitems = Visum.Net.TimeProfileItems.GetMultipleAttributes(["LINEROUTEITEM\\EMME_TTFINDEX", "SUM:USEDLINEROUTEITEMS\\OUTLINK\\AddVal3","SUM:USEDLINEROUTEITEMS\\POSTLENGTH", 
-        #                                                            "LINEROUTEITEM\\EMME_DATA1"])
         result  = []
 
         default_speed = config_data['DefaultTransitSpeed'] # 30mph
@@ -390,28 +389,28 @@ def put_skim_setup(period):
             haul_time = calc_ttf(ft, timau, length, us1, default_speed)
             result.append([haul_time, ])
 
-        Visum.Net.TimeProfileItems.SetMultipleAttributes(["AddVal"], result)
+        Visum.Net.TimeProfileItems.SetMultipleAttributes(["RUN_TIME"], result)
 
     def combinerundwelltimes():
         
         # Pull attributes
-        tpi_addval    = h.GetMulti(Visum.Net.TimeProfileItems,r"ADDVAL"     , activeOnly = True)
+        tpi_runtime    = h.GetMulti(Visum.Net.TimeProfileItems,r"RUN_TIME"     , activeOnly = True)
         tpi_dwelltime = h.GetMulti(Visum.Net.TimeProfileItems,r"DWELL_TIME" , activeOnly = True)
 
         # Make Visum list with link data
-        att_list = [tpi_addval,tpi_dwelltime]
+        att_list = [tpi_runtime,tpi_dwelltime]
     
 	    # Put Visum link list into dataframe
-        df = pd.DataFrame(np.column_stack(att_list), columns = ['tpi_addval','tpi_dwelltime'])
+        df = pd.DataFrame(np.column_stack(att_list), columns = ['tpi_runtime','tpi_dwelltime'])
 
         # Convert fields to float
-        df[['tpi_addval','tpi_dwelltime']] = df[['tpi_addval','tpi_dwelltime']].astype(float)
+        df[['tpi_runtime','tpi_dwelltime']] = df[['tpi_runtime','tpi_dwelltime']].astype(float)
 
         # Calculate field
-        df['tpi_addval'] = df['tpi_addval'] +  df['tpi_dwelltime']
+        df['tpi_runtime'] = df['tpi_runtime'] +  df['tpi_dwelltime']
 
         # Set fields back in Visum
-        h.SetMulti(Visum.Net.TimeProfileItems ,r"ADDVAL", df['tpi_addval'])
+        h.SetMulti(Visum.Net.TimeProfileItems ,r"RUN_TIME", df['tpi_runtime'])
 
 
 
@@ -427,7 +426,7 @@ def put_skim_setup(period):
     # Setting Dwell and Run times
     dwelltime()
     runtime(period)
-    combinerundwelltimes()
+    #combinerundwelltimes()  # Not needed in Visum 26
 
 
 per = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like 'AM' from AM in the code box
