@@ -1,7 +1,12 @@
 SPEC: license_holding_status.csv
 COEFFICIENTS: license_holding_status_coeff.csv
 
-LICENSE_STATUS_ALT: has_license
+# running for all people, using availability feature in the spec
+# can use this to limit to a subset of persons if desired
+# CHOOSE_FILTER_COLUMN_NAME:
+
+# 0-based index of the "has_license" alternative in the spec
+LICENSE_STATUS_ALT: 0
 
 LOGIT_TYPE: MNL
 

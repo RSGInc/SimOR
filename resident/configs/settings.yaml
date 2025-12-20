@@ -27,7 +27,7 @@ trace_hh_id:
 #trace_od:
 
 # metro hhs 862973, so 20% = 172595
-households_sample_size: 172595
+households_sample_size: 0
 
 # input tables
 input_table_list:
@@ -83,8 +83,8 @@ models:
   ### mp_accessibility
   - compute_accessibility
   ### mp_households
-  # - license_holding_status
-  # - bike_comfort
+  - license_holding_status
+  - bike_comfort
   - av_ownership
   - auto_ownership_simulate
   - work_from_home
