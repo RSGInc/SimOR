@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-
 import pandas as pd
 
 from activitysim.core import (
@@ -14,47 +13,50 @@ from activitysim.core import (
     tracing,
     workflow,
 )
-from activitysim.core.configuration.base import PreprocessorSettings
+
+from activitysim.core.configuration.base import PreprocessorSettings, PydanticReadable
 from activitysim.core.configuration.logit import LogitComponentSettings
 
 logger = logging.getLogger("activitysim")
 
 
-class BikeComfortSettings(LogitComponentSettings, extra="forbid"):
+class LicenseHoldingStatusSettings(LogitComponentSettings, extra="forbid"):
     """
-    Settings for the 'bike_comfort' model.
+    Settings for the 'license_holding_status' model.
     """
 
-    CHOOSE_FILTER_COLUMN_NAME: str = "adult"
+    LICENSE_STATUS_ALT: int = 0
+    """Value that specifies if the person has a driver's license (can drive)."""
+
+    CHOOSE_FILTER_COLUMN_NAME: str | None = None
     """Column name in the dataframe to filter persons eligible for license holding status model."""
 
 
 @workflow.step
-def bike_comfort(
+def license_holding_status(
     state: workflow.State,
     persons_merged: pd.DataFrame,
     persons: pd.DataFrame,
-    model_settings: BikeComfortSettings | None = None,
-    model_settings_file_name: str = "bike_comfort.yaml",
-    trace_label: str = "bike_comfort",
+    model_settings: LicenseHoldingStatusSettings | None = None,
+    model_settings_file_name: str = "license_holding_status.yaml",
+    trace_label: str = "license_holding_status",
 ) -> None:
     """
-    This model predicts the bike comfort level for each person.
-    The alternatives of this model are NoWyNoHow, InterestedButConcerned, EnthsuedAndConfident, StrongAndFearless
+    This model predicts whether a person holds a driver's license or not.
+    The output from this model is TRUE (if the person holds a license) or FALSE (if not).
     """
-
     if model_settings is None:
-        model_settings = BikeComfortSettings.read_settings_file(
-            state.filesystem,
-            model_settings_file_name,
+        model_settings = LicenseHoldingStatusSettings.read_settings_file(
+            state.filesystem, model_settings_file_name
         )
 
     choosers = persons_merged
     chooser_filter_columun_name = model_settings.CHOOSE_FILTER_COLUMN_NAME
-    choosers = choosers[(choosers[chooser_filter_columun_name])]
+    if chooser_filter_columun_name:
+        choosers = choosers[(choosers[chooser_filter_columun_name])]
     logger.info("Running %s with %d persons", trace_label, len(choosers))
 
-    estimator = estimation.manager.begin_estimation(state, "bike_comfort")
+    estimator = estimation.manager.begin_estimation(state, "license_holding_status")
 
     constants = config.get_model_constants(model_settings)
 
@@ -88,30 +90,27 @@ def bike_comfort(
         nest_spec=nest_spec,
         locals_d=constants,
         trace_label=trace_label,
-        trace_choice_name="bike_comfort",
+        trace_choice_name="has_license",
         estimator=estimator,
         compute_settings=model_settings.compute_settings,
     )
 
-    choices = pd.Series(model_spec.columns[choices.values], index=choices.index)
-    bike_comfort_cat = pd.api.types.CategoricalDtype(
-        model_spec.columns.tolist() + [""],
-        ordered=False,
-    )
-
-    choices = choices.astype(bike_comfort_cat)
+    has_license = model_settings.LICENSE_STATUS_ALT
+    choices = choices == has_license
 
     if estimator:
         estimator.write_choices(choices)
-        choices = estimator.get_survey_values(choices, "persons", "bike_comfort")
+        choices = estimator.get_survey_values(choices, "persons", "has_license")
         estimator.write_override_choices(choices)
         estimator.end_estimation()
 
-    persons["bike_comfort"] = choices.reindex(persons.index).fillna("")
+    persons["has_license"] = choices.reindex(persons.index).fillna(0).astype(bool)
 
     state.add_table("persons", persons)
 
-    tracing.print_summary("bike_comfort", persons.bike_comfort, value_counts=True)
+    tracing.print_summary(
+        "license_holding_status", persons.has_license, value_counts=True
+    )
 
     if state.settings.trace_hh_id:
         state.tracing.trace_df(persons, label=trace_label, warn_if_empty=True)
