@@ -426,7 +426,7 @@ def put_skim_setup(period):
     # Setting Dwell and Run times
     dwelltime()
     runtime(period)
-    #combinerundwelltimes()  # Not needed in Visum 26
+    combinerundwelltimes()  # Not needed in Visum 26
 
 
 per = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like 'AM' from AM in the code box

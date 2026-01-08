@@ -94,16 +94,22 @@ def putskim_postprocessing(mtx_dseg,knr_flag):
     #    np.fill_diagonal(twpt, 9999.00)
 
     # !!!!!! MASKING FOR COMPARISON WITH EMME (TEMPORARY) !!!!!!!
-    # Mask Transfer Walk Path time  GREATER THAN 20 MINUTES TOTAL WALK, GREATER THAN 30 MINUTES TOTAL TRANSFER WAIT TIME
+    # Mask Transfer Walk Path time  GREATER THAN 20 MINUTES TOTAL WALK, GREATER THAN 30 MINUTES TOTAL ORIGIN OR TRANSFER WAIT TIME
     if knr_flag == 'wtw':
-        twpt = np.where((owpt + dwpt + twpt > 20) | (wowt > 30) | (wtwt > 30), 9999.00, twpt)
+        twpt = np.where((owpt + dwpt + twpt > 20), 9999.00, twpt)
         np.fill_diagonal(twpt, 9999.00)
+        wowt = np.where((wowt > 30), 30.00, wowt)
+        wtwt = np.where((wtwt > 30), 30.00, wtwt)
     elif knr_flag == 'ktw':
-        twpt = np.where((dwpt + twpt > 20) | (wowt > 30) | (wtwt > 30)       , 9999.00, twpt)
+        twpt = np.where((dwpt + twpt > 20), 9999.00, twpt)
         np.fill_diagonal(twpt, 9999.00)
+        wowt = np.where((wowt > 30), 30.00, wowt)
+        wtwt = np.where((wtwt > 30), 30.00, wtwt)
     elif knr_flag == 'wtk':
-        twpt = np.where((owpt + twpt > 20) | (wowt > 30) | (wtwt > 30)       , 9999.00, twpt)
+        twpt = np.where((owpt + twpt > 20), 9999.00, twpt)
         np.fill_diagonal(twpt, 9999.00)
+        wowt = np.where((wowt > 30), 30.00, wowt)
+        wtwt = np.where((wtwt > 30), 30.00, wtwt)
     # !!!!!! TEMPORARY !!!!!!
 
 
