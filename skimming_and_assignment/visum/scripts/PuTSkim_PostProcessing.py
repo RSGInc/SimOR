@@ -94,7 +94,7 @@ def putskim_postprocessing(mtx_dseg,knr_flag):
     #    np.fill_diagonal(twpt, 9999.00)
 
     # !!!!!! MASKING FOR COMPARISON WITH EMME (TEMPORARY) !!!!!!!
-    # Mask Transfer Walk Path time  GREATER THAN 20 MINUTES TOTAL WALK, GREATER THAN 30 MINUTES TOTAL ORIGIN OR TRANSFER WAIT TIME
+    # Mask Transfer Walk Path time  GREATER THAN 20 MINUTES TOTAL WALK, GREATER THAN 30 MINUTES ORIGIN OR TRANSFER WAIT TIME
     if knr_flag == 'wtw':
         twpt = np.where((owpt + dwpt + twpt > 20), 9999.00, twpt)
         np.fill_diagonal(twpt, 9999.00)
