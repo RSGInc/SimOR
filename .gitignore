@@ -11,4 +11,6 @@ htmlcov/
 nosetests.xml
 coverage.xml
 
-ORMetroModel/
+Metro_outputs/
+
+skimming_and_assignment/visum/*.ver

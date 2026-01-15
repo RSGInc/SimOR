@@ -118,17 +118,28 @@ def create_knr_connectors():
     Visum.IO.LoadNet(FN, ReadAdditive=True, RouteSearch=None, AddNetRead=loadnetctrl, NormalizePolygons=False, 
                      MergeSameCoordPolygonPoints=False, DecimalsForMergeSameCoordPolygonPoints=-1)
     
-    # Set Length for direction not previously set
-    length = h.GetMulti(Visum.Net.Connectors,r"LENGTH"    , activeOnly = True)
+    # Set Length for new connectors based on preexisting connector lengths (which come from Emme originally)
+    length   = h.GetMulti(Visum.Net.Connectors,r"LENGTH"    , activeOnly = True)
     zoneno   = h.GetMulti(Visum.Net.Connectors,r"ZONENO"    , activeOnly = True)
-    nodeno   = h.GetMulti(Visum.Net.Connectors,r"NODENO"    , activeOnly = True)
-    att_list = [length,zoneno,nodeno]
-    df = pd.DataFrame(np.column_stack(att_list), columns = ['length','zoneno','nodeno'])
-    df[['zoneno','nodeno']] = df[['zoneno','nodeno']].astype(str)
-    df['concat'] = df['zoneno'] + df['nodeno']
-    df_unique = df.groupby('concat').agg(length_max=('length', 'max')).reset_index()
-    df = pd.merge(df, df_unique, on='concat', how='left')
+    typeno   = h.GetMulti(Visum.Net.Connectors,r"TYPENO"    , activeOnly = True)
+    att_list = [length,zoneno,typeno]
+    df = pd.DataFrame(np.column_stack(att_list), columns = ['length','zoneno','typeno'])
+    df_filtered = df[df['typeno'] < 10]  # All preexisting connectors will be TypeNO = 0 or 7
+    df_unique = df_filtered.groupby('zoneno').agg(length_max=('length', 'max')).reset_index()
+    df = pd.merge(df, df_unique, on='zoneno', how='left')
     h.SetMulti(Visum.Net.Connectors,r"LENGTH"    ,df['length_max'])
+    
+    ## Set Length for new connectors for direction not already set (using Visum calculated length)
+    #length   = h.GetMulti(Visum.Net.Connectors,r"LENGTH"    , activeOnly = True)
+    #zoneno   = h.GetMulti(Visum.Net.Connectors,r"ZONENO"    , activeOnly = True)
+    #nodeno   = h.GetMulti(Visum.Net.Connectors,r"NODENO"    , activeOnly = True)
+    #att_list = [length,zoneno,nodeno]
+    #df = pd.DataFrame(np.column_stack(att_list), columns = ['length','zoneno','nodeno'])
+    #df[['zoneno','nodeno']] = df[['zoneno','nodeno']].astype(str)
+    #df['concat'] = df['zoneno'] + df['nodeno']
+    #df_unique = df.groupby('concat').agg(length_max=('length', 'max')).reset_index()
+    #df = pd.merge(df, df_unique, on='concat', how='left')
+    #h.SetMulti(Visum.Net.Connectors,r"LENGTH"    ,df['length_max'])
 
 
 
@@ -136,11 +147,22 @@ def create_knr_connectors():
 
 
 def set_connector_properties(knrdirection):
+
+    # Save TSysSet in TSys_Holding if the original values are present in TSysSet
+    checktype = np.array(h.GetMulti(Visum.Net.Connectors,r"TSYSSET", activeOnly = True))
+    if 'i' in checktype:
+        Visum.Log(PRIO, 'TSYS_HOLDING Overwriting Skipped')
+    else:
+        Visum.Log(PRIO, 'TSYS_HOLDING Overwritten')
+        tsys = h.GetMulti(Visum.Net.Connectors,r"TSYSSET", activeOnly = True)
+        h.SetMulti(Visum.Net.Connectors,r"TSYS_HOLDING"  ,tsys)
+
+    # Pull attributes
     connector_type_dir = Visum.Net.Connectors.GetMultipleAttributes(["TypeNo", "Direction", "Length", "TSYS_HOLDING"])
     connector_tsys = []
-    connector_time = []
+    connector_time = []     
     # we assume here that KNR is not open on any connector to start
-    for typeno, direction, distance, tsys in connector_type_dir:
+    for typeno, direction, distance, tsys_hold in connector_type_dir:
         if knrdirection == "KTW":    
             if direction == 1: # Origin, leaving a zone
                 if typeno in [7, 10]:
@@ -158,7 +180,7 @@ def set_connector_properties(knrdirection):
                 else:
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
-                    connector_tsys.append(tsys)
+                    connector_tsys.append(tsys_hold)
                     connector_time.append([999999, 3600*distance/2.5])
         elif knrdirection == "WTK":    
             if direction == 2: # Destination, entering a zone
@@ -176,19 +198,17 @@ def set_connector_properties(knrdirection):
                 else:
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
-                    connector_tsys.append(tsys)
+                    connector_tsys.append(tsys_hold)
                     connector_time.append([999999, 3600*distance/2.5])
         elif knrdirection == "WTW":
-            connector_tsys.append(tsys)
+            connector_tsys.append(tsys_hold)
             connector_time.append([999999, 3600*distance/2.5])
     
     h.SetMulti(Visum.Net.Connectors, "TSysSet", connector_tsys)
     Visum.Net.Connectors.SetMultipleAttributes(["T0_TSYS(I)", "T0_TSYS(W)"], connector_time)
 
 
+
+code = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")  
 create_knr_connectors()
-
-
-proj_dir = Visum.GetPath(2)
-knrdir = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")  
-set_connector_properties(knrdir)
+set_connector_properties(code)
