@@ -4,16 +4,21 @@ household_density,household_density,land_use.TOTHHS / land_use.ACRES.clip(lower=
 population_density,population_density,land_use['TOTPOP'] / land_use.ACRES.clip(lower=1)
 # FIXME pseudomsa is used in a few places but there is no equivalent in Metro landuse,,
 ,pseudomsa,0
+# FIXME missing in landuse but used in SANDAG -- setting to 0 for now,,
+,ACTIVE_ACRES,0
+,totint,0
+,micro_dist_local_bus,0
+,microtransit,0
+,nev,0
+,ESCOOACCTIME,land_use.ESCOOACCTIME.fillna(0)
 # FIXME need to decide on what the preschool target looks like,,
-preschool target for mandatory constraint - sum of all size terms,preschool_target,land_use['TOTPOP'] + land_use.EMP_TOT
-Is a zone with parking,is_parking_zone,"np.where(land_use.PRKSPACES > 0, True, False)"
-employment_density,employment_density,(land_use['EMP_TOT'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
+preschool target for mandatory constraint - sum of all size terms,preschool_target,land_use['TOTPOP'] + land_use.EMP_TOTAL
+# FIME whats the criteria for parking zone?,,
+Is a zone with parking,is_parking_zone,"np.where(land_use.PRKCST_MNTH > 0, True, False)"
+employment_density,employment_density,(land_use['EMP_TOTAL'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
 density_index,density_index,(household_density *employment_density) / (household_density + employment_density).clip(lower=1)
-# FIXME not sure what the mapping between parking_type in the sandag model is and our current parkingConstrainedArea
-temporary parking type,parking_type,land_use['PARKAREA']
 # FIXME temporary density calculation -- again I don't think this calculation matches what's in sandag,,
 dwelling unit density,duden,(land_use['TOTHHS'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
 population density,popden,(land_use['TOTPOP'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
-employment unit density,empden,(land_use['EMP_TOT'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
+employment unit density,empden,(land_use['EMP_TOTAL'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
 retail employment density,retempden,(land_use['EMP_RET'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
-total park and ride capacity,PNR_CAP_TOTAL,(land_use['PNR_CAP_FORMAL'] + land_use['PNR_CAP_INFORMAL'])
