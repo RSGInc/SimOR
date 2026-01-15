@@ -13,10 +13,8 @@
             "console": "integratedTerminal",
             "args": [
                 "-c", "configs", // check the settings.yaml file for run settings!
-                // "-d", "model_data/metro/data_full",
-                // "-o", "outputs/20_pct_new_trn_spec_no_pnr",
-                "-d", "C:/projects/odot_joint_estimation/pnr/tasks/run_dir_new_zones/input",
-                "-o", "C:/projects/odot_joint_estimation/pnr/tasks/run_dir_new_zones/output",
+                "-d", "model_data/metro/data_full",
+                "-o", "outputs/full",
             ]
         },
         {
@@ -29,7 +27,7 @@
             "args": [
                 "-c", "configs", // check the settings.yaml file for run settings!
                 "-d", "model_data/metro/data_cropped",
-                "-o", "outputs/test",
+                "-o", "outputs/cropped",
             ]
         },
         {

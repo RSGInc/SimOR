@@ -71,7 +71,7 @@ output_tables:
     - proto_disaggregate_accessibility
     - disaggregate_accessibility
 
-resume_after: parking_location
+resume_after:
 
 models:
   ### mp_init_proto_pop (single process)
