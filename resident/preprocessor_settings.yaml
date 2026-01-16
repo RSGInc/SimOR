@@ -1,0 +1,10 @@
+data_dir: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input\SyntheticPopulation
+# output_dir: null  # null means overwrite input files
+output_dir: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input
+households_file: households.csv
+persons_file: persons.csv
+land_use_file: land_use.csv
+
+maz_shp_file: C:\projects\odot_joint_estimation\metro_data_prep\MAZs_22333_2025-11-20\MAZs_22333_2025-11-20.shp
+
+maz_stop_walk_file: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input\maz_stop_walk.csv

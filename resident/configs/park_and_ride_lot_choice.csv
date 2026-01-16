@@ -8,9 +8,11 @@ util_xfer_wait,transfer wait time,@(ldt_skims['WTW_XWT'] + dlt_skims['WTW_XWT'])
 util_walk_time,walk time,@(ldt_skims['WTW_AUX'] + dlt_skims['WTW_AUX']),coef_xwalk_work
 util_ivtt,in vehcile transit time,@(ldt_skims['WTW_TIV'] + dlt_skims['WTW_TIV']),coef_ivt_work
 util_xfer_penalty,transfer penalty,"@(-23+23*np.exp(0.414*np.clip(ldt_skims['WTW_XFR'], a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(dlt_skims['WTW_XFR'], a_min=None,a_max=4)))",coef_xfer_work
+util_stop_type_constant,stop type constant,@(ldt_skims['WTW_RST'] + dlt_skims['WTW_RST']),coef_ivt_work
+util_vehicle_type_constant,vehicle type constant,@(ldt_skims['WTW_VTC'] + dlt_skims['WTW_VTC']),coef_ivt_work
 # FIXME need fares,,,
 #util_fare,transit fare,"@df.transitSubsidyPassDiscount * (odt_skims['WTW_FARE'] + dot_skims['WTW_FARE']) * 100*df.num_participants/df.cost_sensitivity",coef_income_work
-util_parking_cost,parking cost,@df['PNR_PRKCST'],coef_income_work
-# Size Term,,,
-util_size_variable,Size variable,@df['PNR_CAP_TOTAL'].apply(np.log1p),1
+util_small_lot,Small lot penalty -- 10 min penalty,"@np.where(df['PNR_SPACES'] < 100,10,0)",coef_ivt_work
+#util_med_lot,med lot penalty -- no penalty,"@np.where((df['PNR_SPACES'] >= 100) & (df['PNR_SPACES'] < 500),1,0) * 0",coef_ivt_work
+util_large_lot,large lot penalty -- 10 min back,"@np.where(df['PNR_SPACES'] >= 500,-10,0)",coef_ivt_work
 util_capacity,lot capacity availability,@df['pnr_lot_full'],coef_unavailable

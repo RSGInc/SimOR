@@ -27,8 +27,17 @@
             "args": [
                 "-c", "configs", // check the settings.yaml file for run settings!
                 "-d", "model_data/metro/data_cropped",
-                "-o", "outputs/test",
+                "-o", "outputs/cropped",
             ]
+        },
+        {
+            "name": "Run Preprocessor",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "preprocessor.py",
+            "console": "integratedTerminal",
+            "args": "preprocessor_settings.yaml"
         }
     ]
 }
