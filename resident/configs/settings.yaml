@@ -9,7 +9,7 @@ chunk_training_mode: disabled
 
 # turn shadow_pricing on and off for all models (e.g. school and work)
 # see shadow_pricing.yaml for additional settings
-use_shadow_pricing: False
+use_shadow_pricing: True
 
 memory_profile: False
 
@@ -156,7 +156,7 @@ multiprocess_steps:
         - accessibility
       exclude: True  # this is needed so landuse (i.e. destinations) doesn't get split
   - name: mp_households
-    begin: av_ownership
+    begin: license_holding_status
     slice:
       tables:
         - households
