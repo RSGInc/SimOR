@@ -18,6 +18,20 @@
             ]
         },
         {
+            "name": "Run Estimation Mode",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs_estimation", // check the settings.yaml file for run settings!
+                "-c", "configs",
+                "-d", "model_data/metro/data_full",
+                "-o", "outputs/estimation",
+            ]
+        },
+        {
             "name": "Run Cropped Example",
             "type": "debugpy",
             "request": "launch",
