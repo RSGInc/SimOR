@@ -1,10 +1,10 @@
 coefficient_name,value,constrain
 coef_unavailable,-999,T
 coef_has_license_ASC,1,F
-coef_age,0,F
-coef_female,0,F
-coef_is_worker,0,F
+coef_age,1,F
+coef_female,1,F
+coef_is_worker,1,F
 # coef_mobility_difficulty,-0,F
-coef_logsum_work_0auto,0,F
-coef_logsum_shop_0auto,0,F
-coef_logsum_other_0auto,0,F
+coef_logsum_work_0auto,1,F
+coef_logsum_shop_0auto,1,F
+coef_logsum_other_0auto,1,F
