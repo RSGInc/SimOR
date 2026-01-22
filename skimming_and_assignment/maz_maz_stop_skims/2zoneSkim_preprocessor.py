@@ -1,12 +1,12 @@
 # This script prepares inputs for 2zoneSkim.py using Visum outputs:
 # - Links: [TSYSSET, TYPNO]
 # - Nodes: [NO]
-# - MAZs: (provided by user)
-# - Transit stops: transit stops with list of routes; [STOP_ID, Lines]
-# - Routes/Lines: [ROUTE_ID, SYSMODE]
+# - MAZs: (provided separately)
+# - Transit stops: transit stops with list of routes; [STOP_ID, Lines, X-Coordinate, Y-Coordinate]
+# - Routes/Lines: [LineName, TSysCode]
 
 # And generates the following outputs:
-# - MAZ centroids: [MAZs_NO]
+# - MAZ centroids
 # - Connectors: from MAZ centorid to nearest node on walk network
 # - Nodes: network nodes + MAZ centroids (consistent node numbering); [MAZ, NO]
 # - Links: links + connectors (consistent node numbering; [FROMNODENO, TONODENO]
@@ -39,20 +39,25 @@ class DataLoader():
         self.epsg = None
         self.routes = None
         self.stops = None
+        self.walk_link_types = None
         self.maz_centroids = None
         self.load_data()
         
     def load_data(self):
-        os.chdir(self.config['preprocessing']['input_dir'])
-        self.links = gpd.read_file(self.config['preprocessing']['links_file'])
-        self.nodes = gpd.read_file(self.config['preprocessing']['nodes_file']).rename(columns = {'NO':'NODE_NO'})
-        self.mazs = gpd.read_file(self.config['preprocessing']['maz_file']).rename(columns = {'MAZ_NO':'MAZ'})
+        input_dir = self.config['preprocessing']['input_dir']
+        self.links = gpd.read_file(os.path.join(input_dir, self.config['preprocessing']['links_file']))
+        self.nodes = gpd.read_file(os.path.join(input_dir, self.config['preprocessing']['nodes_file'])).rename(columns = {'NO':'NODE_NO'})
+        self.mazs = gpd.read_file(os.path.join(input_dir, self.config['preprocessing']['maz_file'])).rename(columns = {'MAZ_NO':'MAZ'})
         self.epsg = self.config['preprocessing']['network_epsg']
-        self.routes = pd.read_csv(self.config['preprocessing']['routes'])
-        self.stops = pd.read_csv(self.config['preprocessing']['stops'])
+        self.routes = pd.read_csv(os.path.join(input_dir, self.config['preprocessing']['routes']))
+        self.stops = pd.read_csv(os.path.join(input_dir, self.config['preprocessing']['stops']))
+        self.walk_link_types = self.config['preprocessing']['walk_link_types']
         self.maz_centroids = self._get_maz_centroids()
         
     def _get_maz_centroids(self):
+        """
+        Find centroids of MAZ polygons
+        """
         centroids = self.mazs[['MAZ', 'geometry']].copy()
         centroids['centroid_geom'] = centroids['geometry'].centroid
         centroids = centroids[['MAZ', 'centroid_geom']].rename(columns={'centroid_geom':'geometry'}) 
@@ -66,18 +71,20 @@ def create_centroid_connectors(inputs):
     links = inputs.links[['NO', 'FROMNODENO', 'TONODENO', 'TYPENO', 'TSYSSET', 'geometry']]
     maz_centroids = inputs.maz_centroids
     nodes = inputs.nodes[['geometry', 'NODE_NO']]
-
+    walk_link_types = inputs.walk_link_types
+    
     # Extract walk network
+    links['TYPENO'] = pd.to_numeric(links['TYPENO'], errors='coerce')
+    
     links['TSYSSET'] = np.where(
-        (links['TYPENO'] == '0') & (links['TSYSSET'].isna()),
+        (links['TYPENO'] == 0) & (links['TSYSSET'].isna()),
         "wlk",
         links['TSYSSET']
     )
     walk_network_links = links[
         (links['TSYSSET'].str.contains("wlk", na=False) &
-        (~links['TYPENO'].isin(['1', '4', '10', '19', '20', '70', '71', '79'])))]
-
-    walk_network_links['TYPENO'].value_counts().sort_index()
+        (links['TYPENO'].isin(walk_link_types)))
+        ]
 
     # Remove nodes that are not in the walk network
     walk_network_nodes = nodes[nodes['NODE_NO'].isin(walk_network_links['FROMNODENO']) | nodes['NODE_NO'].isin(walk_network_links['TONODENO'])]
