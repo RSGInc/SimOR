@@ -47,7 +47,7 @@ Description,Target,Expression
 household_density calculated in annotate_landuse in acres and is converted to sq miles here,_origin_density_measure,"reindex(land_use.population_density, df[orig_col_name])"
 employment_density calculated in annotate_landuse in acres and is converted to sq miles here,_dest_density_measure,"reindex(land_use.population_density, df[dest_col_name])"
 ,origin_density,"pd.cut(_origin_density_measure, bins=[-np.inf, 500, 2000, 5000, 15000, np.inf], labels=[5, 4, 3, 2, 1]).astype(int)"
-,dest_density,"pd.cut(_dest_density_measure, bins=[-np.inf, 500, 2000, 5000, 15000, np.inf], labels=[5, 4, 3, 2, 1]).astype(int)"
+,dest_density,"pd.cut(_dest_density_measure.fillna(0), bins=[-np.inf, 500, 2000, 5000, 15000, np.inf], labels=[5, 4, 3, 2, 1]).astype(int)"
 Origin MGRA Dwelling Unit Density,oMGRADUDen,"reindex(land_use.duden,df.origin)"
 Origin MGRA Employment Density,oMGRAEmpDen,"reindex(land_use.empden,df.origin)"
 Origin MGRA Total Intersections,oMGRATotInt,"reindex(land_use.totint,df.origin)"
