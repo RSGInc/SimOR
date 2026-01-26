@@ -54,7 +54,6 @@ CHOOSER_SEGMENT_COLUMN_NAME: occupation #income_segment
 CHOOSER_FILTER_COLUMN_NAME: is_internal_worker
 
 # FIXME - these are assigned to persons in annotate_persons. we need a better way to manage this
-# FIXME - these are not needed for this model and should be re/factored out
 SEGMENT_IDS:
   mngt_busi_scic_arts: mngt_busi_scic_arts 
   services: services
@@ -63,6 +62,7 @@ SEGMENT_IDS:
   prod_trans_move: prod_trans_move
   constr_maint: constr_maint
   military: military
+  missing: missing  # used for estimation mode only
   # work_low: 1  # INCOME_SEGMENT_LOW
   # work_med: 2  # INCOME_SEGMENT_MED
   # work_high: 3  # INCOME_SEGMENT_HIGH
