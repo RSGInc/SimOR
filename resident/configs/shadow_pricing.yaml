@@ -47,4 +47,5 @@ workplace_segmentation_targets:
   prod_trans_move: EMP_TOTAL
   sales_office: EMP_TOTAL
   services: EMP_TOTAL
+  missing: EMP_TOTAL
 
