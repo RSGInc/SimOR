@@ -1,7 +1,7 @@
 # Recommend to use SANDAG's python environment: 
 # https://github.com/SANDAG/ABM/blob/main/src/asim/scripts/environment.yml
 
-# Preprocessing settings
+# Preprocessor settings
 preprocessing:
     input_dir: data
     output_dir: input
@@ -11,23 +11,7 @@ preprocessing:
     stops: "Stops.csv"
     routes: "LineRoutes.csv"
     network_epsg: 2913
-    walk_link_types:    # link types to use for walk network
-        # - 1      # transit
-        - 2      # walk to transit (asserted length)
-        - 3      # walk to transit (acutal length)
-        # - 4      # WES PnR connection length = 0.1m 
-        # - 10     # freeway 
-        # - 19     # freway hov
-        # - 20     # highway
-        - 30     # arterial
-        - 40     # intersection expansion link
-        - 51     # intersection approach
-        - 61     # CBD grid 
-        # - 70     # offramp
-        # - 71     # metered ramp
-        # - 79     # onramp
-        - 80     # other bike facility
-        - 81     # other bike facility
+    walk_modes: ["wlk"] # TSYSSET modes to filter walk links
 
 # Skimming settings
 settings:
