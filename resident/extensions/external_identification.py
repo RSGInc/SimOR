@@ -38,6 +38,8 @@ class ExternalIdentificationSettings(LogitComponentSettings, extra="forbid"):
 
     preprocessor: PreprocessorSettings | None = None
 
+    EXTERNAL_WORKER_ALT: int | None = 0
+
 
 def determine_closest_external_station(
     state, choosers, skim_dict, origin_col="home_zone_id"
@@ -183,7 +185,7 @@ def external_worker_identification(
 
     if external_col_name is not None:
         persons[external_col_name] = (
-            (choices == 0).reindex(persons.index).fillna(False).astype(bool)
+            (choices == model_settings.EXTERNAL_WORKER_ALT).reindex(persons.index).fillna(False).astype(bool)
         )
     if internal_col_name is not None:
         persons[internal_col_name] = persons[filter_col] & ~persons[external_col_name]
