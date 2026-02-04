@@ -65,4 +65,4 @@ travel time sensitivity factor for non-work travel,time_factor_nonwork,"np.minim
 ,naics_code,_naics_code.astype('int') if all(_naics_code!=0) else 0
 #,,
 # FIXME does filling with -1 make sense here? depends on what the missing values mean,,
-occupation categories mapped to workplace segments,occupation,persons.OCCCAT.fillna(-1).map(occupation_xwalk)
+occupation categories mapped to workplace segments,occupation,persons.OCCP.fillna(-1).map(occupation_xwalk)

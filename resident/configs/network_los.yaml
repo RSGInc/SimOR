@@ -15,6 +15,7 @@ taz_skims:
   - autoSkims*.omx
   - transitSkims*.omx
   - walkSkim.omx
+  - fares.omx
 
 maz: land_use.csv
 
