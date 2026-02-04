@@ -71,7 +71,7 @@ output_tables:
     - proto_disaggregate_accessibility
     - disaggregate_accessibility
 
-resume_after:
+resume_after: initialize_landuse
 
 models:
   ### mp_init_proto_pop (single process)

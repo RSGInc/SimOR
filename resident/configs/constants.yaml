@@ -90,18 +90,16 @@ escooterSpeed: 6.70
 driveSpeed: 25.00
 indivTour: 1.00000
 
-### Crosswalk between OCCCAT and size terms
-# FIXME -- this xwalk is completely made up!! Needs to be updated with real data.
+### Crosswalk between OCCP and size terms
 occupation_xwalk:
   1: mngt_busi_scic_arts
-  2: services 
-  3: health
-  4: services 
-  5: sales_office
-  6: constr_maint 
-  7: prod_trans_move
-  999: military 
-  -1:    # no occupation
+  2: white_collar
+  3: blue_collar
+  4: sales_office
+  5: nat_res_cnstr_maint
+  6: prod_trans_move
+  999: missing # no occupation 
+  -1: missing # no occupation
 
 # RIDEHAIL Settings
 Taxi_baseFare: 3.00

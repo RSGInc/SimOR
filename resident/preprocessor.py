@@ -5,7 +5,10 @@ Adds derived columns to land_use, households, and persons tables.
 
 import pandas as pd
 import geopandas as gpd
+import openmatrix as omx
+import numpy as np
 import sys
+import os
 import time
 import yaml
 from pathlib import Path
@@ -22,6 +25,8 @@ class PreprocessorSettings:
     land_use_file: str = "land_use.csv"
     maz_shp_file: str = None  # Path to MAZ shapefile for calculating acres
     maz_stop_walk_file: str = None  # Path to MAZ stop walk distances file
+    fare_skim_input_file: str = None  # Path to non-TOD segmented fare skim matrix file
+    times_of_day: list[str] = field(default_factory=lambda: ["EA", "AM", "MD", "PM", "EV"])
     
     def __post_init__(self):
         # Convert strings to Path objects
@@ -46,7 +51,7 @@ def load_data(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFram
     return households, persons, land_use
 
 
-def fix_duplicate_household_ids(
+def check_ids(
     households: pd.DataFrame, 
     persons: pd.DataFrame
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -68,6 +73,14 @@ def fix_duplicate_household_ids(
     tuple[pd.DataFrame, pd.DataFrame]
         Updated (households, persons) DataFrames
     """
+    # check for required columns
+    assert "household_id" in households.columns, "households table missing household_id column"
+    assert "household_id" in persons.columns, "persons table missing household_id column"
+    assert "MAZ" in households.columns, "households table missing MAZ column"
+    
+    if "person_id" not in persons.columns:
+        persons['person_id'] = persons.household_id * 100 + persons.groupby('household_id').cumcount() + 1
+
     # Check for duplicates
     duplicate_mask = households.duplicated(subset=["household_id"], keep=False)
     num_duplicates = duplicate_mask.sum()
@@ -313,9 +326,11 @@ def merge_maz_stop_walk(land_use: pd.DataFrame, maz_stop_walk_file: str = None) 
         land_use_maz_col = 'MAZ'
     elif 'maz' in land_use.columns:
         land_use_maz_col = 'maz'
+    elif 'MAZ_NO' in land_use.columns:
+        land_use.rename(columns={'MAZ_NO': 'MAZ', 'TAZ_NO': 'TAZ'}, inplace=True)
+        land_use_maz_col = 'MAZ'
     else:
-        print("Warning: Could not find MAZ column in land_use")
-        return land_use
+        raise RuntimeError("Warning: Could not find MAZ column in land_use")
     
     # Merge only the new columns plus the join key
     cols_to_merge = ['maz'] + new_cols
@@ -395,6 +410,51 @@ def write_output(
         print(f"Saved land_use to {land_use_path}")
 
 
+def preprocess_fare_skim(settings: PreprocessorSettings) -> None:
+    """Preprocess fare skim matrix into TOD format if needed.
+    
+    Parameters
+    ----------
+    settings : PreprocessorSettings
+        Configuration settings for the preprocessor
+    """
+    # Placeholder for fare skim preprocessing logic
+    # Implement as needed based on specific fare skim requirements
+    print("Preprocessing fare skim matrix into TOD format")
+
+    fare_skim_file = settings.fare_skim_input_file if hasattr(settings, 'fare_skim_input_file') else None
+    if fare_skim_file is None:
+        print("No fare_skim_input_file provided, skipping fare skim preprocessing")
+        return
+    
+    input_fare_skim_file = omx.open_file(fare_skim_file)
+    output_fare_skim_file_name = settings.output_dir / "fares.omx"
+
+    with omx.open_file(output_fare_skim_file_name, 'w') as fare_skim_tod:
+        # Example: Copy matrices and rename for TOD format
+        matrices = input_fare_skim_file.list_matrices()
+        assert len(matrices)  == 1, "Expeted only one matrix in fare skim file"
+
+        for matrix_name in matrices:
+            matrix = np.array(input_fare_skim_file[matrix_name])
+            
+            for time_period in settings.times_of_day:
+                tod_matrix_name = f"fare__{time_period}"
+                fare_skim_tod[tod_matrix_name] = matrix
+                print(f"\tAdded matrix {tod_matrix_name} to fare skim TOD file")
+        
+        # write mapping to file
+        # Set the shape on the output file first (required before creating mappings)
+        mapping_name = input_fare_skim_file.list_mappings()[0]
+        mapping_entries = np.array(list(input_fare_skim_file.mapping(mapping_name).keys()))
+        fare_skim_tod.create_mapping(mapping_name, mapping_entries)
+        print(f"\tCreated mapping {mapping_name} in fare skim TOD file")
+
+    print(f"Saved fare skim TOD file to {output_fare_skim_file_name}")
+
+    input_fare_skim_file.close()
+
+
 def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Main preprocessing function.
@@ -417,8 +477,8 @@ def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFra
     original_persons = persons.copy()
     original_land_use = land_use.copy()
     
-    # Fix duplicate household IDs
-    households, persons = fix_duplicate_household_ids(households, persons)
+    # Fix duplicate household IDs, check for correct names
+    households, persons = check_ids(households, persons)
     
     # Add TOTHHS and TOTPOP
     land_use = add_tothhs(land_use, households)
@@ -440,6 +500,9 @@ def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFra
         original_persons,
         original_land_use,
     )
+
+    # Preprocess fare skim matrix into TOD format if needed
+    preprocess_fare_skim(settings)
     
     return households, persons, land_use
 

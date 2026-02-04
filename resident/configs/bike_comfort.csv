@@ -1,4 +1,4 @@
-Label,Description,Expression,StrongAndFearless,EnthusedAndConfident,InterstedButConcerned,NoWayNoHow
+Label,Description,Expression,StrongAndFearless,EnthusedAndConfident,InterestedButConcerned,NoWayNoHow
 # dummy spec in here for demonstration in preparation for estimation,,,,,,
 util_age,Age of persons in years,@df.age,coef_age_strong,coef_age_enthused,coef_age_concerned,0
 util_female,Female dummy,@df.female,coef_female_strong,coef_female_enthused,coef_female_concerned,0

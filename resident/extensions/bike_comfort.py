@@ -26,7 +26,7 @@ class BikeComfortSettings(LogitComponentSettings, extra="forbid"):
     """
 
     CHOOSE_FILTER_COLUMN_NAME: str = "adult"
-    """Column name in the dataframe to filter persons eligible for license holding status model."""
+    """Column name in the dataframe to filter persons eligible for bike comfort model."""
 
 
 @workflow.step
@@ -40,7 +40,7 @@ def bike_comfort(
 ) -> None:
     """
     This model predicts the bike comfort level for each person.
-    The alternatives of this model are NoWyNoHow, InterestedButConcerned, EnthsuedAndConfident, StrongAndFearless
+    The alternatives of this model are NoWayNoHow, InterestedButConcerned, EnthusedAndConfident, StrongAndFearless
     """
 
     if model_settings is None:
@@ -50,8 +50,8 @@ def bike_comfort(
         )
 
     choosers = persons_merged
-    chooser_filter_columun_name = model_settings.CHOOSE_FILTER_COLUMN_NAME
-    choosers = choosers[(choosers[chooser_filter_columun_name])]
+    chooser_filter_column_name = model_settings.CHOOSE_FILTER_COLUMN_NAME
+    choosers = choosers[(choosers[chooser_filter_column_name])]
     logger.info("Running %s with %d persons", trace_label, len(choosers))
 
     estimator = estimation.manager.begin_estimation(state, "bike_comfort")

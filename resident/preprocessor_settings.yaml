@@ -1,10 +1,14 @@
-data_dir: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input\SyntheticPopulation
+data_dir: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\raw
 # output_dir: null  # null means overwrite input files
-output_dir: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input
+output_dir: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full
 households_file: households.csv
 persons_file: persons.csv
 land_use_file: land_use.csv
 
 maz_shp_file: C:\projects\odot_joint_estimation\metro_data_prep\MAZs_22333_2025-11-20\MAZs_22333_2025-11-20.shp
 
-maz_stop_walk_file: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input\maz_stop_walk.csv
+maz_stop_walk_file: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\maz_stop_walk.csv
+
+# non-TOD segmented skim file processed into skims.omx segmented by TOD with matrices fare__[time_of_day]
+fare_skim_input_file: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\raw\2024MetroTransitCashFares.omx
+times_of_day: ["EA", "AM", "MD", "PM", "EV"]
