@@ -572,7 +572,11 @@ class SkimGenerator:
 
 def main(path: str):
     """Main execution function"""
+    print("Starting skim processing...")
+    start_time = datetime.now()
+    
     # Load configuration
+    os.chdir(os.path.dirname(__file__))
     with open(os.path.join(path, "2zoneSkim_params.yaml"), 'r') as f:
         config = yaml.safe_load(f)
     
@@ -601,6 +605,9 @@ def main(path: str):
         print(f"{datetime.now().strftime('%H:%M:%S')} Generating MAZ-stop walk skims...")
         stop_skim = skim_generator.generate_maz_stop_walk_skim()
         stop_skim.to_csv(os.path.join(output_path, config['settings']['maz_stop_walk_output']), index=False)
+    
+    elapsed = datetime.now() - start_time
+    print(f"Skimming finished! Total time: {elapsed}")
 
 if __name__ == "__main__":
     import sys
