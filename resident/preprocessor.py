@@ -516,8 +516,6 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
         
         return empDen, retDen, duDen, popDen, popEmpDenPerMi, totInt
     
-    land_use = land_use.sample(100)
-    
     (
         land_use[new_cols[0]], 
         land_use[new_cols[1]], 
