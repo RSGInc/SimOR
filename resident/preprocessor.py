@@ -26,7 +26,7 @@ class PreprocessorSettings:
     maz_maz_walk_file: str = None
     nodes_file: str = None
     links_file: str = None
-    density_radius: float = 0.65 # Buffer radius for density calcs, miles 
+    density_radius: float = 0.50 # Buffer radius for density calcs, miles 
     crs: int = None
     link_filter_col: str = None
     keep_link_types: dict = None
@@ -449,12 +449,10 @@ def get_intersection_count(
         int_dict[i[1][0]] = maz_nodes.loc[maz_nodes['dist'] == maz_nodes['dist'].min()]['MAZ'].values[0]
         
     intersections['near_maz'] = intersections['N'].map(int_dict)
-    intersections = intersections.groupby('near_maz', as_index = False).count()[['near_maz','N']].rename(columns = {'near_maz':'MAZ','N':'totint'})
+    intersections = intersections.groupby('near_maz', as_index = False).count()[['near_maz','N']].rename(columns = {'near_maz':'MAZ','N':'icnt'})
     
     # Merge counts with land use data
     land_use = pd.merge(land_use, intersections, on = "MAZ", how = "left").fillna(0)
-    
-    print("Added column to land_use: ['totint']")
     return land_use
 
 def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.DataFrame:
@@ -480,7 +478,7 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
     print(f"Reading MAZ walk file: {settings.maz_maz_walk_file}")
     maz_maz_walk = pd.read_csv(settings.maz_maz_walk_file)
     
-    new_cols = ['empden', 'retempden', 'duden', 'popden', 'popempdenpermi']
+    new_cols = ['empden', 'retempden', 'duden', 'popden', 'popempdenpermi', 'totint']
     for col in new_cols:
         if col in land_use.columns:
             land_use = land_use.drop(col, axis=1)
@@ -509,7 +507,7 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
         dist_skim = maz_maz_walk[maz_maz_walk['OMAZ'] == maz_in]
         maz_circa_int = dist_skim[dist_skim['DISTWALK'] < settings.density_radius]['j'].unique()
         nearby_maz = land_use[land_use[maz_col].isin(maz_circa_int)]
-        sums = nearby_maz[['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES']].sum()
+        sums = nearby_maz[['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES', 'icnt']].sum()
 
         if (sums['ACRES'] > 0):
             empDen = sums['EMP_TOTAL'] / sums['ACRES']
@@ -517,14 +515,16 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
             duDen = sums['TOTHHS'] / sums['ACRES']     
             popDen = sums['TOTPOP'] / sums['ACRES']      
             popEmpDenPerMi = (sums['EMP_TOTAL'] + sums['TOTPOP']) / (sums['ACRES'] / 640) # acres to miles
+            totInt = sums['icnt']
         else:
             empDen = 0.0
             retDen = 0.0
             duDen = 0.0
             popDen = 0.0
             popEmpDenPerMi = 0.0 
+            totInt = 0
         
-        return empDen, retDen, duDen, popDen, popEmpDenPerMi
+        return empDen, retDen, duDen, popDen, popEmpDenPerMi, totInt
     
     (
         land_use[new_cols[0]], 
@@ -532,6 +532,7 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
         land_use[new_cols[2]], 
         land_use[new_cols[3]], 
         land_use[new_cols[4]], 
+        land_use[new_cols[5]]
     ) = zip(*land_use['MAZ'].map(_density_function))    
     
     land_use[new_cols] = round(land_use[new_cols], 3)

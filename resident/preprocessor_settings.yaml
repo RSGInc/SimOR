@@ -13,7 +13,7 @@ maz_maz_walk_file: C:/Documents/ODOT/data_full/maz_maz_walk.csv
 # Land use densities
 nodes_file: C:/Documents/git_locals/SimOR/skimming_and_assignment/maz_maz_stop_skims/data/Network_node.shp
 links_file: C:/Documents/git_locals/SimOR/skimming_and_assignment/maz_maz_stop_skims/data/Network_link.shp
-density_radius: 0.65 # walk radius (miles) for density calculaitons
+density_radius: 0.50 # walk radius (miles) for density calculations
 crs: 2913 # projected 
 
 # Network filter for intersection counts
