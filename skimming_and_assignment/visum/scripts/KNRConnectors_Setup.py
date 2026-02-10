@@ -41,8 +41,8 @@ with open(yaml_path, 'r') as file:
 PRIO = 20480
 _TABLE = "KnRConstraints"
 SCALEFACTOR = config_data['SCALEFACTOR']  # 5280
-CON_VEH_SPEED = config_data['Connector_Vehicle_Speed'] # 20 mph
-CON_WLK_SPEED = config_data['Walk_Speed'] # 3.5 mph
+#CON_VEH_SPEED = config_data['Connector_Vehicle_Speed'] # 20 mph
+#CON_WLK_SPEED = config_data['Walk_Speed'] # 3.5 mph
 
 # FN = os.path.join(Visum.GetPath(2), "taz_connectors.json")
 FN = os.path.join(Visum.GetPath(2), "connectors_knr.net")
@@ -188,52 +188,52 @@ def set_connector_properties(knrdirection):
     # Pull attributes
     connector_type_dir = Visum.Net.Connectors.GetMultipleAttributes(["TypeNo", "Direction", "Length", "TSYS_HOLDING"])
     connector_tsys = []
-    connector_time = []     
+    #connector_time = []     
     # we assume here that KNR is not open on any connector to start
     for typeno, direction, distance, tsys_hold in connector_type_dir:
         if knrdirection == "KTW":    
             if direction == 1: # Origin, leaving a zone
                 if typeno in [7, 10]:
                     connector_tsys.append("i")
-                    connector_time.append([3600*distance/CON_VEH_SPEED, 999999])
+                    #connector_time.append([3600*distance/CON_VEH_SPEED, 999999])
                 else:
                     connector_tsys.append("")
-                    connector_time.append([999999, 999999])
+                    #connector_time.append([999999, 999999])
             
             elif direction == 2: # Destination, entering a zone
                 if typeno == 10:
                     # a knr drive only connector- so no walk on this.
                     connector_tsys.append("")
-                    connector_time.append([999999, 999999])
+                    #connector_time.append([999999, 999999])
                 else:
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
                     connector_tsys.append(tsys_hold)
-                    connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
+                    #connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
         elif knrdirection == "WTK":    
             if direction == 2: # Destination, entering a zone
                 if typeno in [7, 10]:
                     connector_tsys.append("i")
-                    connector_time.append([3600*distance/CON_VEH_SPEED, 999999])
+                    #connector_time.append([3600*distance/CON_VEH_SPEED, 999999])
                 else:
                     connector_tsys.append("")
-                    connector_time.append([999999, 999999])
+                    #connector_time.append([999999, 999999])
             elif direction == 1: # Origin, leaving a zone
                 if typeno == 10:
                     # a knr drive only connector- so no walk on this.
                     connector_tsys.append("")
-                    connector_time.append([999999, 999999])
+                    #connector_time.append([999999, 999999])
                 else:
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
                     connector_tsys.append(tsys_hold)
-                    connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
+                    #connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
         elif knrdirection == "WTW":
             connector_tsys.append(tsys_hold)
-            connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
+            #connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
     
     h.SetMulti(Visum.Net.Connectors, "TSysSet", connector_tsys)
-    Visum.Net.Connectors.SetMultipleAttributes(["T0_TSYS(I)", "T0_TSYS(W)"], connector_time)
+    #Visum.Net.Connectors.SetMultipleAttributes(["T0_TSYS(I)", "T0_TSYS(W)"], connector_time)
 
 
 

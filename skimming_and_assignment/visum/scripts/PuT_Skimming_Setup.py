@@ -50,7 +50,7 @@ def put_skim_setup(period):
 
         # Make Visum list with link data
         att_list = [sa_isbrt,sa_isscr,sa_islrt,sa_iswes,sp_lrtsyscode] 
-    
+        print(att_list)
 	    # Put Visum link list into dataframe
         df = pd.DataFrame(np.column_stack(att_list), columns = ['sa_isbrt','sa_isscr','sa_islrt','sa_iswes','sp_lrtsyscode'])
         

@@ -89,7 +89,7 @@ def net_initialization():
 
     # Calculate default connector times
     cc_df['veh_time'] = cc_df['cc_length'] / (connector_vehicle_speed/3600)
-    cc_df['wlk_time'] = cc_df['cc_length'] / (walk_speed/3600)
+    cc_df['wlk_time'] = cc_df['cc_length'] / (walk_speed/3600)     
 
     # Set Calculated attributes on ALL connectors
     # Vehicles
@@ -100,6 +100,7 @@ def net_initialization():
     h.SetMulti(Visum.Net.Connectors ,r"T0_TSYS(SR3)" , cc_df['veh_time'], activeOnly = False)
     h.SetMulti(Visum.Net.Connectors ,r"T0_TSYS(MT)"  , cc_df['veh_time'], activeOnly = False)
     h.SetMulti(Visum.Net.Connectors ,r"T0_TSYS(HT)"  , cc_df['veh_time'], activeOnly = False)
+    h.SetMulti(Visum.Net.Connectors ,r"T0_TSYS(I)"   , cc_df['veh_time'], activeOnly = False)
     # Walk
     h.SetMulti(Visum.Net.Connectors ,r"T0_TSYS(WLK)" , cc_df['wlk_time'], activeOnly = False)
     h.SetMulti(Visum.Net.Connectors ,r"T0_TSYS(W)"   , cc_df['wlk_time'], activeOnly = False)
