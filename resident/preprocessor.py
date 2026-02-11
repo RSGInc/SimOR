@@ -77,9 +77,11 @@ def check_ids(
     assert "household_id" in households.columns, "households table missing household_id column"
     assert "household_id" in persons.columns, "persons table missing household_id column"
     assert "MAZ" in households.columns, "households table missing MAZ column"
-    
+
     if "person_id" not in persons.columns:
         persons['person_id'] = persons.household_id * 100 + persons.groupby('household_id').cumcount() + 1
+
+    assert persons.person_id.is_unique, "persons table person_id values are not unique"
 
     # Check for duplicates
     duplicate_mask = households.duplicated(subset=["household_id"], keep=False)
