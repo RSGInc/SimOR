@@ -30,6 +30,8 @@ class PreprocessorSettings:
     crs: int = None
     link_filter_col: str = None
     keep_link_types: dict = None
+    count_intersections: bool = True
+    icnt_col: str = None
     
     def __post_init__(self):
         # Convert strings to Path objects
@@ -37,7 +39,13 @@ class PreprocessorSettings:
             self.data_dir = Path(self.data_dir)
         if isinstance(self.output_dir, str):
             self.output_dir = Path(self.output_dir)
-    
+        
+        # Check intersection count field is provided if not counting inters 
+        if not self.count_intersections and not self.icnt_col:
+            raise ValueError(
+                "intersection column must be provided when count_intersections is False"
+            )
+
     @classmethod
     def from_yaml(cls, yaml_path: Path) -> "PreprocessorSettings":
         """Load settings from a YAML file."""
@@ -490,8 +498,9 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
             break
     
     # Count intersections per MAZ
-    land_use = get_intersection_count(settings, land_use)
-    
+    if settings.count_intersections:
+        land_use = get_intersection_count(settings, land_use)
+        
     def _density_function(maz_in: int) -> tuple:
         """Calculate densities for one MAZ by including other MAZs within walking radius.
         
@@ -507,7 +516,7 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
         dist_skim = maz_maz_walk[maz_maz_walk['OMAZ'] == maz_in]
         maz_circa_int = dist_skim[dist_skim['DISTWALK'] < settings.density_radius]['j'].unique()
         nearby_maz = land_use[land_use[maz_col].isin(maz_circa_int)]
-        sums = nearby_maz[['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES', 'icnt']].sum()
+        sums = nearby_maz[['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES']].sum()
 
         if (sums['ACRES'] > 0):
             empDen = sums['EMP_TOTAL'] / sums['ACRES']
@@ -515,14 +524,17 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
             duDen = sums['TOTHHS'] / sums['ACRES']     
             popDen = sums['TOTPOP'] / sums['ACRES']      
             popEmpDenPerMi = (sums['EMP_TOTAL'] + sums['TOTPOP']) / (sums['ACRES'] / 640) # acres to miles
-            totInt = sums['icnt']
         else:
             empDen = 0.0
             retDen = 0.0
             duDen = 0.0
             popDen = 0.0
             popEmpDenPerMi = 0.0 
-            totInt = 0
+            
+        if settings.count_intersections:
+            totInt = nearby_maz['icnt'].sum() if sums['ACRES'] > 0 else 0
+        else: 
+            totInt = land_use.loc[land_use.MAZ == maz_in, settings.icnt_col].iloc[0]
         
         return empDen, retDen, duDen, popDen, popEmpDenPerMi, totInt
     
