@@ -43,6 +43,7 @@ def net_initialization():
     # Constants from Config.yaml
     walk_speed              = config_data['Walk_Speed']              # 3.5 mph
     connector_vehicle_speed = config_data['Connector_Vehicle_Speed'] # 20 mph
+    intrazonal_vehicle_speed = config_data['Intrazonal_Vehicle_Speed'] # 33.3333 mph
 
     # LINKS
     # Pull Attributes
@@ -106,6 +107,34 @@ def net_initialization():
     h.SetMulti(Visum.Net.Connectors ,r"T0_TSYS(W)"   , cc_df['wlk_time'], activeOnly = False)
     # TSys (set to "holding" field which has the default values pre KnR processes)
     h.SetMulti(Visum.Net.Connectors ,r"TSYSSET"      , cc_df['tsys_holding'], activeOnly = False)
+
+
+
+    # ZONES
+    # Intrazonal distance and time
+    # Pull Attributes
+    area      = h.GetMulti(Visum.Net.Zones,r"AREAMI2", activeOnly = False)
+    intrdist  = h.GetMulti(Visum.Net.Zones,r"INTRDIST", activeOnly = False) 
+    intrtime  = h.GetMulti(Visum.Net.Zones,r"INTRTIME", activeOnly = False)
+
+    # Make Visum list with data
+    att_list = [area,intrdist,intrtime]
+    
+	# Put Visum list into dataframe
+    zone_df = pd.DataFrame(np.column_stack(att_list), columns = ['area','intrdist','intrtime'])
+
+    # Convert Area to Acres
+    zone_df['acres'] = zone_df['area'] * 640
+
+    # Calculate intrdist and intrtime
+    zone_df['intrdist'] = np.minimum(np.sqrt(zone_df['acres']) * 0.024 , 0.75)
+    zone_df['intrtime'] = np.minimum((zone_df['intrdist'] / intrazonal_vehicle_speed) * 3600 , 72)
+
+    # Set Calculated attributes on ALL Zones
+    h.SetMulti(Visum.Net.Zones ,r"INTRDIST"      , zone_df['intrdist'], activeOnly = False)
+    h.SetMulti(Visum.Net.Zones ,r"INTRDIST_WLK"  , zone_df['intrdist'], activeOnly = False)
+    h.SetMulti(Visum.Net.Zones ,r"INTRTIME"      , zone_df['intrtime'], activeOnly = False)
+
 
 net_initialization()
 

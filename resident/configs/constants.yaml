@@ -263,6 +263,7 @@ out_of_vehicle_time_weight: 2.0
 SCALEFACTOR: 5280
 Walk_Speed: 3.0
 Connector_Vehicle_Speed: 20
+Intrazonal_Vehicle_Speed: 33.33333
 
 # CostSkim_Setup.py
 SOV_LOW_VOT: 3.39
