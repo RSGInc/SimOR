@@ -414,15 +414,19 @@ def get_intersection_count(
     links = links[links[filter_col].isin(keep_link_types)]
     links['link_count'] = 1
     
+    # Remove duplicate links
+    links['link_AB'] = [tuple(sorted(x)) for x in zip(links['FROMNODENO'], links['TONODENO'])]
+    links = links.drop_duplicates(subset='link_AB', keep='first')
+
     # Aggregate by NodeA and NodeB
     links_nodeA = links[['FROMNODENO', 'link_count']].groupby('FROMNODENO').sum().reset_index().rename(columns = {'FROMNODENO':'A'})
     links_nodeB = links[['TONODENO', 'link_count']].groupby("TONODENO").sum().reset_index().rename(columns = {'TONODENO':'B'})
     
-    # Merge the two and keep all recrods from both dataframe (how='outer')
+    # Merge the two and keep all records from both dataframe (how='outer')
     nodes_linkcount = pd.merge(links_nodeA, links_nodeB, left_on='A', right_on = 'B', how='outer')
     nodes_linkcount = nodes_linkcount.fillna(0)
     nodes_linkcount['link_count'] = nodes_linkcount['link_count_x'] + nodes_linkcount['link_count_y']
-    
+
     # Get node id from both dataframes
     nodes_linkcount['N'] = 0.0 # float
     nodes_linkcount.loc[nodes_linkcount.A > 0, 'N'] = nodes_linkcount['A']
