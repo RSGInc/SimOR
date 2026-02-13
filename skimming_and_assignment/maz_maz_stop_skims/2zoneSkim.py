@@ -570,15 +570,18 @@ class SkimGenerator:
         """
         return df.astype(columns)
 
-def main(path: str):
+def main(yaml_path: str):
     """Main execution function"""
+    print("Starting skim processing...")
+    start_time = datetime.now()
+    
     # Load configuration
-    with open(os.path.join(path, "2zoneSkim_params.yaml"), 'r') as f:
+    with open(yaml_path, 'r') as f:
         config = yaml.safe_load(f)
     
     params = SkimParameters.from_yaml(config)
-    model_inputs = os.path.join(path, "input")
-    output_path = os.path.join(path, "output")
+    model_inputs = config['settings']['input_dir']
+    output_path = config['settings']['output_dir']
     
     # Create network builder using class method
     network_builder = NetworkBuilder.from_files(model_inputs, config)
@@ -587,6 +590,7 @@ def main(path: str):
     skim_generator = SkimGenerator(network_builder, params, output_path)
     
     # Generate and save skims
+    os.makedirs(output_path, exist_ok=True)
     if config['settings']['run_maz_maz_walk']:
         print(f"{datetime.now().strftime('%H:%M:%S')} Generating MAZ-MAZ walk skims...")
         walk_skim = skim_generator.generate_maz_maz_walk_skim()
@@ -601,6 +605,9 @@ def main(path: str):
         print(f"{datetime.now().strftime('%H:%M:%S')} Generating MAZ-stop walk skims...")
         stop_skim = skim_generator.generate_maz_stop_walk_skim()
         stop_skim.to_csv(os.path.join(output_path, config['settings']['maz_stop_walk_output']), index=False)
+    
+    elapsed = datetime.now() - start_time
+    print(f"Skimming finished! Total time: {elapsed}")
 
 if __name__ == "__main__":
     import sys

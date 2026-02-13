@@ -4,6 +4,7 @@ Adds derived columns to land_use, households, and persons tables.
 """
 
 import pandas as pd
+import numpy as np
 import geopandas as gpd
 import openmatrix as omx
 import numpy as np
@@ -27,6 +28,14 @@ class PreprocessorSettings:
     maz_stop_walk_file: str = None  # Path to MAZ stop walk distances file
     fare_skim_input_file: str = None  # Path to non-TOD segmented fare skim matrix file
     times_of_day: list[str] = field(default_factory=lambda: ["EA", "AM", "MD", "PM", "EV"])
+    maz_maz_walk_file: str = None
+    nodes_file: str = None
+    links_file: str = None
+    density_radius: float = 0.50 # Buffer radius for density calcs, miles 
+    link_filter_col: str = None
+    keep_link_types: dict = None
+    count_intersections: bool = True
+    icnt_col: str = None
     
     def __post_init__(self):
         # Convert strings to Path objects
@@ -34,7 +43,13 @@ class PreprocessorSettings:
             self.data_dir = Path(self.data_dir)
         if isinstance(self.output_dir, str):
             self.output_dir = Path(self.output_dir)
-    
+        
+        # Check intersection count field is provided if not counting inters 
+        if not self.count_intersections and not self.icnt_col:
+            raise ValueError(
+                "intersection column must be provided when count_intersections is False"
+            )
+
     @classmethod
     def from_yaml(cls, yaml_path: Path) -> "PreprocessorSettings":
         """Load settings from a YAML file."""
@@ -227,6 +242,15 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
         print(f"Available columns: {list(gdf.columns)}")
         return land_use
     
+    land_use_maz_col = None
+    if land_use_maz_col is None:
+        for col in land_use.columns:
+            if col.upper() in ['MAZ', 'MAZ_ID', 'ID', 'MAZ_NO']:
+                land_use_maz_col = col
+                break
+            
+    gdf = gdf.rename(columns = {maz_col:land_use_maz_col})
+    
     print(f"Using '{maz_col}' as MAZ identifier")
     
     # Calculate area in acres
@@ -257,12 +281,12 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
     
     # Calculate area in native units, then convert to acres
     gdf['ACRES'] = gdf.geometry.area / sq_units_per_acre
-    
-    # Create a mapping from MAZ to ACRES
-    acres_map = gdf.set_index(maz_col)['ACRES'].to_dict()
-    
-    # Add ACRES to land_use based on MAZ index
-    land_use['ACRES'] = land_use.index.map(acres_map)
+        
+    # Add ACRES to land_use
+    land_use = land_use.merge(
+        gdf[['ACRES', land_use_maz_col]], 
+        how = 'left', 
+        on=land_use_maz_col)
     
     # Check for missing values
     missing_count = land_use['ACRES'].isna().sum()
@@ -358,6 +382,203 @@ def merge_maz_stop_walk(land_use: pd.DataFrame, maz_stop_walk_file: str = None) 
     
     return land_use
 
+def get_intersection_count(
+    settings: PreprocessorSettings, 
+    land_use: pd.DataFrame
+) -> pd.DataFrame:
+    """ Count number of intersections in network 
+    
+    Parameters
+    ----------
+    land_use : pd.DataFrame
+        Land use table with MAZ column
+ 
+    Returns
+    -------
+    pd.DataFrame
+        Updated land_use with intersection counts
+    
+    """   
+    # Load settings 
+    nodes_file = settings.nodes_file
+    links_file = settings.links_file
+    maz_shp_file = settings.maz_shp_file
+    filter_col = settings.link_filter_col
+    keep_link_types = settings.keep_link_types
+    
+    if nodes_file is None:
+        print("Warning: missing node data, skipping intersection count")
+        return land_use
+    if links_file is None:
+        print("Warning: missing link data, skipping intersection count")
+        return land_use
+    if maz_shp_file is None:
+        print("Warning: missing maz_shp_file, skipping intersection count")
+        return land_use
+    
+    # Load data
+    print(f"Reading nodes file: {nodes_file}")
+    nodes = gpd.read_file(nodes_file)
+    print(f"Reading links file: {links_file}")
+    links = gpd.read_file(links_file)
+    print(f"Reading maz_shp_file: {maz_shp_file}")
+    maz = gpd.read_file(settings.maz_shp_file)
+    
+    links[filter_col] = pd.to_numeric(links[filter_col], errors='coerce')
+    
+    # Check crs
+    if nodes.crs.is_geographic:
+        print(f"Warning: Nodes shapefile is in geographic CRS ({nodes.crs}), reprojecting to UTM")
+        nodes = nodes.to_crs(nodes.estimate_utm_crs())
+           
+    if maz.crs != nodes.crs:
+        print(f"Converted maz shp to {nodes.crs}")
+        maz = maz.to_crs(nodes.crs)
+    
+    # Filter links
+    links = links[links[filter_col].isin(keep_link_types)]
+    links['link_count'] = 1
+    
+    # Remove duplicate links
+    links['link_AB'] = [tuple(sorted(x)) for x in zip(links['FROMNODENO'], links['TONODENO'])]
+    links = links.drop_duplicates(subset='link_AB', keep='first')
+
+    # Aggregate by NodeA and NodeB
+    links_nodeA = links[['FROMNODENO', 'link_count']].groupby('FROMNODENO').sum().reset_index().rename(columns = {'FROMNODENO':'A'})
+    links_nodeB = links[['TONODENO', 'link_count']].groupby("TONODENO").sum().reset_index().rename(columns = {'TONODENO':'B'})
+    
+    # Merge the two and keep all records from both dataframe (how='outer')
+    nodes_linkcount = pd.merge(links_nodeA, links_nodeB, left_on='A', right_on = 'B', how='outer')
+    nodes_linkcount = nodes_linkcount.fillna(0)
+    nodes_linkcount['link_count'] = nodes_linkcount['link_count_x'] + nodes_linkcount['link_count_y']
+
+    # Get node id from both dataframes
+    nodes_linkcount['N'] = 0.0 # float
+    nodes_linkcount.loc[nodes_linkcount.A > 0, 'N'] = nodes_linkcount['A']
+    nodes_linkcount.loc[nodes_linkcount.B > 0, 'N'] = nodes_linkcount['B']
+    nodes_linkcount = nodes_linkcount[['N', 'link_count']]
+        
+    # Keep nodes with 3+ links
+    intersections_temp = nodes_linkcount.loc[nodes_linkcount.link_count >= 3]
+
+    # Get node X and Y
+    intersections = pd.merge(intersections_temp, nodes[['NO', 'XCOORD', 'YCOORD']], left_on='N', right_on='NO', how='left')
+    intersections = intersections[['N', 'XCOORD', 'YCOORD']]
+    intersections = intersections.rename(columns = {'XCOORD':'X', 'YCOORD':'Y'})
+
+    # Find MAZ col in maz_shp
+    maz_col = None
+    for col in maz.columns:
+        if col.upper() in ['MAZ', 'MAZ_NO', 'MAZ_ID', 'ID']:
+            maz_col = col
+            break
+    
+    # Find maz centroids
+    maz['XCOORD'] = maz.geometry.centroid.x
+    maz['YCOORD'] = maz.geometry.centroid.y
+    maz_nodes = maz[[maz_col] + ['XCOORD', 'YCOORD']]
+    maz_nodes.columns = ['MAZ', 'X', 'Y']
+
+    # Find nearest maz for each intersection (euclidean distance)
+    int_dict = {}
+    for i in intersections.iterrows():
+        maz_nodes['dist'] = np.sqrt((i[1][1] - maz_nodes['X'])**2+(i[1][2] - maz_nodes['Y'])**2)
+        int_dict[i[1][0]] = maz_nodes.loc[maz_nodes['dist'] == maz_nodes['dist'].min()]['MAZ'].values[0]
+        
+    intersections['near_maz'] = intersections['N'].map(int_dict)
+    intersections = intersections.groupby('near_maz', as_index = False).count()[['near_maz','N']].rename(columns = {'near_maz':'MAZ','N':'icnt'})
+    
+    # Merge counts with land use data
+    land_use = pd.merge(land_use, intersections, on = "MAZ", how = "left").fillna(0)
+    return land_use
+
+def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.DataFrame:
+    """Calculate land use densities and intersections
+    
+    Parameters
+    ----------
+    land_use : pd.DataFrame
+        Land use table with MAZ column
+        
+    Returns
+    -------
+    pd.DataFrame
+        Updated land_use with empden, retempden, duden,
+        popden, popempdenpermi, totint
+    
+    """
+    # Load settings
+    if settings.maz_maz_walk_file is None:
+        print("No maz_maz_walk file provided, skipping densities")
+        return land_use
+    
+    print(f"Reading MAZ walk file: {settings.maz_maz_walk_file}")
+    maz_maz_walk = pd.read_csv(settings.maz_maz_walk_file)
+    
+    new_cols = ['empden', 'retempden', 'duden', 'popden', 'popempdenpermi', 'totint']
+    for col in new_cols:
+        if col in land_use.columns:
+            land_use = land_use.drop(col, axis=1)
+            
+    maz_col = None
+    for col in land_use.columns:
+        if col.upper() in ['MAZ', 'MAZ_NO', 'MAZ_ID', 'ID']:
+            maz_col = col
+            break
+    
+    # Count intersections per MAZ
+    if settings.count_intersections:
+        land_use = get_intersection_count(settings, land_use)
+        
+    def _density_function(maz_in: int) -> tuple:
+        """Calculate densities for one MAZ by including other MAZs within walking radius.
+        
+        Parameters
+        ----------
+        maz_in: MAZ ID to analyze
+            
+        Returns
+        -------
+        Tuple with density metrics 
+        
+        """
+        dist_skim = maz_maz_walk[maz_maz_walk['OMAZ'] == maz_in]
+        maz_circa_int = dist_skim[dist_skim['DISTWALK'] < settings.density_radius]['j'].unique()
+        nearby_maz = land_use[land_use[maz_col].isin(maz_circa_int)]
+        sums = nearby_maz[['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES']].sum()
+
+        if (sums['ACRES'] > 0):
+            empDen = sums['EMP_TOTAL'] / sums['ACRES']
+            retDen = sums['EMP_RET'] / sums['ACRES']    
+            duDen = sums['TOTHHS'] / sums['ACRES']     
+            popDen = sums['TOTPOP'] / sums['ACRES']      
+            popEmpDenPerMi = (sums['EMP_TOTAL'] + sums['TOTPOP']) / (sums['ACRES'] / 640) # acres to miles
+        else:
+            empDen = 0.0
+            retDen = 0.0
+            duDen = 0.0
+            popDen = 0.0
+            popEmpDenPerMi = 0.0 
+            
+        if settings.count_intersections:
+            totInt = nearby_maz['icnt'].sum() if sums['ACRES'] > 0 else 0
+        else: 
+            totInt = land_use.loc[land_use.MAZ == maz_in, settings.icnt_col].iloc[0]
+        
+        return empDen, retDen, duDen, popDen, popEmpDenPerMi, totInt
+    
+    (
+        land_use[new_cols[0]], 
+        land_use[new_cols[1]], 
+        land_use[new_cols[2]], 
+        land_use[new_cols[3]], 
+        land_use[new_cols[4]], 
+        land_use[new_cols[5]]
+    ) = zip(*land_use['MAZ'].map(_density_function))    
+    
+    land_use[new_cols] = round(land_use[new_cols], 3)
+    print(f"Added columns to land_use: {new_cols}")
+    return land_use
 
 def dataframes_equal(df1: pd.DataFrame, df2: pd.DataFrame) -> bool:
     """Check if two DataFrames are equal."""
@@ -491,6 +712,9 @@ def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFra
     
     # Merge MAZ stop walk distances if provided
     land_use = merge_maz_stop_walk(land_use, settings.maz_stop_walk_file)
+    
+    # Calculate land use densities
+    land_use = get_density(land_use, settings)
     
     # Write output files
     write_output(

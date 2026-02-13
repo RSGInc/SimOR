@@ -19,6 +19,7 @@ import sys
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from shapely.geometry import LineString
 
 class ConfigLoader():
@@ -27,6 +28,7 @@ class ConfigLoader():
         self.config = self.load_config()
         
     def load_config(self):
+        os.chdir(os.path.dirname(__file__))
         with open(self.config_file, "r") as file:
             return yaml.load(file, Loader = yaml.FullLoader)
 
@@ -218,6 +220,9 @@ def prepare_transit_routes_and_stops(inputs):
     return routes, stops_gdf[keep_cols]
 
 def main(config_file):
+    print("Starting non-motorized skim preprocessing....")
+    start_time = datetime.now()
+    
     config = ConfigLoader(config_file)
     inputs = DataLoader(config)
     
@@ -235,6 +240,9 @@ def main(config_file):
     links.to_file(os.path.join(output_dir, "links.shp"))
     routes.to_csv(os.path.join(output_dir, "routes.csv"))
     stops.to_csv(os.path.join(output_dir, "stops.csv"))
+    
+    elapsed = datetime.now() - start_time
+    print(f"Skim preprocessing complete! Total time: {elapsed}")
 
 if __name__ == "__main__":
     main(sys.argv[1])
