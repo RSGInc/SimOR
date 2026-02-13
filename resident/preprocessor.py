@@ -227,6 +227,15 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
         print(f"Available columns: {list(gdf.columns)}")
         return land_use
     
+    land_use_maz_col = None
+    if land_use_maz_col is None:
+        for col in land_use.columns:
+            if col.upper() in ['MAZ', 'MAZ_ID', 'ID', 'MAZ_NO']:
+                land_use_maz_col = col
+                break
+            
+    gdf = gdf.rename(columns = {maz_col:land_use_maz_col})
+    
     print(f"Using '{maz_col}' as MAZ identifier")
     
     # Calculate area in acres
@@ -257,12 +266,12 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
     
     # Calculate area in native units, then convert to acres
     gdf['ACRES'] = gdf.geometry.area / sq_units_per_acre
-    
-    # Create a mapping from MAZ to ACRES
-    acres_map = gdf.set_index(maz_col)['ACRES'].to_dict()
-    
-    # Add ACRES to land_use based on MAZ index
-    land_use['ACRES'] = land_use.index.map(acres_map)
+        
+    # Add ACRES to land_use
+    land_use = land_use.merge(
+        gdf[['ACRES', land_use_maz_col]], 
+        how = 'left', 
+        on=land_use_maz_col)
     
     # Check for missing values
     missing_count = land_use['ACRES'].isna().sum()
