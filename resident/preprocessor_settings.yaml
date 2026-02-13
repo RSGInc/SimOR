@@ -1,10 +1,45 @@
-data_dir: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input\SyntheticPopulation
+data_dir: C:/Documents/ODOT/data_full
 # output_dir: null  # null means overwrite input files
-output_dir: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input
+output_dir: C:/Documents/ODOT/output
 households_file: households.csv
 persons_file: persons.csv
 land_use_file: land_use.csv
 
-maz_shp_file: C:\projects\odot_joint_estimation\metro_data_prep\MAZs_22333_2025-11-20\MAZs_22333_2025-11-20.shp
+maz_shp_file: C:/Documents/git_locals/SimOR/skimming_and_assignment/maz_maz_stop_skims/data/MAZs_22333_2025-11-20.shp
 
-maz_stop_walk_file: C:\projects\odot_joint_estimation\pnr\tasks\run_dir_new_zones\input\maz_stop_walk.csv
+maz_stop_walk_file: C:/Documents/ODOT/data_full/maz_stop_walk.csv
+maz_maz_walk_file: C:/Documents/ODOT/data_full/maz_maz_walk.csv
+
+# Land use settings
+nodes_file: C:/Documents/git_locals/SimOR/skimming_and_assignment/maz_maz_stop_skims/data/Network_node.shp
+links_file: C:/Documents/git_locals/SimOR/skimming_and_assignment/maz_maz_stop_skims/data/Network_link.shp
+density_radius: 0.50 # walk radius (miles) for density calculations
+
+# Intersection counts
+count_intersections: True 
+# If count_intersections is False, provide col name with intersection counts
+# icnt_col: INTHMI
+
+# Network filter for intersection counts
+# Specify col name and values to filter on
+link_filter_col: TYPENO
+keep_link_types: [  
+  0,  # uknown
+  # 1,  # transit
+  # 2,  # walk to transit (asserted length)
+  # 3,  # walk to transit (actual length)
+  # 4,  # WES PnR connection
+  # 10, # freeway
+  # 19, # freeway hov
+  # 20, # highway 
+  30, # arterial
+  40, # intersection expansion link
+  51, # intersection approach
+  61, # CBD grid
+  # 70, # offramp
+  # 71, # metered ramp
+  # 79, # onramp
+  # 80, # bike facility
+  # 81, # bike facility
+  # 82  # bike facility
+]
