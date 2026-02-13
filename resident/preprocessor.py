@@ -27,7 +27,6 @@ class PreprocessorSettings:
     nodes_file: str = None
     links_file: str = None
     density_radius: float = 0.50 # Buffer radius for density calcs, miles 
-    crs: int = None
     link_filter_col: str = None
     keep_link_types: dict = None
     count_intersections: bool = True
@@ -402,10 +401,10 @@ def get_intersection_count(
     links[filter_col] = pd.to_numeric(links[filter_col], errors='coerce')
     
     # Check crs
-    if not nodes.crs.is_projected:
-        print(f"Converted nodes to projected CRS: {settings.crs}")
-        nodes = nodes.to_crs(settings.crs)
-   
+    if nodes.crs.is_geographic:
+        print(f"Warning: Nodes shapefile is in geographic CRS ({nodes.crs}), reprojecting to UTM")
+        nodes = nodes.to_crs(nodes.estimate_utm_crs())
+           
     if maz.crs != nodes.crs:
         print(f"Converted maz shp to {nodes.crs}")
         maz = maz.to_crs(nodes.crs)
