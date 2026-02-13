@@ -479,13 +479,16 @@ def get_intersection_count(
     maz_nodes = maz[[maz_col] + ['XCOORD', 'YCOORD']]
     maz_nodes.columns = ['MAZ', 'X', 'Y']
 
-    # Find nearest maz for each intersection (euclidean distance)
-    int_dict = {}
-    for i in intersections.iterrows():
-        maz_nodes['dist'] = np.sqrt((i[1][1] - maz_nodes['X'])**2+(i[1][2] - maz_nodes['Y'])**2)
-        int_dict[i[1][0]] = maz_nodes.loc[maz_nodes['dist'] == maz_nodes['dist'].min()]['MAZ'].values[0]
-        
-    intersections['near_maz'] = intersections['N'].map(int_dict)
+    # Find nearest maz for each intersection
+    print("Finding nearest MAZ for each intersection...")
+    int_gdf = gpd.GeoDataFrame(
+        intersections, geometry=gpd.points_from_xy(intersections['X'], intersections['Y']), crs=nodes.crs
+    )
+    maz_gdf = gpd.GeoDataFrame(
+        maz_nodes, geometry=gpd.points_from_xy(maz_nodes['X'], maz_nodes['Y']), crs=nodes.crs
+    )
+    joined = gpd.sjoin_nearest(int_gdf, maz_gdf[['MAZ', 'geometry']], how='left')
+    intersections['near_maz'] = joined['MAZ'].values
     intersections = intersections.groupby('near_maz', as_index = False).count()[['near_maz','N']].rename(columns = {'near_maz':'MAZ','N':'icnt'})
     
     # Merge counts with land use data
@@ -530,51 +533,69 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
     if settings.count_intersections:
         land_use = get_intersection_count(settings, land_use)
         
-    def _density_function(maz_in: int) -> tuple:
-        """Calculate densities for one MAZ by including other MAZs within walking radius.
-        
-        Parameters
-        ----------
-        maz_in: MAZ ID to analyze
-            
-        Returns
-        -------
-        Tuple with density metrics 
-        
-        """
-        dist_skim = maz_maz_walk[maz_maz_walk['OMAZ'] == maz_in]
-        maz_circa_int = dist_skim[dist_skim['DISTWALK'] < settings.density_radius]['j'].unique()
-        nearby_maz = land_use[land_use[maz_col].isin(maz_circa_int)]
-        sums = nearby_maz[['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES']].sum()
-
-        if (sums['ACRES'] > 0):
-            empDen = sums['EMP_TOTAL'] / sums['ACRES']
-            retDen = sums['EMP_RET'] / sums['ACRES']    
-            duDen = sums['TOTHHS'] / sums['ACRES']     
-            popDen = sums['TOTPOP'] / sums['ACRES']      
-            popEmpDenPerMi = (sums['EMP_TOTAL'] + sums['TOTPOP']) / (sums['ACRES'] / 640) # acres to miles
-        else:
-            empDen = 0.0
-            retDen = 0.0
-            duDen = 0.0
-            popDen = 0.0
-            popEmpDenPerMi = 0.0 
-            
-        if settings.count_intersections:
-            totInt = nearby_maz['icnt'].sum() if sums['ACRES'] > 0 else 0
-        else: 
-            totInt = land_use.loc[land_use.MAZ == maz_in, settings.icnt_col].iloc[0]
-        
-        return empDen, retDen, duDen, popDen, popEmpDenPerMi, totInt
+    print("Calculating densities for each MAZ...")
     
-    (
-        land_use[new_cols[0]], 
-        land_use[new_cols[1]], 
-        land_use[new_cols[2]], 
-        land_use[new_cols[3]], 
-        land_use[new_cols[4]], 
-        land_use[new_cols[5]]
-    ) = zip(*land_use['MAZ'].map(_density_function))    
+    # Filter walk skim to only pairs within the density radius (once, upfront)
+    nearby_pairs = maz_maz_walk.loc[
+        maz_maz_walk['DISTWALK'] < settings.density_radius, ['OMAZ', 'j']
+    ]
+    
+    # Prepare land_use lookup columns
+    agg_cols = ['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES']
+    if settings.count_intersections:
+        agg_cols.append('icnt')
+    
+    # Join land_use attributes onto each nearby pair by destination MAZ
+    nearby_with_data = nearby_pairs.merge(
+        land_use[[maz_col] + agg_cols],
+        left_on='j',
+        right_on=maz_col,
+        how='left'
+    )
+    
+    # Sum attributes across all nearby MAZs for each origin MAZ
+    sums = nearby_with_data.groupby('OMAZ')[agg_cols].sum()
+    
+    # Merge sums back to land_use
+    land_use = land_use.merge(sums, left_on=maz_col, right_index=True, how='left', suffixes=('', '_sum'))
+    
+    # Resolve suffixed columns from the sum
+    for col in agg_cols:
+        sum_col = col + '_sum'
+        if sum_col in land_use.columns:
+            land_use[sum_col] = land_use[sum_col].fillna(0)
+        else:
+            # No suffix means no collision; rename for consistency
+            sum_col = col
+    
+    # Build references to summed columns
+    emp_total_sum = 'EMP_TOTAL_sum' if 'EMP_TOTAL_sum' in land_use.columns else 'EMP_TOTAL'
+    emp_ret_sum = 'EMP_RET_sum' if 'EMP_RET_sum' in land_use.columns else 'EMP_RET'
+    tothhs_sum = 'TOTHHS_sum' if 'TOTHHS_sum' in land_use.columns else 'TOTHHS'
+    totpop_sum = 'TOTPOP_sum' if 'TOTPOP_sum' in land_use.columns else 'TOTPOP'
+    acres_sum = 'ACRES_sum' if 'ACRES_sum' in land_use.columns else 'ACRES'
+    icnt_sum = 'icnt_sum' if 'icnt_sum' in land_use.columns else 'icnt'
+    
+    # Calculate densities vectorized (avoid division by zero)
+    has_acres = land_use[acres_sum] > 0
+    land_use['empden'] = np.where(has_acres, land_use[emp_total_sum] / land_use[acres_sum], 0.0)
+    land_use['retempden'] = np.where(has_acres, land_use[emp_ret_sum] / land_use[acres_sum], 0.0)
+    land_use['duden'] = np.where(has_acres, land_use[tothhs_sum] / land_use[acres_sum], 0.0)
+    land_use['popden'] = np.where(has_acres, land_use[totpop_sum] / land_use[acres_sum], 0.0)
+    land_use['popempdenpermi'] = np.where(
+        has_acres,
+        (land_use[emp_total_sum] + land_use[totpop_sum]) / (land_use[acres_sum] / 640),
+        0.0
+    )
+    
+    if settings.count_intersections:
+        land_use['totint'] = np.where(has_acres, land_use[icnt_sum], 0)
+    else:
+        land_use['totint'] = land_use[settings.icnt_col]
+    
+    # Drop temporary sum columns
+    temp_cols = [c for c in land_use.columns if c.endswith('_sum')]
+    land_use = land_use.drop(columns=temp_cols)    
     
     land_use[new_cols] = round(land_use[new_cols], 3)
     print(f"Added columns to land_use: {new_cols}")
