@@ -306,7 +306,7 @@ def external_non_mandatory_identification(
     network_los: los.Network_LOS,
     model_settings: ExternalIdentificationSettings | None = None,
     model_settings_file_name: str = "external_non_mandatory_identification.yaml",
-    trace_label: str = "external_non_mandatory_identification",
+    trace_label: str = "external_non_mandatory_tour_identification",
     trace_hh_id: bool = False,
 ) -> None:
     """
