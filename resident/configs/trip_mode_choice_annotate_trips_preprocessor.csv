@@ -145,8 +145,8 @@ Total trips on tour,totalTrips,totStops+2
 Indicator for trip origin is tour prim. Destination,tripOrigIsTourDest,~df.outbound*df.trip_num==1
 Indicator for trip destination is tour prim. Destination,tripDestIsTourDest,df.outbound*df.trip_num==df.trip_count
 Contribution to trip parking cost from primary destination,parkCostTourDestContrib,parkingCostPrimDest/(totalTrips+2)
-Hourly parking cost at trip origin,parkCostTripOrig,"reindex(land_use.PRKCST_HR, origin)*100"
-Hourly parking cost at trip destination,parkCostTripDest,"reindex(land_use.PRKCST_HR, destination)*100"
+Hourly parking cost at trip origin,parkCostTripOrig,"reindex(land_use.PRKCST_HR, origin)"
+Hourly parking cost at trip destination,parkCostTripDest,"reindex(land_use.PRKCST_HR, destination)"
 Contribution to trip parking cost from trip origin,parkCostTripOrigContrib,parkCostTripOrig*(1-firstTrip)*(1-tripOrigIsTourDest)
 Contribution to trip parking cost from trip origin,parkCostTripOrigContrib,parkingCostPrimDest/(totalTrips+2) * tripOrigIsTourDest
 Contribution to trip parking cost from trip destination,parkCostTripDestContrib,parkCostTripDest * (1-lastTrip)*(1-tripDestIsTourDest)

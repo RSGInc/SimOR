@@ -14,7 +14,7 @@ util_persons_5_15_in_hhld,Persons age 5-15 in hhld,@df.num_children_5_to_15,0,co
 util_zero_autos,zero auto household ownership,@df.auto_ownership==0,0,coef_zero_autos_pass
 util_auto_deficient,auto deficient household,@((df.auto_ownership < df.num_workers) & (df.auto_ownership > 0)),0,coef_auto_deficient_pass
 util_subs,Subsidy offered,@df.transit_pass_subsidy,0,coef_subs_pass
-util_inc_adj_transit_pass_cost,Income adjusted transit pass cost,"@df.transit_pass_cost_per_trip / (np.maximum(df.income, 1000) ** df.income_exponent) / 60",0,coef_tripmc_cost_coef
+util_inc_adj_transit_pass_cost,Income adjusted transit pass cost in cents since trip mc coef is in cents,"@df.transit_pass_cost_per_trip / (np.maximum(df.income, 1000) ** df.income_exponent) / 60 * 100",0,coef_tripmc_cost_coef
 util_parking_cost_at_work,Parking cost at work,@df.exp_daily_work,0,coef_parking_cost_at_work_pass
 #util_total_acc_transit,Total accessibility (0.66*PK + 0.34*OP) by transit,@(0.66*df.trPkTotal+0.34*df.trOpTotal),0,coef_total_transit_acc_pass
 util_is_univ,University student,@df.pstudent == PSTUDENT_UNIVERSITY,0,coef_is_univ
