@@ -66,6 +66,51 @@ def load_data(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFram
     return households, persons, land_use
 
 
+def set_land_use_maz_index(land_use: pd.DataFrame) -> pd.DataFrame:
+    """Infer the MAZ column, rename it to 'MAZ', and set it as the index.
+    
+    Searches for common MAZ column name variations (MAZ, MAZ_ID, MAZ_NO)
+    and standardizes to 'MAZ' as the DataFrame index.
+    
+    Parameters
+    ----------
+    land_use : pd.DataFrame
+        Land use table with an MAZ-like column
+        
+    Returns
+    -------
+    pd.DataFrame
+        Land use table with 'MAZ' as the index
+    """
+    # If MAZ is already the index, just ensure the name
+    if land_use.index.name and land_use.index.name.upper() in ['MAZ', 'MAZ_ID', 'MAZ_NO']:
+        land_use.index.name = 'MAZ'
+        print("land_use index already set to MAZ")
+        return land_use
+    
+    # Search for a MAZ-like column
+    maz_col = None
+    for col in land_use.columns:
+        if col.upper() in ['MAZ', 'MAZ_ID', 'MAZ_NO']:
+            maz_col = col
+            break
+    
+    if maz_col is None:
+        raise RuntimeError(
+            f"Could not identify MAZ column in land_use. "
+            f"Available columns: {list(land_use.columns)}"
+        )
+    
+    # Rename to 'MAZ' if needed, then set as index
+    if maz_col != 'MAZ':
+        land_use = land_use.rename(columns={maz_col: 'MAZ'})
+        print(f"Renamed land_use column '{maz_col}' to 'MAZ'")
+    
+    land_use = land_use.set_index('MAZ')
+    print(f"Set land_use index to 'MAZ' ({len(land_use)} zones)")
+    return land_use
+
+
 def check_ids(
     households: pd.DataFrame, 
     persons: pd.DataFrame
@@ -92,9 +137,11 @@ def check_ids(
     assert "household_id" in households.columns, "households table missing household_id column"
     assert "household_id" in persons.columns, "persons table missing household_id column"
     assert "MAZ" in households.columns, "households table missing MAZ column"
-    
+
     if "person_id" not in persons.columns:
         persons['person_id'] = persons.household_id * 100 + persons.groupby('household_id').cumcount() + 1
+
+    assert persons.person_id.is_unique, "persons table person_id values are not unique"
 
     # Check for duplicates
     duplicate_mask = households.duplicated(subset=["household_id"], keep=False)
@@ -159,7 +206,10 @@ def check_ids(
 
 
 def add_tothhs(land_use: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame:
-    """Add TOTHHS (total households per zone) to land_use if not present."""
+    """Add TOTHHS (total households per zone) to land_use if not present.
+    
+    Expects land_use to be indexed by MAZ.
+    """
     if "TOTHHS" not in land_use.columns:
         tothhs = (
             households.groupby("MAZ")
@@ -168,7 +218,7 @@ def add_tothhs(land_use: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame
             .fillna(0)
             .astype(int)
         )
-        land_use["TOTHHS"] = tothhs.values
+        land_use["TOTHHS"] = tothhs
         print("Added TOTHHS to land_use")
     else:
         print("TOTHHS already exists in land_use")
@@ -176,7 +226,10 @@ def add_tothhs(land_use: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame
 
 
 def add_totpop(land_use: pd.DataFrame, persons: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame:
-    """Add TOTPOP (total population per zone) to land_use if not present."""
+    """Add TOTPOP (total population per zone) to land_use if not present.
+    
+    Expects land_use to be indexed by MAZ.
+    """
     if "TOTPOP" not in land_use.columns:
         # Join persons to households to get MAZ
         if "MAZ" not in persons.columns:
@@ -194,7 +247,7 @@ def add_totpop(land_use: pd.DataFrame, persons: pd.DataFrame, households: pd.Dat
             .fillna(0)
             .astype(int)
         )
-        land_use["TOTPOP"] = totpop.values
+        land_use["TOTPOP"] = totpop
         print("Added TOTPOP to land_use")
     else:
         print("TOTPOP already exists in land_use")
@@ -240,15 +293,7 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
         print(f"Available columns: {list(gdf.columns)}")
         return land_use
     
-    land_use_maz_col = None
-    if land_use_maz_col is None:
-        for col in land_use.columns:
-            if col.upper() in ['MAZ', 'MAZ_ID', 'ID', 'MAZ_NO']:
-                land_use_maz_col = col
-                break
-            
-    gdf = gdf.rename(columns = {maz_col:land_use_maz_col})
-    
+    gdf = gdf.rename(columns={maz_col: 'MAZ'})
     print(f"Using '{maz_col}' as MAZ identifier")
     
     # Calculate area in acres
@@ -280,11 +325,9 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
     # Calculate area in native units, then convert to acres
     gdf['ACRES'] = gdf.geometry.area / sq_units_per_acre
         
-    # Add ACRES to land_use
-    land_use = land_use.merge(
-        gdf[['ACRES', land_use_maz_col]], 
-        how = 'left', 
-        on=land_use_maz_col)
+    # Add ACRES to land_use (merge on MAZ index)
+    acres_map = gdf.set_index('MAZ')['ACRES']
+    land_use['ACRES'] = acres_map.reindex(land_use.index).values
     
     # Check for missing values
     missing_count = land_use['ACRES'].isna().sum()
@@ -344,30 +387,10 @@ def merge_maz_stop_walk(land_use: pd.DataFrame, maz_stop_walk_file: str = None) 
         print("  All columns already exist in land_use, skipping merge")
         return land_use
     
-    # Merge on MAZ
-    # Determine the MAZ column name in land_use (could be 'MAZ' or 'maz')
-    if 'MAZ' in land_use.columns:
-        land_use_maz_col = 'MAZ'
-    elif 'maz' in land_use.columns:
-        land_use_maz_col = 'maz'
-    elif 'MAZ_NO' in land_use.columns:
-        land_use.rename(columns={'MAZ_NO': 'MAZ', 'TAZ_NO': 'TAZ'}, inplace=True)
-        land_use_maz_col = 'MAZ'
-    else:
-        raise RuntimeError("Warning: Could not find MAZ column in land_use")
-    
-    # Merge only the new columns plus the join key
+    # Merge on MAZ index
     cols_to_merge = ['maz'] + new_cols
-    land_use = land_use.merge(
-        maz_stop_walk[cols_to_merge],
-        left_on=land_use_maz_col,
-        right_on='maz',
-        how='left'
-    )
-    
-    # Drop the duplicate maz column from the merge if it was added
-    if 'maz' in land_use.columns and land_use_maz_col == 'MAZ':
-        land_use = land_use.drop(columns=['maz'])
+    stop_walk_indexed = maz_stop_walk[cols_to_merge].set_index('maz')
+    land_use = land_use.join(stop_walk_indexed[new_cols], how='left')
     
     # Check for missing values
     for col in new_cols:
@@ -477,17 +500,21 @@ def get_intersection_count(
     maz_nodes = maz[[maz_col] + ['XCOORD', 'YCOORD']]
     maz_nodes.columns = ['MAZ', 'X', 'Y']
 
-    # Find nearest maz for each intersection (euclidean distance)
-    int_dict = {}
-    for i in intersections.iterrows():
-        maz_nodes['dist'] = np.sqrt((i[1][1] - maz_nodes['X'])**2+(i[1][2] - maz_nodes['Y'])**2)
-        int_dict[i[1][0]] = maz_nodes.loc[maz_nodes['dist'] == maz_nodes['dist'].min()]['MAZ'].values[0]
-        
-    intersections['near_maz'] = intersections['N'].map(int_dict)
+    # Find nearest maz for each intersection
+    print("Finding nearest MAZ for each intersection...")
+    int_gdf = gpd.GeoDataFrame(
+        intersections, geometry=gpd.points_from_xy(intersections['X'], intersections['Y']), crs=nodes.crs
+    )
+    maz_gdf = gpd.GeoDataFrame(
+        maz_nodes, geometry=gpd.points_from_xy(maz_nodes['X'], maz_nodes['Y']), crs=nodes.crs
+    )
+    joined = gpd.sjoin_nearest(int_gdf, maz_gdf[['MAZ', 'geometry']], how='left')
+    intersections['near_maz'] = joined['MAZ'].values
     intersections = intersections.groupby('near_maz', as_index = False).count()[['near_maz','N']].rename(columns = {'near_maz':'MAZ','N':'icnt'})
     
-    # Merge counts with land use data
-    land_use = pd.merge(land_use, intersections, on = "MAZ", how = "left").fillna(0)
+    # Merge counts with land use data (join on MAZ index)
+    icnt_map = intersections.set_index('MAZ')['icnt']
+    land_use['icnt'] = icnt_map.reindex(land_use.index).fillna(0)
     return land_use
 
 def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.DataFrame:
@@ -517,62 +544,61 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
     for col in new_cols:
         if col in land_use.columns:
             land_use = land_use.drop(col, axis=1)
-            
-    maz_col = None
-    for col in land_use.columns:
-        if col.upper() in ['MAZ', 'MAZ_NO', 'MAZ_ID', 'ID']:
-            maz_col = col
-            break
     
     # Count intersections per MAZ
     if settings.count_intersections:
         land_use = get_intersection_count(settings, land_use)
         
-    def _density_function(maz_in: int) -> tuple:
-        """Calculate densities for one MAZ by including other MAZs within walking radius.
-        
-        Parameters
-        ----------
-        maz_in: MAZ ID to analyze
-            
-        Returns
-        -------
-        Tuple with density metrics 
-        
-        """
-        dist_skim = maz_maz_walk[maz_maz_walk['OMAZ'] == maz_in]
-        maz_circa_int = dist_skim[dist_skim['DISTWALK'] < settings.density_radius]['j'].unique()
-        nearby_maz = land_use[land_use[maz_col].isin(maz_circa_int)]
-        sums = nearby_maz[['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES']].sum()
-
-        if (sums['ACRES'] > 0):
-            empDen = sums['EMP_TOTAL'] / sums['ACRES']
-            retDen = sums['EMP_RET'] / sums['ACRES']    
-            duDen = sums['TOTHHS'] / sums['ACRES']     
-            popDen = sums['TOTPOP'] / sums['ACRES']      
-            popEmpDenPerMi = (sums['EMP_TOTAL'] + sums['TOTPOP']) / (sums['ACRES'] / 640) # acres to miles
-        else:
-            empDen = 0.0
-            retDen = 0.0
-            duDen = 0.0
-            popDen = 0.0
-            popEmpDenPerMi = 0.0 
-            
-        if settings.count_intersections:
-            totInt = nearby_maz['icnt'].sum() if sums['ACRES'] > 0 else 0
-        else: 
-            totInt = land_use.loc[land_use.MAZ == maz_in, settings.icnt_col].iloc[0]
-        
-        return empDen, retDen, duDen, popDen, popEmpDenPerMi, totInt
+    print("Calculating densities for each MAZ...")
     
-    (
-        land_use[new_cols[0]], 
-        land_use[new_cols[1]], 
-        land_use[new_cols[2]], 
-        land_use[new_cols[3]], 
-        land_use[new_cols[4]], 
-        land_use[new_cols[5]]
-    ) = zip(*land_use['MAZ'].map(_density_function))    
+    # Filter walk skim to only pairs within the density radius (once, upfront)
+    nearby_pairs = maz_maz_walk.loc[
+        maz_maz_walk['DISTWALK'] < settings.density_radius, ['OMAZ', 'j']
+    ]
+    
+    # Prepare land_use lookup columns
+    agg_cols = ['EMP_TOTAL', 'EMP_RET', 'TOTHHS', 'TOTPOP', 'ACRES']
+    if settings.count_intersections:
+        agg_cols.append('icnt')
+    
+    # Join land_use attributes onto each nearby pair by destination MAZ (index)
+    nearby_with_data = nearby_pairs.merge(
+        land_use[agg_cols],
+        left_on='j',
+        right_index=True,
+        how='left'
+    )
+    
+    # Sum attributes across all nearby MAZs for each origin MAZ
+    sums = nearby_with_data.groupby('OMAZ')[agg_cols].sum()
+    sums.index.name = 'MAZ'
+    
+    # Join sums back to land_use on the MAZ index
+    sum_cols = {col: col + '_nearby' for col in agg_cols}
+    sums = sums.rename(columns=sum_cols)
+    land_use = land_use.join(sums, how='left')
+    for sc in sum_cols.values():
+        land_use[sc] = land_use[sc].fillna(0)
+    
+    # Calculate densities vectorized (avoid division by zero)
+    has_acres = land_use['ACRES_nearby'] > 0
+    land_use['empden'] = np.where(has_acres, land_use['EMP_TOTAL_nearby'] / land_use['ACRES_nearby'], 0.0)
+    land_use['retempden'] = np.where(has_acres, land_use['EMP_RET_nearby'] / land_use['ACRES_nearby'], 0.0)
+    land_use['duden'] = np.where(has_acres, land_use['TOTHHS_nearby'] / land_use['ACRES_nearby'], 0.0)
+    land_use['popden'] = np.where(has_acres, land_use['TOTPOP_nearby'] / land_use['ACRES_nearby'], 0.0)
+    land_use['popempdenpermi'] = np.where(
+        has_acres,
+        (land_use['EMP_TOTAL_nearby'] + land_use['TOTPOP_nearby']) / (land_use['ACRES_nearby'] / 640),
+        0.0
+    )
+    
+    if settings.count_intersections:
+        land_use['totint'] = np.where(has_acres, land_use['icnt_nearby'], 0)
+    else:
+        land_use['totint'] = land_use[settings.icnt_col]
+    
+    # Drop temporary nearby columns
+    land_use = land_use.drop(columns=list(sum_cols.values()))    
     
     land_use[new_cols] = round(land_use[new_cols], 3)
     print(f"Added columns to land_use: {new_cols}")
@@ -622,12 +648,12 @@ def write_output(
         persons.to_csv(persons_path, index=False)
         print(f"Saved persons to {persons_path}")
     
-    # Write land_use
+    # Write land_use (include MAZ index as a column)
     land_use_path = output_dir / settings.land_use_file
     if overwriting and dataframes_equal(land_use, original_land_use):
         print(f"No changes to land_use, skipping write")
     else:
-        land_use.to_csv(land_use_path, index=False)
+        land_use.to_csv(land_use_path, index=True)
         print(f"Saved land_use to {land_use_path}")
 
 
@@ -692,6 +718,9 @@ def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFra
     """
     # Load data
     households, persons, land_use = load_data(settings)
+    
+    # Set MAZ as the land_use index
+    land_use = set_land_use_maz_index(land_use)
     
     # Keep copies of originals for change detection
     original_households = households.copy()
