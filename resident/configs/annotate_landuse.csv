@@ -2,11 +2,12 @@ Description,Target,Expression
 #,, annotate landuse table after import
 household_density,household_density,land_use.TOTHHS / land_use.ACRES.clip(lower=1)
 population_density,population_density,land_use['TOTPOP'] / land_use.ACRES.clip(lower=1)
+employment_density,employment_density,(land_use['EMP_TOTAL'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
+density_index,density_index,(household_density * employment_density) / (household_density + employment_density).clip(lower=1)
 # FIXME pseudomsa is used in a few places but there is no equivalent in Metro landuse,,
 ,pseudomsa,0
 # FIXME missing in landuse but used in SANDAG -- setting to 0 for now,,
 ,ACTIVE_ACRES,0
-,totint,0
 ,micro_dist_local_bus,0
 ,microtransit,0
 ,nev,0
@@ -15,10 +16,3 @@ population_density,population_density,land_use['TOTPOP'] / land_use.ACRES.clip(l
 preschool target for mandatory constraint - sum of all size terms,preschool_target,land_use['TOTPOP'] + land_use.EMP_TOTAL
 # FIME whats the criteria for parking zone?,,
 Is a zone with parking,is_parking_zone,"np.where(land_use.PRKCST_MNTH > 0, True, False)"
-employment_density,employment_density,(land_use['EMP_TOTAL'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
-density_index,density_index,(household_density *employment_density) / (household_density + employment_density).clip(lower=1)
-# FIXME temporary density calculation -- again I don't think this calculation matches what's in sandag,,
-dwelling unit density,duden,(land_use['TOTHHS'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
-population density,popden,(land_use['TOTPOP'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
-employment unit density,empden,(land_use['EMP_TOTAL'] / land_use.ACRES.clip(lower=1)).clip(upper=500)
-retail employment density,retempden,(land_use['EMP_RET'] / land_use.ACRES.clip(lower=1)).clip(upper=500)

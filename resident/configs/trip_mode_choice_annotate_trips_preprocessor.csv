@@ -43,9 +43,8 @@ Description,Target,Expression
 ,walk_transit_available,_walk_transit_origin & _walk_transit_destination
 ,drive_transit_available,"np.where(df.outbound, _walk_transit_destination, _walk_transit_origin) & (df.auto_ownership > 0)"
 # RIDEHAIL,,
-# FIXME population_density replaced PopDenPerSqMi which may not be calculated the same,,
-household_density calculated in annotate_landuse in acres and is converted to sq miles here,_origin_density_measure,"reindex(land_use.population_density, df[orig_col_name])"
-employment_density calculated in annotate_landuse in acres and is converted to sq miles here,_dest_density_measure,"reindex(land_use.population_density, df[dest_col_name])"
+popempdenpermi calculated in preprocessor and input via landuse file,_origin_density_measure,"reindex(land_use.popempdenpermi, df[orig_col_name])"
+,_dest_density_measure,"reindex(land_use.popempdenpermi, df[dest_col_name])"
 ,origin_density,"pd.cut(_origin_density_measure, bins=[-np.inf, 500, 2000, 5000, 15000, np.inf], labels=[5, 4, 3, 2, 1]).astype(int)"
 ,dest_density,"pd.cut(_dest_density_measure, bins=[-np.inf, 500, 2000, 5000, 15000, np.inf], labels=[5, 4, 3, 2, 1]).astype(int)"
 Origin MGRA Dwelling Unit Density,oMGRADUDen,"reindex(land_use.duden,df.origin)"
@@ -146,8 +145,8 @@ Total trips on tour,totalTrips,totStops+2
 Indicator for trip origin is tour prim. Destination,tripOrigIsTourDest,~df.outbound*df.trip_num==1
 Indicator for trip destination is tour prim. Destination,tripDestIsTourDest,df.outbound*df.trip_num==df.trip_count
 Contribution to trip parking cost from primary destination,parkCostTourDestContrib,parkingCostPrimDest/(totalTrips+2)
-Hourly parking cost at trip origin,parkCostTripOrig,"reindex(land_use.PRKCST_HR, origin)*100"
-Hourly parking cost at trip destination,parkCostTripDest,"reindex(land_use.PRKCST_HR, destination)*100"
+Hourly parking cost at trip origin,parkCostTripOrig,"reindex(land_use.PRKCST_HR, origin)"
+Hourly parking cost at trip destination,parkCostTripDest,"reindex(land_use.PRKCST_HR, destination)"
 Contribution to trip parking cost from trip origin,parkCostTripOrigContrib,parkCostTripOrig*(1-firstTrip)*(1-tripOrigIsTourDest)
 Contribution to trip parking cost from trip origin,parkCostTripOrigContrib,parkingCostPrimDest/(totalTrips+2) * tripOrigIsTourDest
 Contribution to trip parking cost from trip destination,parkCostTripDestContrib,parkCostTripDest * (1-lastTrip)*(1-tripDestIsTourDest)
