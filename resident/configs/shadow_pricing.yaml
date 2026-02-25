@@ -40,11 +40,11 @@ school_segmentation_targets:
 
 # if target names are the same, they will be combined together
 workplace_segmentation_targets:
-  constr_maint: EMP_TOTAL
-  health: EMP_TOTAL
-  military: EMP_TOTAL
   mngt_busi_scic_arts: EMP_TOTAL
-  prod_trans_move: EMP_TOTAL
+  white_collar: EMP_TOTAL
+  blue_collar: EMP_TOTAL
   sales_office: EMP_TOTAL
-  services: EMP_TOTAL
+  nat_res_cnstr_maint: EMP_TOTAL
+  prod_trans_move: EMP_TOTAL
+  missing: EMP_TOTAL
 
