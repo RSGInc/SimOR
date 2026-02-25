@@ -29,6 +29,15 @@
                 "-d", "model_data/metro/data_cropped",
                 "-o", "outputs/test",
             ]
+        },
+        {
+            "name": "Run Visum_Runner.py",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/skimming_and_assignment/visum",
+            "program": "Visum_Runner.py",
+            "console": "integratedTerminal",
+            "args": ["skims"]
         }
     ]
 }

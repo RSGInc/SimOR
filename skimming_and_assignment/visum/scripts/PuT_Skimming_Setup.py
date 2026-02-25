@@ -39,20 +39,20 @@ with open(yaml_path, 'r') as file:
 
 def put_skim_setup(period):
 
-    def ismode():  # isbrt, isscr, islrt, & iswes
+    def ismode():  # isbrt, isscr, islrt, & iscrr
 
         # Pull attributes
         sa_isbrt      = h.GetMulti(Visum.Net.StopAreas,r"isbrt", activeOnly = True)
         sa_isscr      = h.GetMulti(Visum.Net.StopAreas,r"isscr", activeOnly = True)
         sa_islrt      = h.GetMulti(Visum.Net.StopAreas,r"islrt", activeOnly = True)
-        sa_iswes      = h.GetMulti(Visum.Net.StopAreas,r"iswes", activeOnly = True)
+        sa_iscrr      = h.GetMulti(Visum.Net.StopAreas,r"iscrr", activeOnly = True)
         sp_lrtsyscode = h.GetMulti(Visum.Net.StopAreas,r"FIRST:STOPPOINTS\DISTINCT:LINEROUTES\TSYSCODE", activeOnly = True)
 
         # Make Visum list with link data
-        att_list = [sa_isbrt,sa_isscr,sa_islrt,sa_iswes,sp_lrtsyscode] 
+        att_list = [sa_isbrt,sa_isscr,sa_islrt,sa_iscrr,sp_lrtsyscode] 
         print(att_list)
 	    # Put Visum link list into dataframe
-        df = pd.DataFrame(np.column_stack(att_list), columns = ['sa_isbrt','sa_isscr','sa_islrt','sa_iswes','sp_lrtsyscode'])
+        df = pd.DataFrame(np.column_stack(att_list), columns = ['sa_isbrt','sa_isscr','sa_islrt','sa_iscrr','sp_lrtsyscode'])
         
         # Break out 'DISTINCT:LINEROUTES\TSYSCODE' field to separate by commas into individual columns	
         df[['sp_lrtsyscode']] = df[['sp_lrtsyscode']].astype(str)																													
@@ -72,13 +72,13 @@ def put_skim_setup(period):
         df['isbrt'] = df.apply(lambda row: 1 if row['Mode1'] == 'a' or row['Mode2'] == 'a' or row['Mode3'] == 'a' or row['Mode4'] == 'a' or row['Mode5'] == 'a' else 0, axis=1)
         df['isscr'] = df.apply(lambda row: 1 if row['Mode1'] == 'e' or row['Mode2'] == 'e' or row['Mode3'] == 'e' or row['Mode4'] == 'e' or row['Mode5'] == 'e' else 0, axis=1)
         df['islrt'] = df.apply(lambda row: 1 if row['Mode1'] == 'l' or row['Mode2'] == 'l' or row['Mode3'] == 'l' or row['Mode4'] == 'l' or row['Mode5'] == 'l' else 0, axis=1)
-        df['iswes'] = df.apply(lambda row: 1 if row['Mode1'] == 'r' or row['Mode2'] == 'r' or row['Mode3'] == 'r' or row['Mode4'] == 'r' or row['Mode5'] == 'r' else 0, axis=1)
+        df['iscrr'] = df.apply(lambda row: 1 if row['Mode1'] == 'r' or row['Mode2'] == 'r' or row['Mode3'] == 'r' or row['Mode4'] == 'r' or row['Mode5'] == 'r' else 0, axis=1)
     
         # Set fields back in Visum
         h.SetMulti(Visum.Net.StopAreas ,r"isbrt", df['isbrt'])
         h.SetMulti(Visum.Net.StopAreas ,r"isscr", df['isscr'])
         h.SetMulti(Visum.Net.StopAreas ,r"islrt", df['islrt'])
-        h.SetMulti(Visum.Net.StopAreas ,r"iswes", df['iswes'])
+        h.SetMulti(Visum.Net.StopAreas ,r"iscrr", df['iscrr'])
 
     def headway(period): # Headway and Headway_Halved
 
@@ -149,22 +149,22 @@ def put_skim_setup(period):
         sa_isbrt   = h.GetMulti(Visum.Net.StopAreas,r"isbrt"  , activeOnly = True)
         sa_isscr   = h.GetMulti(Visum.Net.StopAreas,r"isscr"  , activeOnly = True)
         sa_islrt   = h.GetMulti(Visum.Net.StopAreas,r"islrt"  , activeOnly = True)
-        sa_iswes   = h.GetMulti(Visum.Net.StopAreas,r"iswes"  , activeOnly = True)
+        sa_iscrr   = h.GetMulti(Visum.Net.StopAreas,r"iscrr"  , activeOnly = True)
         sa_opbushr = h.GetMulti(Visum.Net.StopAreas,r"op_bushr", activeOnly = True)
 
         # Make Visum list with link data
-        att_list = [sa_sttyp,sa_stcon,sa_istc,sa_istm ,sa_isbrt,sa_isscr,sa_islrt,sa_iswes,sa_opbushr]
+        att_list = [sa_sttyp,sa_stcon,sa_istc,sa_istm ,sa_isbrt,sa_isscr,sa_islrt,sa_iscrr,sa_opbushr]
     
 	    # Put Visum link list into dataframe
-        df = pd.DataFrame(np.column_stack(att_list), columns = ['sa_sttyp','sa_stcon','sa_istc','sa_istm','sa_isbrt','sa_isscr','sa_islrt','sa_iswes','sa_opbushr'])
+        df = pd.DataFrame(np.column_stack(att_list), columns = ['sa_sttyp','sa_stcon','sa_istc','sa_istm','sa_isbrt','sa_isscr','sa_islrt','sa_iscrr','sa_opbushr'])
 
         # Convert condition fields & stop type constant to float
-        df[['sa_stcon','sa_istc','sa_istm','sa_isbrt','sa_isscr','sa_islrt','sa_iswes','sa_opbushr']] = df[[
-            'sa_stcon','sa_istc','sa_istm','sa_isbrt','sa_isscr','sa_islrt','sa_iswes','sa_opbushr']].astype(float)
+        df[['sa_stcon','sa_istc','sa_istm','sa_isbrt','sa_isscr','sa_islrt','sa_iscrr','sa_opbushr']] = df[[
+            'sa_stcon','sa_istc','sa_istm','sa_isbrt','sa_isscr','sa_islrt','sa_iscrr','sa_opbushr']].astype(float)
 
         # Calculate Stop Type field
         for x in range(len(df)):
-            if ((df.at[x,'sa_istc'] == 1) | (df.at[x,'sa_istm'] == 1) | (df.at[x,'sa_islrt'] == 1) | (df.at[x,'sa_iswes'] == 1)):
+            if ((df.at[x,'sa_istc'] == 1) | (df.at[x,'sa_istm'] == 1) | (df.at[x,'sa_islrt'] == 1) | (df.at[x,'sa_iscrr'] == 1)):
                 df.at[x,'sa_sttyp'] = 'A,B,C'   # Is transit center, is transit mall, is LRT stop, is WES stop
             elif ((df.at[x,'sa_isbrt'] == 1) | (df.at[x,'sa_isscr'] == 1) | (df.at[x,'sa_opbushr'] >= 4)):
                 df.at[x,'sa_sttyp'] = 'D'       # Is BRT stop, is streetcar stop, has >= 4 transit vehicles per hour
@@ -264,49 +264,90 @@ def put_skim_setup(period):
         h.SetMulti(Visum.Net.TimeProfiles ,r"ivpf", df['tp_ivpf'])
 
 
-    def boardingpenalty(period):  # Boarding penalty (seconds)
+    def boardingpenalty(period):  # Boarding penalty (seconds)    NEED TO MOVE TO APPLY ON THE NODE
 
         # Pull attributes
-        tp_tsyscode  = h.GetMulti(Visum.Net.TimeProfiles,r"TSYSCODE", activeOnly = True)
-        tp_brdpen    = h.GetMulti(Visum.Net.TimeProfiles,r"brdpen"  , activeOnly = True)
+        n_tsyscode  = h.GetMulti(Visum.Net.Nodes,r"DISTINCT:LINEROUTES\TSYSCODE", activeOnly = True)
+        n_brdco     = h.GetMulti(Visum.Net.Nodes,r"brdco"  , activeOnly = True)
 
         # Make Visum list with link data
-        att_list = [tp_tsyscode,tp_brdpen]
+        att_list = [n_tsyscode,n_brdco]
     
 	    # Put Visum link list into dataframe
-        df = pd.DataFrame(np.column_stack(att_list), columns = ['tp_tsyscode','tp_brdpen'])
+        df = pd.DataFrame(np.column_stack(att_list), columns = ['n_tsyscode','n_brdco'])
 
-        # Calculate field
+        # Calculate field (in decending order of stop level)
         for y in range(len(df)):
             if period == 'AM' or period == 'PM':  # Peak
-                if df.at[y,'tp_tsyscode'] == 'l':
-                    df.at[y,'tp_brdpen'] = config_data['PkBrdPl']
-                elif df.at[y,'tp_tsyscode'] == 'r':
-                    df.at[y,'tp_brdpen'] = config_data['PkBrdPr']
-                elif df.at[y,'tp_tsyscode'] == 'a':
-                    df.at[y,'tp_brdpen'] = config_data['PkBrdPa']
-                elif df.at[y,'tp_tsyscode'] == 'e':
-                    df.at[y,'tp_brdpen'] = config_data['PkBrdPe']
+                if 'r' in df.at[y,'n_tsyscode']:
+                    df.at[y,'n_brdco'] = config_data['PkBrdPr']
+                elif 'l' in df.at[y,'n_tsyscode']:
+                    df.at[y,'n_brdco'] = config_data['PkBrdPl']
+                elif 'a' in df.at[y,'n_tsyscode']:
+                    df.at[y,'n_brdco'] = config_data['PkBrdPa']
+                elif 'e' in df.at[y,'n_tsyscode']:
+                    df.at[y,'n_brdco'] = config_data['PkBrdPe']
                 else:
-                    df.at[y,'tp_brdpen'] = config_data['PkBrdPelse']
+                    df.at[y,'n_brdco'] = config_data['PkBrdPelse']
             else:                                 # Off-Peak
-                if df.at[y,'tp_tsyscode'] == 'l':
-                    df.at[y,'tp_brdpen'] = config_data['OpBrdPl']
-                elif df.at[y,'tp_tsyscode'] == 'r':
-                    df.at[y,'tp_brdpen'] = config_data['OpBrdPr']
-                elif df.at[y,'tp_tsyscode'] == 'a':
-                    df.at[y,'tp_brdpen'] = config_data['OpBrdPa']
-                elif df.at[y,'tp_tsyscode'] == 'e':
-                    df.at[y,'tp_brdpen'] = config_data['OpBrdPe']
+                if 'r' in df.at[y,'n_tsyscode']:
+                    df.at[y,'n_brdco'] = config_data['OpBrdPr']
+                elif 'l' in df.at[y,'n_tsyscode']:
+                    df.at[y,'n_brdco'] = config_data['OpBrdPl']
+                elif 'a' in df.at[y,'n_tsyscode']:
+                    df.at[y,'n_brdco'] = config_data['OpBrdPa']
+                elif 'e' in df.at[y,'n_tsyscode']:
+                    df.at[y,'n_brdco'] = config_data['OpBrdPe']
                 else:
-                    df.at[y,'tp_brdpen'] = config_data['OpBrdPelse']
+                    df.at[y,'n_brdco'] = config_data['OpBrdPelse']
 
-        # Add global boarding penalty
-        for y in range(len(df)):
-            df.at[y,'tp_brdpen'] = df.at[y,'tp_brdpen'] + config_data['BrdPenGlb']
 
         # Set fields back in Visum
-        h.SetMulti(Visum.Net.TimeProfiles ,r"brdpen", df['tp_brdpen'])
+        h.SetMulti(Visum.Net.Nodes ,r"brdco", df['n_brdco'])
+
+
+
+        ## Pull attributes
+        #tp_tsyscode  = h.GetMulti(Visum.Net.TimeProfiles,r"TSYSCODE", activeOnly = True)
+        #tp_brdpen    = h.GetMulti(Visum.Net.TimeProfiles,r"brdpen"  , activeOnly = True)
+#
+        ## Make Visum list with link data
+        #att_list = [tp_tsyscode,tp_brdpen]
+    #
+	    ## Put Visum link list into dataframe
+        #df = pd.DataFrame(np.column_stack(att_list), columns = ['tp_tsyscode','tp_brdpen'])
+#
+        ## Calculate field
+        #for y in range(len(df)):
+        #    if period == 'AM' or period == 'PM':  # Peak
+        #        if df.at[y,'tp_tsyscode'] == 'l':
+        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPl']
+        #        elif df.at[y,'tp_tsyscode'] == 'r':
+        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPr']
+        #        elif df.at[y,'tp_tsyscode'] == 'a':
+        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPa']
+        #        elif df.at[y,'tp_tsyscode'] == 'e':
+        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPe']
+        #        else:
+        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPelse']
+        #    else:                                 # Off-Peak
+        #        if df.at[y,'tp_tsyscode'] == 'l':
+        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPl']
+        #        elif df.at[y,'tp_tsyscode'] == 'r':
+        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPr']
+        #        elif df.at[y,'tp_tsyscode'] == 'a':
+        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPa']
+        #        elif df.at[y,'tp_tsyscode'] == 'e':
+        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPe']
+        #        else:
+        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPelse']
+#
+        ## Add global boarding penalty
+        #for y in range(len(df)):
+        #    df.at[y,'tp_brdpen'] = df.at[y,'tp_brdpen'] + config_data['BrdPenGlb']
+#
+        ## Set fields back in Visum
+        #h.SetMulti(Visum.Net.TimeProfiles ,r"brdpen", df['tp_brdpen'])
 
 
     def dwelltime():
@@ -426,7 +467,7 @@ def put_skim_setup(period):
     # Setting Dwell and Run times
     dwelltime()
     runtime(period)
-    combinerundwelltimes()  # Not needed in Visum 26
+    combinerundwelltimes()
 
 
 per = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like 'AM' from AM in the code box
