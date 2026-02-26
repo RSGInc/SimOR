@@ -14,33 +14,6 @@ import openmatrix as omx
 def omx_export(x, mtx_code, corename, mtx_dseg, omx_fn):
     
     
-    # Attempt to bulletproof the OMX export step by deleting OMX's if the number of rows doesnt match between the existing OMX and the exporting matrix/zone system
-    #   FAILED as of 2/23/2026 (LG)
-
-    ## Delete existing omx file for first matrix
-    #try:
-    #    omx_file = omx.open_file(omx_fn, 'a')
-#
-    #    with omx.open_file(omx_fn, 'a') as m1:
-    #    
-    #        m2 = h.GetMatrixRaw(Visum, {"CODE": mtx_code , "DSegCode": mtx_dseg})
-#
-    #        core_name = corename
-    #        if m1[core_name].shape[0] != m2.shape[0]:
-    #            try:
-    #                os.remove(omx_fn)
-    #            except Exception as e:
-    #               print(f"OMX File Doesn't Exist Yet: {e}")
-#
-    #except Exception as e:
-    #    print(f"OMX File Doesn't Exist Yet: {e}")
-    #if x == 0:
-    #    try:
-    #        os.remove(omx_fn)
-    #    except Exception as e:
-    #        print(f"OMX File Doesn't Exist Yet: {e}")
-
-
     # Below exports the matrices as OMX files succesfully
     # Pull matrix out but close .omx file if there is an error
     omx_file = omx.open_file(omx_fn, 'a')
