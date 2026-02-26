@@ -264,7 +264,7 @@ def put_skim_setup(period):
         h.SetMulti(Visum.Net.TimeProfiles ,r"ivpf", df['tp_ivpf'])
 
 
-    def boardingpenalty(period):  # Boarding penalty (seconds)    NEED TO MOVE TO APPLY ON THE NODE
+    def boardingpenalty(period):  # Boarding penalty (seconds)  APPLIED ON THE NODES
 
         # Pull attributes
         n_tsyscode  = h.GetMulti(Visum.Net.Nodes,r"DISTINCT:LINEROUTES\TSYSCODE", activeOnly = True)
@@ -304,50 +304,6 @@ def put_skim_setup(period):
 
         # Set fields back in Visum
         h.SetMulti(Visum.Net.Nodes ,r"brdco", df['n_brdco'])
-
-
-
-        ## Pull attributes
-        #tp_tsyscode  = h.GetMulti(Visum.Net.TimeProfiles,r"TSYSCODE", activeOnly = True)
-        #tp_brdpen    = h.GetMulti(Visum.Net.TimeProfiles,r"brdpen"  , activeOnly = True)
-#
-        ## Make Visum list with link data
-        #att_list = [tp_tsyscode,tp_brdpen]
-    #
-	    ## Put Visum link list into dataframe
-        #df = pd.DataFrame(np.column_stack(att_list), columns = ['tp_tsyscode','tp_brdpen'])
-#
-        ## Calculate field
-        #for y in range(len(df)):
-        #    if period == 'AM' or period == 'PM':  # Peak
-        #        if df.at[y,'tp_tsyscode'] == 'l':
-        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPl']
-        #        elif df.at[y,'tp_tsyscode'] == 'r':
-        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPr']
-        #        elif df.at[y,'tp_tsyscode'] == 'a':
-        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPa']
-        #        elif df.at[y,'tp_tsyscode'] == 'e':
-        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPe']
-        #        else:
-        #            df.at[y,'tp_brdpen'] = config_data['PkBrdPelse']
-        #    else:                                 # Off-Peak
-        #        if df.at[y,'tp_tsyscode'] == 'l':
-        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPl']
-        #        elif df.at[y,'tp_tsyscode'] == 'r':
-        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPr']
-        #        elif df.at[y,'tp_tsyscode'] == 'a':
-        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPa']
-        #        elif df.at[y,'tp_tsyscode'] == 'e':
-        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPe']
-        #        else:
-        #            df.at[y,'tp_brdpen'] = config_data['OpBrdPelse']
-#
-        ## Add global boarding penalty
-        #for y in range(len(df)):
-        #    df.at[y,'tp_brdpen'] = df.at[y,'tp_brdpen'] + config_data['BrdPenGlb']
-#
-        ## Set fields back in Visum
-        #h.SetMulti(Visum.Net.TimeProfiles ,r"brdpen", df['tp_brdpen'])
 
 
     def dwelltime():

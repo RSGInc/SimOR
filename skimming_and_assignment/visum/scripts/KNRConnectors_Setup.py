@@ -107,15 +107,6 @@ def create_knr_connectors():
                     break 
         
         result[taz] = list(connector_nodes)
-        
-        # THIS IS HOW CONNECTORS ARE ADDED USING COM - BUT THIS IS TOO SLOW: SO USE NET FILE BATCHING INSTEAD.
-        # for node in connector_nodes:
-        #     if Visum.Net.Connectors.ExistsByKey(node, taz):
-        #         Visum.Log(PRIO, "{} -> {} | already exists!".format(taz, node))
-        #         Visum.Net.Connectors.SourceItemByKey(taz, node).SetAttValue("TypeNo", 7)
-        #     else:
-        #         connector = Visum.Net.AddConnector(taz, node)
-        #         connector.SetAttValue("TypeNo", 10)
 
         # GENERATE NET FILE BATCH TABLE FOR CONNECTORS. 
         # need to preserve original connectors esp: walk to destination(?)
@@ -156,18 +147,6 @@ def create_knr_connectors():
     df_unique = df_filtered.groupby('zoneno').agg(length_max=('length', 'max')).reset_index()
     df = pd.merge(df, df_unique, on='zoneno', how='left')
     h.SetMulti(Visum.Net.Connectors,r"LENGTH"    ,df['length_max'])
-    
-    ## Set Length for new connectors for direction not already set (using Visum calculated length)
-    #length   = h.GetMulti(Visum.Net.Connectors,r"LENGTH"    , activeOnly = True)
-    #zoneno   = h.GetMulti(Visum.Net.Connectors,r"ZONENO"    , activeOnly = True)
-    #nodeno   = h.GetMulti(Visum.Net.Connectors,r"NODENO"    , activeOnly = True)
-    #att_list = [length,zoneno,nodeno]
-    #df = pd.DataFrame(np.column_stack(att_list), columns = ['length','zoneno','nodeno'])
-    #df[['zoneno','nodeno']] = df[['zoneno','nodeno']].astype(str)
-    #df['concat'] = df['zoneno'] + df['nodeno']
-    #df_unique = df.groupby('concat').agg(length_max=('length', 'max')).reset_index()
-    #df = pd.merge(df, df_unique, on='concat', how='left')
-    #h.SetMulti(Visum.Net.Connectors,r"LENGTH"    ,df['length_max'])
 
 
 
@@ -195,45 +174,35 @@ def set_connector_properties(knrdirection):
             if direction == 1: # Origin, leaving a zone
                 if typeno in [7, 10]:
                     connector_tsys.append("i")
-                    #connector_time.append([3600*distance/CON_VEH_SPEED, 999999])
                 else:
                     connector_tsys.append("")
-                    #connector_time.append([999999, 999999])
             
             elif direction == 2: # Destination, entering a zone
                 if typeno == 10:
                     # a knr drive only connector- so no walk on this.
                     connector_tsys.append("")
-                    #connector_time.append([999999, 999999])
                 else:
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
                     connector_tsys.append(tsys_hold)
-                    #connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
         elif knrdirection == "WTK":    
             if direction == 2: # Destination, entering a zone
                 if typeno in [7, 10]:
                     connector_tsys.append("i")
-                    #connector_time.append([3600*distance/CON_VEH_SPEED, 999999])
                 else:
                     connector_tsys.append("")
-                    #connector_time.append([999999, 999999])
             elif direction == 1: # Origin, leaving a zone
                 if typeno == 10:
                     # a knr drive only connector- so no walk on this.
                     connector_tsys.append("")
-                    #connector_time.append([999999, 999999])
                 else:
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
                     connector_tsys.append(tsys_hold)
-                    #connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
         elif knrdirection == "WTW":
             connector_tsys.append(tsys_hold)
-            #connector_time.append([999999, 3600*distance/CON_WLK_SPEED])
     
     h.SetMulti(Visum.Net.Connectors, "TSysSet", connector_tsys)
-    #Visum.Net.Connectors.SetMultipleAttributes(["T0_TSYS(I)", "T0_TSYS(W)"], connector_time)
 
 
 
