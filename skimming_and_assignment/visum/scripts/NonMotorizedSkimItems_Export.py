@@ -114,6 +114,25 @@ def network_shp_export():
 	cc_shp_export_params.AddColumn("Length")
 	
 	Visum.IO.ExportShapefile(nonmotorizedinputs_path + "/Network.shp", cc_shp_export_params)
+     
+
+
+	# MAZs
+	# Create export shapefile parameters object
+	maz_shp_export_params = Visum.IO.CreateExportShapeFilePara()
+	
+	# Set options for export in parameters object
+	maz_shp_export_params.SetAttValue("OBJECTTYPE", 9) # POIs
+	maz_shp_export_params.SetAttValue("ONLYACTIVE", 1)
+	
+	# Set columns for export in parameters object
+	maz_shp_export_params.ClearLayout()
+	maz_shp_export_params.AddColumn("XCOORD")
+	maz_shp_export_params.AddColumn("YCOORD")
+	maz_shp_export_params.AddColumn("AREAMI2")
+	
+	Visum.IO.ExportShapefile(nonmotorizedinputs_path + "/MAZs.shp", maz_shp_export_params)
+
 
 
 
