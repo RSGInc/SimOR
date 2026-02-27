@@ -14,3 +14,6 @@ coverage.xml
 Metro_outputs/
 
 skimming_and_assignment/visum/*.ver
+
+# External dependencies managed by setup_environment.bat
+ext_dependencies/*/
