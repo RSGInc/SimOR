@@ -31,6 +31,7 @@ SET "PROCEDURE_SEQ=%SKIM_DIR%\visum\config\visum_metro\SkimSequence_Metro.xml"
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :: Run motorized skims in Visum
+ECHO.
 ECHO Running motorized skims.
 ECHO Visum version file: %VISUM_VERSION_FILE%
 ECHO Procedure sequence: %PROCEDURE_SEQ%
@@ -41,12 +42,14 @@ IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 ECHO Motorized skims complete.
 
 :: Run non-motorized skims in Python
+ECHO.
 ECHO Running non-motorized skim preprocessor.
 CD /D "%SKIM_DIR%\maz_maz_stop_skims"
 "%PYTHON_SANDAG_ASIM%" 2zoneSkim_preprocessor.py 2zoneSkim_params.yaml
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
-ECHO Running non-motorized skims.
+ECHO .
+ECHO Running non-motorized skims. 
 "%PYTHON_SANDAG_ASIM%" 2zoneSkim.py 2zoneSkim_params.yaml
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 ECHO Non-motorized skims complete.
@@ -54,15 +57,14 @@ ECHO Non-motorized skims complete.
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :: Run ActivitySim
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ECHO.
 ECHO Running land use preprocessor.
 CD /D "%MODEL_DIR%"
 "%PYTHON_ASIM%" preprocessor.py preprocessor_settings.yaml
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 ECHO Land use preprocessor complete.
 
-:: ADD CODE TO RUN ASIM
-::
-
+ECHO.
 ECHO All steps completed successfully.
 ENDLOCAL
 GOTO :EOF
