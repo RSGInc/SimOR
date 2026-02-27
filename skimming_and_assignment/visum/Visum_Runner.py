@@ -43,9 +43,10 @@ def loadProcedure(Visum,parFileName,execute=True):
     Visum.Procedures.Execute()
     
 if __name__ == "__main__":
-    runmode = sys.argv[1]
-    procedure = sys.argv[2]
-    inputVersionFile = f"Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver"
+    inputVersionFile = sys.argv[1]
+    runmode = sys.argv[2]
+    procedure = sys.argv[3]
+    # inputVersionFile = f"Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver"
     
     print(f"start {runmode} run: {time.time()}")
     
