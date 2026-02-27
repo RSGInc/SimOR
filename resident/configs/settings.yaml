@@ -3,6 +3,7 @@ model_name: resident
 #inherit_settings: True
 
 multiprocess: False
+fail_fast: True
 num_processes: 10
 chunk_training_mode: disabled
 
@@ -21,13 +22,14 @@ want_dest_choice_sample_tables: False
 
 # trace household id; comment out or leave empty for no trace
 # households with all tour types
-trace_hh_id:
+# trace_hh_id: 1158203
 
 # trace origin, destination in accessibility calculation; comment out or leave empty for no trace
 #trace_od:
 
-# metro hhs 862973, so 20% = 172595
-households_sample_size: 172595
+# metro hhs 954182, so 20% = 190836
+# households_sample_size: 95418
+households_sample_size: 100
 
 # input tables
 input_table_list:
@@ -70,10 +72,11 @@ output_tables:
     - proto_disaggregate_accessibility
     - disaggregate_accessibility
 
-resume_after:
+# resume_after:
 
 models:
   ### mp_init_proto_pop (single process)
+  - transit_lot_connectivity
   - initialize_proto_population # Separate step so proto tables can be split for multiprocess.
   ### mp_disaggregate_accessibility
   - compute_disaggregate_accessibility
@@ -83,8 +86,8 @@ models:
   ### mp_accessibility
   - compute_accessibility
   ### mp_households
-  # - license_holding_status
-  # - bike_comfort
+  - license_holding_status
+  - bike_comfort
   - av_ownership
   - auto_ownership_simulate
   - work_from_home
@@ -135,7 +138,7 @@ models:
 
 multiprocess_steps:
   - name: mp_init_proto_pop
-    begin: initialize_proto_population
+    begin: transit_lot_connectivity
   - name: mp_disaggregate_accessibility
     num_processes: 10
     begin: compute_disaggregate_accessibility
@@ -154,7 +157,7 @@ multiprocess_steps:
         - accessibility
       exclude: True  # this is needed so landuse (i.e. destinations) doesn't get split
   - name: mp_households
-    begin: av_ownership
+    begin: license_holding_status
     slice:
       tables:
         - households

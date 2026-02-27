@@ -9,22 +9,14 @@ on:
       - '**'
 
 jobs:
-  oregon_metro_mini_example:
-    env:
-      conda-env-prefix: /usr/share/miniconda3/envs/conda-abm_dev
-      label: linux-64
+  oregon_metro_cropped_example:
     strategy:
       matrix:
-        region:
-          - oregon_metro
         python-version:
           - "3.10"
       fail-fast: false
-    defaults:
-      run:
-        shell: bash -l {0}
 
-    name: ${{ matrix.region }}-py${{ matrix.python-version }}
+    name: cropped-example-py${{ matrix.python-version }}
     runs-on: ubuntu-latest
 
     steps:
@@ -36,32 +28,28 @@ jobs:
           cd ..
           git clone --branch SimOR_pnr https://github.com/RSGInc/activitysim.git
           pwd
-          tree -L 2
+          ls -la
 
-      - name: Setup Miniforge
-        uses: conda-incubator/setup-miniconda@v3
+      # Install UV
+      - name: Install UV
+        uses: astral-sh/setup-uv@v4
         with:
-          auto-update-conda: true
-          miniforge-version: latest
-          mamba-version: "2.0.5"
-          conda-solver: classic
-          conda-remove-defaults: true
-          environment-file: ../activitysim/conda-environments/github-actions-tests.yml
-          activate-environment: asim-test
-          python-version: ${{ matrix.python-version }}
+          version: "latest"
 
-      # Install cloned fork of ActivitySim
-      - name: Install ActivitySim in editable mode
+      # Set up Python with UV
+      - name: Set up Python
+        run: uv python install ${{ matrix.python-version }}
+
+      # Install dependencies using UV and the lock file from ActivitySim
+      - name: Install dependencies with UV
         run: |
-          pwd
           cd ../activitysim
-          python -m pip install -e . --no-deps
-          cd ..
-          cd SimOR
-          ls
-          conda info -a
-          conda list
+          uv sync --frozen
+          uv pip install -e . --no-deps
+          uv pip list
 
       # Run the test
       - name: Run cropped example test
-        run: python resident/test/test_cropped_dataset.py
+        run: |
+          cd ../activitysim
+          uv run python $GITHUB_WORKSPACE/resident/test/test_cropped_dataset.py

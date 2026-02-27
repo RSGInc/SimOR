@@ -33,18 +33,18 @@ FAIL_THRESHOLD: 1
 # apply different targets for each segment specified in destination_size_terms.csv
 school_segmentation_targets:
   # format is segment: land_use_column
-  university: ENROLL_COLL
-  highschool: ENROLL_K8
-  gradeschool: ENROLL_912
+  university: COLLEGEENROLL
+  highschool: ENROLLGRADE9to12
+  gradeschool: ENROLLGRADEKto8
   preschool: preschool_target
 
 # if target names are the same, they will be combined together
 workplace_segmentation_targets:
-  constr_maint: EMP_TOT
-  health: EMP_TOT
-  military: EMP_TOT
-  mngt_busi_scic_arts: EMP_TOT
-  prod_trans_move: EMP_TOT
-  sales_office: EMP_TOT
-  services: EMP_TOT
+  mngt_busi_scic_arts: EMP_TOTAL
+  white_collar: EMP_TOTAL
+  blue_collar: EMP_TOTAL
+  sales_office: EMP_TOTAL
+  nat_res_cnstr_maint: EMP_TOTAL
+  prod_trans_move: EMP_TOTAL
+  missing: EMP_TOTAL
 

@@ -1,25 +1,37 @@
 # Recommend to use SANDAG's python environment: 
 # https://github.com/SANDAG/ABM/blob/main/src/asim/scripts/environment.yml
 
-# Project settings
+# Preprocessor settings
+preprocessing:
+    input_dir: data
+    output_dir: input
+    links_file: "Network_link.shp"
+    nodes_file: "Network_node.shp"
+    maz_file: "MAZs_22333_2025-11-20.shp"
+    stops: "Stops.csv"
+    routes: "LineRoutes.csv"
+    network_epsg: 2913
+    walk_modes: ["wlk"] # TSYSSET modes to filter walk links
+
+# Skimming settings
 settings:
-    run_maz_maz_walk: False
+    run_maz_maz_walk: True
     run_maz_maz_bike: False
-    run_maz_stop_walk: True
+    run_maz_stop_walk: False
     maz_maz_walk_output: "maz_maz_walk.csv"
     maz_maz_bike_output: "maz_maz_bike.csv"
     maz_stop_walk_output: "maz_stop_walk.csv"
-    input_dir: input
+    input_dir: input    # preprocessed data
     output_dir: output
-    epsg: 32126    # projected crs of project
+    epsg: 2838     # projected crs of project
 
 # Stop attributes CSV, expectd in input_dir
 # One stop (row) per transit route
 stop_attributes:
     file: "stops.csv"
     id_field: "NO"
-    x_field: "Latitude"
-    y_field: "Longitude"
+    x_field: "Latitude"     # epsg:4326
+    y_field: "Longitude"    # epsg:4326
     rid_field: "Route_ID"
 
 # Route attributes CSV, expected in input_dir
@@ -43,7 +55,7 @@ mmms:
     two_way_network: False   # True if links are bidirectional, False if one link per direction
     mmms_link_ref_id: "FROMNODENO" 
     mmms_link_nref_id: "TONODENO"
-    mmms_link_id: "NO" 
+    mmms_link_id: "NO"  # not used
     mmms_link_len: "length"    # feet
     mmms_node_maz_id: "MAZ"
     max_maz_maz_walk_dist_feet: 15840   # int

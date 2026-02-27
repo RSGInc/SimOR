@@ -1,0 +1,11 @@
+Label,Description,Expression,has_license,does_not_have_license
+# dummy specification for license holding status model,,,
+util_constant,alternative specific constant,1,coef_has_license_ASC,0
+util_unavailable_for_under_16,unavailable for persons under 16 years old,@df.age < 16,coef_unavailable,0
+util_age,Age of person in years,@df.age,coef_age,0
+util_female,Female dummy,@df.female,coef_female,0
+util_worker,Is worker dummy,@df.is_worker,coef_is_worker,0
+#util_mobility_difficulty, Has mobility difficulty dummy,@df.mobility_difficulty,coef_mobility_difficulty,0
+util_logsum_work_0auto,Work accessibility -- 0 autos,workplace_location_accessibility_0,coef_logsum_work_0auto,0 
+util_logsum_shop_0auto,Shopping accessibility -- 0 autos,shopping_accessibility_0,coef_logsum_shop_0auto,0
+util_logsum_other_0auto,Other accessibility -- 0 autos,othdiscr_accessibility_0,coef_logsum_other_0auto,0

@@ -426,10 +426,10 @@ coef_calib_distance_TNC_TRANSIT_atwork,-0.032,F
 #coef_calib_zeroautohhindivtou_DRIVEALONE_work,-0.8236,F
 coef_calib_zeroautohhindivtou_SHARED2_work,-1.0611602231451105,F
 coef_calib_zeroautohhindivtou_SHARED3_work,-4.1746,F
-coef_calib_zeroautohhindivtou_WALK_work,2.557215851820022,F
+coef_calib_zeroautohhindivtou_WALK_work,-2,F
 coef_calib_zeroautohhindivtou_BIKE_work,-8.079656586782757,F
 coef_calib_zeroautohhindivtou_WALK_TRANSIT_work,-1.000,F
-coef_calib_zeroautohhindivtou_PNR_TRANSIT_work,-999.0,F
+coef_calib_zeroautohhindivtou_PNR_TRANSIT_work,-10.0,F
 coef_calib_zeroautohhindivtou_KNR_TRANSIT_work,-4.075069451,F
 coef_calib_zeroautohhindivtou_TNC_TRANSIT_work,-929.0,F
 coef_calib_zeroautohhindivtou_TAXI_work,-1.9627,F
@@ -437,10 +437,10 @@ coef_calib_zeroautohhindivtou_TNC_SINGLE_work,1.8216385166062703,F
 coef_calib_zeroautohhindivtou_TNC_SHARED_work,-3.9627,F
 coef_calib_autodeficienthhind_SHARED2_work,-2.7731029168864034,F
 coef_calib_autodeficienthhind_SHARED3_work,-2.61696716883417,F
-coef_calib_autodeficienthhind_WALK_work,-0.704903616,F
+coef_calib_autodeficienthhind_WALK_work,-6,F
 coef_calib_autodeficienthhind_BIKE_work,-6.805072109777588,F
 coef_calib_autodeficienthhind_WALK_TRANSIT_work,-5.100,F
-coef_calib_autodeficienthhind_PNR_TRANSIT_work,-8.541,F
+coef_calib_autodeficienthhind_PNR_TRANSIT_work,0.0,F
 coef_calib_autodeficienthhind_KNR_TRANSIT_work,-7.30,F
 coef_calib_autodeficienthhind_TNC_TRANSIT_work,-9.3988,F
 coef_calib_autodeficienthhind_TAXI_work,-9.6667,F
@@ -448,10 +448,10 @@ coef_calib_autodeficienthhind_TNC_SINGLE_work,-9.364061706,F
 coef_calib_autodeficienthhind_TNC_SHARED_work,-9.6667,F
 coef_calib_autosufficienthhin_SHARED2_work,-2.621306584450577,F
 coef_calib_autosufficienthhin_SHARED3_work,-2.302972872840689,F
-coef_calib_autosufficienthhin_WALK_work,-3.868807014483816,F
+coef_calib_autosufficienthhin_WALK_work,-9,F
 coef_calib_autosufficienthhin_BIKE_work,-4.144721153632634,F
 coef_calib_autosufficienthhin_WALK_TRANSIT_work,-7.463386267911408,F
-coef_calib_autosufficienthhin_PNR_TRANSIT_work,-9.50,F
+coef_calib_autosufficienthhin_PNR_TRANSIT_work,0.0,F
 coef_calib_autosufficienthhin_KNR_TRANSIT_work,-8.441000645946893,F
 coef_calib_autosufficienthhin_TNC_TRANSIT_work,-10.69754986,F
 coef_calib_autosufficienthhin_TAXI_work,-9.9013,F
@@ -460,7 +460,7 @@ coef_calib_autosufficienthhin_TNC_SHARED_work,-11.9013,F
 #coef_calib_zeroautohhindivtou_DRIVEALONE_univ,-19.7064,F
 coef_calib_zeroautohhindivtou_SHARED2_univ,1.4025215719623791,F
 coef_calib_zeroautohhindivtou_SHARED3_univ,-0.0017257324431166343,F
-coef_calib_zeroautohhindivtou_WALK_univ,-2.29788548,F
+coef_calib_zeroautohhindivtou_WALK_univ,-17,F
 coef_calib_zeroautohhindivtou_BIKE_univ,-1.3743078182020079,F
 coef_calib_zeroautohhindivtou_WALK_TRANSIT_univ,0.7016008892584799,F
 coef_calib_zeroautohhindivtou_PNR_TRANSIT_univ,-2.743,F
@@ -471,10 +471,10 @@ coef_calib_zeroautohhindivtou_TNC_SINGLE_univ,-999.0,F
 coef_calib_zeroautohhindivtou_TNC_SHARED_univ,-999.0,F
 coef_calib_autodeficienthhind_SHARED2_univ,-2.8659437665920695,F
 coef_calib_autodeficienthhind_SHARED3_univ,-2.4044424666408846,F
-coef_calib_autodeficienthhind_WALK_univ,1.941902143,F
+coef_calib_autodeficienthhind_WALK_univ,-13,F
 coef_calib_autodeficienthhind_BIKE_univ,-5.618019092314136,F
 coef_calib_autodeficienthhind_WALK_TRANSIT_univ,-1.4664567331132938,F
-coef_calib_autodeficienthhind_PNR_TRANSIT_univ,-8.2079,F
+coef_calib_autodeficienthhind_PNR_TRANSIT_univ,0.0,F
 coef_calib_autodeficienthhind_KNR_TRANSIT_univ,-5.921932441559945,F
 coef_calib_autodeficienthhind_TNC_TRANSIT_univ,-999.0,F
 coef_calib_autodeficienthhind_TAXI_univ,-11.6732,F
@@ -482,10 +482,10 @@ coef_calib_autodeficienthhind_TNC_SINGLE_univ,-2.9118614430509138,F
 coef_calib_autodeficienthhind_TNC_SHARED_univ,-11.6732,F
 coef_calib_autosufficienthhin_SHARED2_univ,-2.743838372569629,F
 coef_calib_autosufficienthhin_SHARED3_univ,-2.5952628250266048,F
-coef_calib_autosufficienthhin_WALK_univ,1.940567696,F
+coef_calib_autosufficienthhin_WALK_univ,-13,F
 coef_calib_autosufficienthhin_BIKE_univ,-7.621801378782758,F
 coef_calib_autosufficienthhin_WALK_TRANSIT_univ,-7.800131433397487,F
-coef_calib_autosufficienthhin_PNR_TRANSIT_univ,-7.940,F
+coef_calib_autosufficienthhin_PNR_TRANSIT_univ,0.0,F
 coef_calib_autosufficienthhin_KNR_TRANSIT_univ,-8.0489,F
 coef_calib_autosufficienthhin_TNC_TRANSIT_univ,-8.2328,F
 coef_calib_autosufficienthhin_TAXI_univ,-4.6511,F
@@ -494,7 +494,7 @@ coef_calib_autosufficienthhin_TNC_SHARED_univ,-6.6511,F
 #coef_calib_zeroautohhindivtou_DRIVEALONE_school,-0.9723,F
 coef_calib_zeroautohhindivtou_SHARED2_school,-117.0,F
 coef_calib_zeroautohhindivtou_SHARED3_school,34.549978586276076,F
-coef_calib_zeroautohhindivtou_WALK_school,-6.461274242936103,F
+coef_calib_zeroautohhindivtou_WALK_school,-21,F
 coef_calib_zeroautohhindivtou_BIKE_school,11.738543413217242,F
 coef_calib_zeroautohhindivtou_WALK_TRANSIT_school,-0.4078562423030851,F
 coef_calib_zeroautohhindivtou_PNR_TRANSIT_school,-999.0,F
@@ -506,7 +506,7 @@ coef_calib_zeroautohhindivtou_TNC_SHARED_school,-1001.0,F
 coef_calib_zeroautohhindivtou_SCH_BUS_school,35.35537348509467,F
 coef_calib_autodeficienthhind_SHARED2_school,-5.560002977,F
 coef_calib_autodeficienthhind_SHARED3_school,-1.672317192000944,F
-coef_calib_autodeficienthhind_WALK_school,-0.6590523669067371,F
+coef_calib_autodeficienthhind_WALK_school,-16,F
 coef_calib_autodeficienthhind_BIKE_school,-1.4755707227827584,F
 coef_calib_autodeficienthhind_WALK_TRANSIT_school,-141.40396559028179,F
 coef_calib_autodeficienthhind_PNR_TRANSIT_school,-5.9201,F
@@ -518,7 +518,7 @@ coef_calib_autodeficienthhind_TNC_SHARED_school,-1001.0,F
 coef_calib_autodeficienthhind_SCH_BUS_school,-2.257875674399108,F
 coef_calib_autosufficienthhin_SHARED2_school,-18.199635297754693,F
 coef_calib_autosufficienthhin_SHARED3_school,-3.4814411977218755,F
-coef_calib_autosufficienthhin_WALK_school,0.3649936466457807,F
+coef_calib_autosufficienthhin_WALK_school,-10,F
 coef_calib_autosufficienthhin_BIKE_school,4.603938022893227,F
 coef_calib_autosufficienthhin_WALK_TRANSIT_school,-3.841696972180493,F
 coef_calib_autosufficienthhin_PNR_TRANSIT_school,-10.5186,F
@@ -565,7 +565,7 @@ coef_calib_autosufficienthhin_TNC_SHARED_atwork,-13.13094895,F
 #coef_calib_zeroautohhindivtou_DRIVEALONE_maint,-0.272127,F
 coef_calib_zeroautohhindivtou_SHARED2_maint,-0.0953975040639451,F
 coef_calib_zeroautohhindivtou_SHARED3_maint,-0.5861750007692645,F
-coef_calib_zeroautohhindivtou_WALK_maint,2.5015568247527207,F
+coef_calib_zeroautohhindivtou_WALK_maint,-12,F
 coef_calib_zeroautohhindivtou_BIKE_maint,-6.495779154782759,F
 coef_calib_zeroautohhindivtou_WALK_TRANSIT_maint,0.254,F
 coef_calib_zeroautohhindivtou_PNR_TRANSIT_maint,-999.0,F
@@ -578,7 +578,7 @@ coef_calib_zeroautohhindivtou_EBIKE_maint,-1.9588924148656395,F
 coef_calib_zeroautohhindivtou_ESCOOTER_maint,-2.0910122923459893,F
 coef_calib_autodeficienthhind_SHARED2_maint,-0.427698775,F
 coef_calib_autodeficienthhind_SHARED3_maint,-0.135402405,F
-coef_calib_autodeficienthhind_WALK_maint,-0.680160963,F
+coef_calib_autodeficienthhind_WALK_maint,-21,F
 coef_calib_autodeficienthhind_BIKE_maint,-4.148845394377202,F
 coef_calib_autodeficienthhind_WALK_TRANSIT_maint,-2.4511143207320331,F
 coef_calib_autodeficienthhind_PNR_TRANSIT_maint,-4.300,F
@@ -591,7 +591,7 @@ coef_calib_autodeficienthhind_EBIKE_maint,-9.121312466020221,F
 coef_calib_autodeficienthhind_ESCOOTER_maint,-9.112007173155705,F
 coef_calib_autosufficienthhin_SHARED2_maint,-0.73368848,F
 coef_calib_autosufficienthhin_SHARED3_maint,-0.407647498,F
-coef_calib_autosufficienthhin_WALK_maint,-1.035931295266452,F
+coef_calib_autosufficienthhin_WALK_maint,-21,F
 coef_calib_autosufficienthhin_BIKE_maint,-1.777248300569825,F
 coef_calib_autosufficienthhin_WALK_TRANSIT_maint,-6.361456246944145,F
 coef_calib_autosufficienthhin_PNR_TRANSIT_maint,-9.207,F
@@ -605,7 +605,7 @@ coef_calib_autosufficienthhin_ESCOOTER_maint,-9.112007173155705,F
 #coef_calib_zeroautohhindivtou_DRIVEALONE_disc,-1.878657,F
 coef_calib_zeroautohhindivtou_SHARED2_disc,-0.24110458629661868,F
 coef_calib_zeroautohhindivtou_SHARED3_disc,-2.6123048389425985,F
-coef_calib_zeroautohhindivtou_WALK_disc,0.897642439,F
+coef_calib_zeroautohhindivtou_WALK_disc,-14,F
 coef_calib_zeroautohhindivtou_BIKE_disc,-3.795507333782758,F
 coef_calib_zeroautohhindivtou_WALK_TRANSIT_disc,0.350,F
 coef_calib_zeroautohhindivtou_PNR_TRANSIT_disc,-999.0,F
@@ -618,7 +618,7 @@ coef_calib_zeroautohhindivtou_EBIKE_disc,-7.443041956020212,F
 coef_calib_zeroautohhindivtou_ESCOOTER_disc,-5.656387152155711,F
 coef_calib_autodeficienthhind_SHARED2_disc,-0.3753256374994909,F
 coef_calib_autodeficienthhind_SHARED3_disc,0.0532018185751006,F
-coef_calib_autodeficienthhind_WALK_disc,-1.594754179,F
+coef_calib_autodeficienthhind_WALK_disc,-22,F
 coef_calib_autodeficienthhind_BIKE_disc,-2.36086490826382,F
 coef_calib_autodeficienthhind_WALK_TRANSIT_disc,-0.512,F
 coef_calib_autodeficienthhind_PNR_TRANSIT_disc,-6.013662,F
@@ -631,7 +631,7 @@ coef_calib_autodeficienthhind_EBIKE_disc,-3.553244205201142,F
 coef_calib_autodeficienthhind_ESCOOTER_disc,-6.302998778155713,F
 coef_calib_autosufficienthhin_SHARED2_disc,-0.6311678896592476,F
 coef_calib_autosufficienthhin_SHARED3_disc,0.2541481243589367,F
-coef_calib_autosufficienthhin_WALK_disc,-0.049841242,F
+coef_calib_autosufficienthhin_WALK_disc,-20,F
 coef_calib_autosufficienthhin_BIKE_disc,-2.417694133782759,F
 coef_calib_autosufficienthhin_WALK_TRANSIT_disc,-2.870,F
 coef_calib_autosufficienthhin_PNR_TRANSIT_disc,-7.132,F
@@ -711,7 +711,7 @@ coef_calib_autodeficienthhjoi_EBIKE_disc,-53.59405712502022,F
 coef_calib_autodeficienthhjoi_ESCOOTER_disc,-54.8720071731557,F
 #coef_calib_autosufficienthhjo_SHARED2_disc,4.253195896,F
 coef_calib_autosufficienthhjo_SHARED3_disc,-2.175409902383395,F
-coef_calib_autosufficienthhjo_WALK_disc,-1.753924105381346,F
+coef_calib_autosufficienthhjo_WALK_disc,-7,F
 coef_calib_autosufficienthhjo_BIKE_disc,-17.70975822678276,F
 coef_calib_autosufficienthhjo_WALK_TRANSIT_disc,-18.918341,F
 coef_calib_autosufficienthhjo_PNR_TRANSIT_disc,-15.46037795,F

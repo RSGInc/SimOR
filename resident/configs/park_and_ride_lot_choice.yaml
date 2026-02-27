@@ -10,14 +10,14 @@ preprocessor:
     - vehicles
     - tours
 
-
-LANDUSE_PNR_SPACES_COLUMN: PNR_CAP_TOTAL
+LANDUSE_PNR_SPACES_COLUMN: PNR_SPACES
 
 # will check the tour destination to make sure transit access is available
 # if no transit access, then no PNR lot will be available and could get 
 # zero probabilities error
 TRANSIT_SKIMS_FOR_ELIGIBILITY:
   - WTW_TIV__PM
+  - WTW_TIV__MD
 
 # Precompute destination eligibility for tours
 # LANDUSE_COL_FOR_PNR_ELIGIBLE_DEST: is_pnr_eligible_destination
