@@ -1,0 +1,4 @@
+# Ignore everything in this directory – these are external dependencies
+# managed by setup_environment.bat and should not be tracked in SimOR.
+*
+!.gitignore
