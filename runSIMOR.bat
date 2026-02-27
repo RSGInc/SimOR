@@ -19,13 +19,13 @@ SET "EXT_DIR=%BASE_DIR%ext_dependencies"
 SET "PYTHON_ASIM=%EXT_DIR%\activitysim\.venv\Scripts\python.exe"
 SET "PYTHON_SANDAG_ASIM=%EXT_DIR%\sandag_parking\.venv\Scripts\python.exe"
 
-:: Visum Python is a system install - edit this path to match your Visum version
+:: Visum Python version file
 SET "PYTHON_VISUM=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python\python.exe"
 
 :: User-defined Visum version file (should be saved in skimming_and_assingment\Visum)
 SET "VISUM_VERSION_FILE=Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver"
 SET "PROCEDURE_SEQ=%SKIM_DIR%\visum\config\visum_metro\SkimSequence_Metro.xml"
-
+ 
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :: Skimming
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

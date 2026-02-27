@@ -1,11 +1,10 @@
-import os, shutil, sys, time, csv
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2026/Exe/Python/Lib/site-packages")
-import win32com.client as com
+import os, sys, time
+_visum_site_packages = os.path.normpath(
+    os.path.join(os.path.dirname(sys.executable), "..", "..", "Python", "Lib", "site-packages")
+)
+sys.path.append(_visum_site_packages)
 import VisumPy.helpers
-import VisumPy.csvHelpers
-import traceback
-import pandas as pd
-sys.path.append("scripts") # check
+import pandas as pd 
 import warnings
 import tables
 
@@ -44,21 +43,18 @@ def loadProcedure(Visum,parFileName,execute=True):
     
 if __name__ == "__main__":
     inputVersionFile = sys.argv[1]
-    runmode = sys.argv[2]
-    procedure = sys.argv[3]
-    # inputVersionFile = f"Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver"
-    
-    print(f"start {runmode} run: {time.time()}")
-    
-    if runmode == 'skims':
-        try:
-            Visum = startVisum()
-            loadVersion(Visum, inputVersionFile)
-            print("Loaded Visum")
-            loadProcedure(Visum, os.path.join("config", procedure))
-            closeVisum(Visum)
-            sys.exit(0)
-        except Exception as e:
-            print(runmode + "Failed")
-            print(e)
-            sys.exit(1)
+    procedure = sys.argv[2]
+        
+    print(f"start {procedure} run: {time.time()}")
+
+    try:
+        Visum = startVisum()
+        loadVersion(Visum, inputVersionFile)
+        print("Loaded Visum")
+        loadProcedure(Visum, os.path.join("config", procedure))
+        closeVisum(Visum)
+        sys.exit(0)
+    except Exception as e:
+        print(procedure + "Failed")
+        print(e)
+        sys.exit(1)
