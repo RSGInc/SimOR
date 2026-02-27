@@ -18,11 +18,12 @@ ECHO Skimming directory: %SKIM_DIR%
 SET "EXT_DIR=%BASE_DIR%ext_dependencies"
 SET "PYTHON_ASIM=%EXT_DIR%\activitysim\.venv\Scripts\python.exe"
 SET "PYTHON_SANDAG_ASIM=%EXT_DIR%\sandag_parking\.venv\Scripts\python.exe"
+SET "PYTHON_SANDAG_ASIM_140=C:\Users\.conda\envs\asim_140\python.exe"
 
 :: Visum Python version file
 SET "PYTHON_VISUM=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python\python.exe"
 
-:: User-defined Visum version file (should be saved in skimming_and_assingment\Visum)
+:: User-defined Visum version file and procedure sequence
 SET "VISUM_VERSION_FILE=Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver"
 SET "PROCEDURE_SEQ=%SKIM_DIR%\visum\config\visum_metro\SkimSequence_Metro.xml"
  
@@ -45,12 +46,12 @@ ECHO Motorized skims complete.
 ECHO.
 ECHO Running non-motorized skim preprocessor.
 CD /D "%SKIM_DIR%\maz_maz_stop_skims"
-"%PYTHON_SANDAG_ASIM%" 2zoneSkim_preprocessor.py 2zoneSkim_params.yaml
+"%PYTHON_SANDAG_ASIM_140%" 2zoneSkim_preprocessor.py 2zoneSkim_params.yaml
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
-ECHO .
+ECHO.
 ECHO Running non-motorized skims. 
-"%PYTHON_SANDAG_ASIM%" 2zoneSkim.py 2zoneSkim_params.yaml
+"%PYTHON_SANDAG_ASIM_140%" 2zoneSkim.py 2zoneSkim_params.yaml
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 ECHO Non-motorized skims complete.
 
