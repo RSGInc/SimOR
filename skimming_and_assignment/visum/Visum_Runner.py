@@ -48,13 +48,13 @@ if __name__ == "__main__":
     print(f"start {procedure} run: {time.time()}")
 
     try:
-        Visum = startVisum()
-        loadVersion(Visum, inputVersionFile)
-        print("Loaded Visum")
-        loadProcedure(Visum, os.path.join("config", procedure))
-        closeVisum(Visum)
-        sys.exit(0)
+      Visum = startVisum()
+      loadVersion(Visum, inputVersionFile)
+      print("Loaded Visum")
+      loadProcedure(Visum, os.path.join("config", procedure))
+      closeVisum(Visum)
+      sys.exit(0)
     except Exception as e:
-        print(procedure + "Failed")
-        print(e)
-        sys.exit(1)
+      print(procedure + "Failed")
+      print(e)
+      sys.exit(1)

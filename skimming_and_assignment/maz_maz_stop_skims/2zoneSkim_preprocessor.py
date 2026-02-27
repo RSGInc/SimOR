@@ -242,7 +242,7 @@ def main(config_file):
     stops.to_csv(os.path.join(output_dir, "stops.csv"))
     
     elapsed = datetime.now() - start_time
-    print(f"Skim preprocessing complete! Total time: {elapsed}")
+    print(f"Non-motorized skim preprocessing complete! Total time: {elapsed}")
 
 if __name__ == "__main__":
     main(sys.argv[1])
