@@ -129,7 +129,7 @@ def network_shp_export():
 	maz_shp_export_params.ClearLayout()
 	maz_shp_export_params.AddColumn("XCOORD")
 	maz_shp_export_params.AddColumn("YCOORD")
-	maz_shp_export_params.AddColumn("AREAMI2")
+	maz_shp_export_params.AddColumn("MAZ_NO")
 	
 	Visum.IO.ExportShapefile(nonmotorizedinputs_path + "/MAZs.shp", maz_shp_export_params)
 

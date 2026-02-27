@@ -190,8 +190,8 @@ def prepare_transit_routes_and_stops(inputs):
     stops = inputs.stops
     
     # Prepare routes
-    routes.rename(columns={"TSysCode":"Mode",
-                       "LineName":"Route_ID"}, inplace=True)
+    routes.rename(columns={"TSYSCODE":"Mode",
+                           "LINE":"Route_ID"}, inplace=True)
 
     # Create dictionary for mapping
     routes_mode_dict = dict(zip(routes["Route_ID"], routes["Mode"]))
@@ -200,7 +200,7 @@ def prepare_transit_routes_and_stops(inputs):
     # Convert coordinates to epsg 4326
     stops_gdf = gpd.GeoDataFrame(
         stops,
-        geometry = gpd.points_from_xy(stops["X-Coordinate"], stops["Y-Coordinate"]),
+        geometry = gpd.points_from_xy(stops["XCOORD"], stops["YCOORD"]),
         crs = inputs.epsg
     )
     stops_gdf = stops_gdf.to_crs(epsg=4326)
@@ -211,7 +211,7 @@ def prepare_transit_routes_and_stops(inputs):
         "StopID":"NO"}, inplace=True)
 
     # Explode mode - need route per row
-    stops_gdf["Route_ID"] = stops["Lines"].apply(lambda x: [i for i in x.split(",")])
+    stops_gdf["Route_ID"] = stops["LINES"].apply(lambda x: [i for i in x.split(",")])
     stops_gdf = stops_gdf.explode("Route_ID")
 
     # Format
