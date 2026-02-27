@@ -163,7 +163,7 @@ def prepare_links(connectors, walk_network_links, walk_network_nodes):
     
     # Make sure they are the same crs
     if connectors.crs != walk_network_links.crs:
-        connectors = connectors.to_crs(walk_network_links)
+        connectors = connectors.to_crs(walk_network_links.crs)
 
     # Merge connectors with links
     keep_cols = ["FROMNODENO", "TONODENO", "geometry"]
