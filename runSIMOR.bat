@@ -1,62 +1,71 @@
 @ECHO OFF
-ECHO %startTime%%Time%
+SETLOCAL
 
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :: Run ActivitySim and associated scripts
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :: Settings 
-SET PROJECT_DIRECTORY=%~dp0
-ECHO PROJECT_DIRECTORY: %PROJECT_DIRECTORY%
+SET "BASE_DIR=%~dp0"
+SET "SKIM_DIR=%BASE_DIR%\skimming_and_assignment"
+SET "MODEL_DIR=%BASE_DIR%\resident"
 
-SET SKIM_DIR=%PROJECT_DIRECTORY%\skimming_and_assignment
-ECHO SKIM_DIR: %SKIM_DIR%
-
-SET MODEL_DIR=%PROJECT_DIRECTORY%\resident
-ECHO MODEL_DIR: %MODEL_DIR%
-
-@REM SET VISUM_DIR=D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum
-@REM SET VISUM_DIR=%ROOT_DIRECTORY%\skimming_and_assignment\visum
+ECHO Base directory: %BASE_DIR%
+ECHO Model directory: %MODEL_DIR%
+ECHO Skimming directory: %SKIM_DIR%
 
 :: User-defined python environments
-SET PYTHON_SANDAG_ASIM=C:\Users\edna.aguilar\.conda\envs\asim_140\python.exe
-SET PYTHON_VISUM=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python\python.exe
-SET PYTHON_ASIM=C:\Users\edna.aguilar\Documents\git_locals\activitysim\.venv\Scripts\python.exe
+SET "PYTHON_SANDAG_ASIM=C:\Users\edna.aguilar\.conda\envs\asim_140\python.exe"
+SET "PYTHON_VISUM=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python\python.exe"
+SET "PYTHON_ASIM=C:\Users\edna.aguilar\Documents\git_locals\activitysim\.venv\Scripts\python.exe"
 
 :: User-defined Visum version file (should be saved in skimming_and_assingment\Visum)
-SET VISUM_VERSION_FILE=Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver
-ECHO VISUM_VERSION_FILE: %VISUM_VERSION_FILE%
+SET "VISUM_VERSION_FILE=Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver"
+SET "PROCEDURE_SEQ=%SKIM_DIR%\visum\config\visum_metro\SkimSequence_Metro.xml"
 
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :: Skimming
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:: Motorized skims
-@REM ECHO Running motorized skims.
-@REM ECHO %startTime%%Time%
+:: Run motorized skims in Visum
+ECHO Running motorized skims.
+ECHO Visum version file: %VISUM_VERSION_FILE%
+ECHO Procedure sequence: %PROCEDURE_SEQ%
 
-@REM CD %SKIM_DIR%\visum
-@REM "%PYTHON_VISUM%" Visum_Runner.py %VISUM_VERSION_FILE% skims visum_metro/SkimSequence_Metro.xml
-@REM IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
-@REM ECHO Motorized skims complete.
+CD /D "%SKIM_DIR%\visum"
+"%PYTHON_VISUM%" Visum_Runner.py %VISUM_VERSION_FILE% %PROCEDURE_SEQ%
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
+ECHO Motorized skims complete.
 
-:: Non-motorized skims 
-ECHO Running non-motorized skims preprocessor.
-ECHO %startTime%%Time%
-
-CD %SKIM_DIR%\maz_maz_stop_skims
-%PYTHON_SANDAG_ASIM% 2zoneSkim_preprocessor.py 2zoneSkim_params.yaml
+:: Run non-motorized skims in Python
+ECHO Running non-motorized skim preprocessor.
+CD /D "%SKIM_DIR%\maz_maz_stop_skims"
+"%PYTHON_SANDAG_ASIM%" 2zoneSkim_preprocessor.py 2zoneSkim_params.yaml
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 ECHO Running non-motorized skims.
-ECHO %startTime%%Time%
-%PYTHON_SANDAG_ASIM% 2zoneSkim.py 2zoneSkim_params.yaml
-CD %SKIM_DIR%
+"%PYTHON_SANDAG_ASIM%" 2zoneSkim.py 2zoneSkim_params.yaml
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
+ECHO Non-motorized skims complete.
 
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :: Run ActivitySim
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@REM ECHO Running land use preprocessor.
-@REM ECHO %startTime%%Time%
-@REM CD /D %MODEL_DIR%
-@REM %PYTHON_ASIM% preprocessor.py preprocessor_settings.yaml
+ECHO Running land use preprocessor.
+CD /D "%MODEL_DIR%"
+"%PYTHON_ASIM%" preprocessor.py preprocessor_settings.yaml
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
+ECHO Land use preprocessor complete.
 
+:: ADD CODE TO RUN ASIM
+::
+
+ECHO All steps completed successfully.
+ENDLOCAL
+GOTO :EOF
+
+:MODEL_ERROR
+ECHO.
+ECHO ERROR: A step failed. Check the output above for details.
+ENDLOCAL
+EXIT /B 1
