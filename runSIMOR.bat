@@ -7,17 +7,20 @@ SETLOCAL
 
 :: Settings 
 SET "BASE_DIR=%~dp0"
-SET "SKIM_DIR=%BASE_DIR%\skimming_and_assignment"
-SET "MODEL_DIR=%BASE_DIR%\resident"
+SET "SKIM_DIR=%BASE_DIR%skimming_and_assignment"
+SET "MODEL_DIR=%BASE_DIR%resident"
 
 ECHO Base directory: %BASE_DIR%
 ECHO Model directory: %MODEL_DIR%
 ECHO Skimming directory: %SKIM_DIR%
 
-:: User-defined python environments
-SET "PYTHON_SANDAG_ASIM=C:\Users\edna.aguilar\.conda\envs\asim_140\python.exe"
+:: Python environments built by setup_environment.bat
+SET "EXT_DIR=%BASE_DIR%ext_dependencies"
+SET "PYTHON_ASIM=%EXT_DIR%\activitysim\.venv\Scripts\python.exe"
+SET "PYTHON_SANDAG_ASIM=%EXT_DIR%\sandag_parking\.venv\Scripts\python.exe"
+
+:: Visum Python is a system install - edit this path to match your Visum version
 SET "PYTHON_VISUM=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python\python.exe"
-SET "PYTHON_ASIM=C:\Users\edna.aguilar\Documents\git_locals\activitysim\.venv\Scripts\python.exe"
 
 :: User-defined Visum version file (should be saved in skimming_and_assingment\Visum)
 SET "VISUM_VERSION_FILE=Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver"
@@ -33,7 +36,7 @@ ECHO Visum version file: %VISUM_VERSION_FILE%
 ECHO Procedure sequence: %PROCEDURE_SEQ%
 
 CD /D "%SKIM_DIR%\visum"
-"%PYTHON_VISUM%" Visum_Runner.py %VISUM_VERSION_FILE% %PROCEDURE_SEQ%
+"%PYTHON_VISUM%" Visum_Runner.py "%VISUM_VERSION_FILE%" "%PROCEDURE_SEQ%"
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 ECHO Motorized skims complete.
 
