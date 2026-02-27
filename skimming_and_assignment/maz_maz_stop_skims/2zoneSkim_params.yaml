@@ -3,7 +3,7 @@
 
 # Preprocessor settings
 preprocessing:
-    input_dir: data
+    input_dir: Visum_Outputs
     output_dir: input
     links_file: "Network_link.shp"
     nodes_file: "Network_node.shp"
@@ -15,13 +15,13 @@ preprocessing:
 
 # Skimming settings
 settings:
-    run_maz_maz_walk: True
+    run_maz_maz_walk: False
     run_maz_maz_bike: False
-    run_maz_stop_walk: False
+    run_maz_stop_walk: True
     maz_maz_walk_output: "maz_maz_walk.csv"
     maz_maz_bike_output: "maz_maz_bike.csv"
     maz_stop_walk_output: "maz_stop_walk.csv"
-    input_dir: input    # preprocessed data
+    input_dir: input    # preprocessing output dir
     output_dir: output
     epsg: 2838     # projected crs of project
 

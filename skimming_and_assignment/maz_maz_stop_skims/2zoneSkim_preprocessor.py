@@ -28,7 +28,7 @@ class ConfigLoader():
         self.config = self.load_config()
         
     def load_config(self):
-        os.chdir(os.path.dirname(__file__))
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
         with open(self.config_file, "r") as file:
             return yaml.load(file, Loader = yaml.FullLoader)
 
