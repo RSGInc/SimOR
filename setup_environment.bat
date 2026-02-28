@@ -19,10 +19,10 @@ SETLOCAL EnableDelayedExpansion
 :: Example: C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python
 SET "VISUM_PYTHON_DIR=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python"
 
-:: Set to Y to clone and install sandag_parking (oregon_metro branch), N to skip.
-SET "INSTALL_PARKING=Y"
+:: Set to Y to clone and install sandag_parking (oregon_metro branch), N to skip
+:: (optional dependency, only needed if you want to regenerate parking cost data)
+SET "INSTALL_PARKING=N"
 :: ---------------------------------------------------------------------------
-
 
 
 :: ---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ IF NOT EXIST "%EXT_DIR%" (
 :: ============================================================================
 :: STEP 1 – Ensure UV is installed
 :: ============================================================================
-ECHO [1/4] Checking for UV package manager...
+ECHO [1/5] Checking for UV package manager...
 
 where uv >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
@@ -108,7 +108,7 @@ ECHO.
 :: ============================================================================
 :: STEP 2 – Clone / update ActivitySim and create its virtual environment
 :: ============================================================================
-ECHO [2/4] Setting up ActivitySim (SimOR_pnr branch)...
+ECHO [2/5] Setting up ActivitySim (SimOR_pnr branch)...
 
 SET "ACTIVITYSIM_DIR=%EXT_DIR%\activitysim"
 
@@ -133,13 +133,13 @@ IF EXIST "%ACTIVITYSIM_DIR%\.git" (
 :: Build the environment using the uv lock file
 ECHO  Installing ActivitySim dependencies via UV...
 pushd "%ACTIVITYSIM_DIR%"
-uv sync --frozen
+uv sync --frozen --link-mode copy
 IF !ERRORLEVEL! NEQ 0 (
     ECHO  ERROR: uv sync failed for ActivitySim.
     popd
     GOTO :ERROR_EXIT
 )
-uv pip install -e . --no-deps
+uv pip install -e . --no-deps --link-mode copy
 popd
 
 :: Resolve the absolute path to the venv Python
@@ -156,14 +156,13 @@ ECHO.
 :: ============================================================================
 :: STEP 3 – Visum Python packages
 :: ============================================================================
-ECHO [3/4] Setting up Visum Python packages...
+ECHO [3/5] Setting up Visum Python packages...
 
 IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
     ECHO  WARNING: Visum Python not found at:
     ECHO    %VISUM_PYTHON_DIR%
     ECHO  Please edit VISUM_PYTHON_DIR in this script to point to your Visum 2026 Python folder.
     ECHO  Skipping Visum package installation.
-    SET "VISUM_ACTIVITYSIM="
 ) ELSE (
     ECHO  Installing tables, openmatrix, pyyaml into Visum Python...
     "%VISUM_PYTHON_DIR%\python.exe" -m pip install tables openmatrix pyyaml --quiet
@@ -172,13 +171,39 @@ IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
     ) ELSE (
         ECHO  Visum packages installed successfully.
     )
-    SET "VISUM_ACTIVITYSIM=%VISUM_PYTHON_DIR%"
-    ECHO  VISUM_ACTIVITYSIM = !VISUM_ACTIVITYSIM!
 )
 ECHO.
 
 :: ============================================================================
-:: STEP 4 – (Optional) Clone / update sandag_parking
+:: STEP 4 – MAZ skimming Python environment
+:: ============================================================================
+ECHO [4/5] Setting up MAZ skimming Python environment...
+
+SET "MAZ_SKIM_DIR=%EXT_DIR%\maz_skimming"
+
+ECHO  Installing MAZ skimming dependencies via UV...
+pushd "%MAZ_SKIM_DIR%"
+uv sync --frozen --link-mode copy
+IF !ERRORLEVEL! NEQ 0 (
+    ECHO  ERROR: uv sync failed for MAZ skimming environment.
+    popd
+    GOTO :ERROR_EXIT
+)
+popd
+
+:: Resolve the absolute path to the venv Python
+FOR /F "delims=" %%P IN ('powershell -Command "(Resolve-Path '%MAZ_SKIM_DIR%\.venv\Scripts\python.exe').Path"') DO SET "PYTHON_MAZ_SKIMMING=%%P"
+
+IF NOT EXIST "%PYTHON_MAZ_SKIMMING%" (
+    ECHO  ERROR: Could not find Python at %MAZ_SKIM_DIR%\.venv\Scripts\python.exe
+    GOTO :ERROR_EXIT
+)
+
+ECHO  PYTHON_MAZ_SKIMMING = %PYTHON_MAZ_SKIMMING%
+ECHO.
+
+:: ============================================================================
+:: STEP 5 – (Optional) Clone / update sandag_parking
 :: ============================================================================
 
 IF /I "%INSTALL_PARKING%"=="Y" (
@@ -207,7 +232,7 @@ IF /I "%INSTALL_PARKING%"=="Y" (
     :: Build the environment using the uv lock file
     ECHO  Installing sandag_parking dependencies via UV...
     pushd "!PARKING_DIR!"
-    uv sync --frozen
+    uv sync --frozen --link-mode copy
     IF !ERRORLEVEL! NEQ 0 (
         ECHO  ERROR: uv sync failed for sandag_parking.
         popd
@@ -238,6 +263,13 @@ IF /I "%INSTALL_PARKING%"=="Y" (
 )
 ECHO.
 
+:: Set PYTHON_VISUM as the full path to the Visum Python executable
+IF EXIST "%VISUM_PYTHON_DIR%\python.exe" (
+    SET "PYTHON_VISUM=%VISUM_PYTHON_DIR%\python.exe"
+) ELSE (
+    SET "PYTHON_VISUM="
+)
+
 :: ============================================================================
 :: Summary
 :: ============================================================================
@@ -245,23 +277,29 @@ ECHO ============================================================
 ECHO  Environment Setup Complete
 ECHO ============================================================
 ECHO.
-ECHO  PYTHON_ACTIVITYSIM = %PYTHON_ACTIVITYSIM%
-IF DEFINED VISUM_ACTIVITYSIM (
-    ECHO  VISUM_ACTIVITYSIM  = %VISUM_ACTIVITYSIM%
-) ELSE (
-    ECHO  VISUM_ACTIVITYSIM  = (not set - Visum Python path not found)
-)
+ECHO  PYTHON_ACTIVITYSIM  = %PYTHON_ACTIVITYSIM%
+ECHO  PYTHON_MAZ_SKIMMING = %PYTHON_MAZ_SKIMMING%
+ECHO  PYTHON_VISUM        = %PYTHON_VISUM%
 IF DEFINED PYTHON_PARKING (
     ECHO  PYTHON_PARKING     = !PYTHON_PARKING!
 ) ELSE (
-    ECHO  PYTHON_PARKING     = (not set)
+    ECHO  PYTHON_PARKING     = ^(not set^)
 )
 ECHO.
-ECHO  These variables are available for the remainder of this
-ECHO  terminal session. To persist them, add them to your
-ECHO  system environment variables.
 ECHO ============================================================
 
+:: ---------------------------------------------------------------------------
+:: Export variables to the caller's scope (survives ENDLOCAL)
+:: ---------------------------------------------------------------------------
+ENDLOCAL & (
+    SET "PYTHON_ACTIVITYSIM=%PYTHON_ACTIVITYSIM%"
+    SET "PYTHON_MAZ_SKIMMING=%PYTHON_MAZ_SKIMMING%"
+    SET "PYTHON_VISUM=%PYTHON_VISUM%"
+    SET "PYTHON_PARKING=%PYTHON_PARKING%"
+    SET "EXT_DIR=%EXT_DIR%"
+    SET "BASE_DIR=%BASE_DIR%"
+    SET "PATH=%PATH%"
+)
 GOTO :EOF
 
 :ERROR_EXIT
@@ -269,4 +307,5 @@ ECHO.
 ECHO ============================================================
 ECHO  Setup failed. See errors above.
 ECHO ============================================================
+ENDLOCAL
 EXIT /B 1
