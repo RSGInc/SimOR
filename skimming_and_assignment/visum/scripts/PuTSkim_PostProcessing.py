@@ -8,6 +8,34 @@ import pandas as pd
 import os
 import VisumPy.helpers as h
 import openmatrix as omx
+import yaml
+
+
+# YAML file constants management
+# Get the folder where this script lives
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up directories to reach SimOR directory
+folder_a = script_dir
+while True:
+    if os.path.basename(folder_a) == "SimOR":
+        break
+    parent = os.path.dirname(folder_a)
+    if parent == folder_a:  # reached root directory
+        raise FileNotFoundError("Folder 'SimOR' not found in parent hierarchy.")
+    folder_a = parent
+
+# Read the path from the pointer file
+with open(os.path.join(folder_a, 'path_config.txt'), 'r') as f:
+    yaml_relative_path = f.read().strip()
+
+# Build the absolute path to the YAML file
+yaml_path = os.path.join(folder_a, yaml_relative_path)
+
+# Pull constants from the YAML file
+with open(yaml_path, 'r') as file:
+    config_data = yaml.safe_load(file)
+
 
 
 # Create function to build skim matrices that weren't built during the skimming procedure itself if they don't yet exist
@@ -26,13 +54,12 @@ def putskim_postprocessing(mtx_dseg,knr_flag):
     creatematrices("NBR" ,mtx_dseg)
     creatematrices("IVTT",mtx_dseg)
     creatematrices("STC" ,mtx_dseg)
-    #creatematrices("OVT" ,mtx_dseg)
     creatematrices("VTC" ,mtx_dseg)
 
     # Pull matrices out of Visum as numpy arrays
-    wkt    = h.GetMatrixRaw(Visum, {"CODE": "WKT"     , "DSegCode": mtx_dseg})  # Walk time
-    act    = h.GetMatrixRaw(Visum, {"CODE": "ACT"     , "DSegCode": mtx_dseg})  # Access time
-    egt    = h.GetMatrixRaw(Visum, {"CODE": "EGT"     , "DSegCode": mtx_dseg})  # Egress time
+    twpt   = h.GetMatrixRaw(Visum, {"CODE": "TWPT"    , "DSegCode": mtx_dseg})  # Transfer Walk Path time    (formerly walk time)
+    owpt   = h.GetMatrixRaw(Visum, {"CODE": "OWPT"    , "DSegCode": mtx_dseg})  # Origin Walk Path time      (formerly access time)
+    dwpt   = h.GetMatrixRaw(Visum, {"CODE": "DWPT"    , "DSegCode": mtx_dseg})  # Destination Walk Path time (formerly egress time)
     ntr    = h.GetMatrixRaw(Visum, {"CODE": "NTR"     , "DSegCode": mtx_dseg})  # Number of transfers
     nbr    = h.GetMatrixRaw(Visum, {"CODE": "NBR"     , "DSegCode": mtx_dseg})  # Number of boardings
     wowt   = h.GetMatrixRaw(Visum, {"CODE": "WOWT"    , "DSegCode": mtx_dseg})  # Weighted origin wait time
@@ -45,58 +72,101 @@ def putskim_postprocessing(mtx_dseg,knr_flag):
     ivtt_r = h.GetMatrixRaw(Visum, {"CODE": "IVTT(r)" , "DSegCode": mtx_dseg})  # In-vehicle travel time (WES)
     pla    = h.GetMatrixRaw(Visum, {"CODE": "PLA"     , "DSegCode": mtx_dseg})  # Stop type constant (raw sum)
     stc    = h.GetMatrixRaw(Visum, {"CODE": "STC"     , "DSegCode": mtx_dseg})  # Stop type constant (final average)
-    #ovt    = h.GetMatrixRaw(Visum, {"CODE": "OVT"     , "DSegCode": mtx_dseg})  # Out of vehicle time
     vtc    = h.GetMatrixRaw(Visum, {"CODE": "VTC"     , "DSegCode": mtx_dseg})  # Vehicle type constant
 
     # Process matrices
-    # Walk time
+    # Set maximum walk time allowed
+    wlkspeed            = config_data['Walk_Speed']
+    origin_maxwlktime   = 1.00 * (60 / wlkspeed) # Minutes to walk 1 mile
+    dest_maxwlktime     = 1.00 * (60 / wlkspeed) # Minutes to walk 1 mile
+    transfer_maxwlktime = 0.25 * (60 / wlkspeed) # Minutes to walk 0.25 miles
+
+    ## CHANGE TO BE MAX WALK DISTANCE BY Transfer Walk Path time (0.25 mi), Origin Walk Path time (1 mi), Destination Walk Path time (1 mi)
+    ## Mask Transfer Walk Path time
+    #if knr_flag == 'wtw':
+    #    twpt = np.where((owpt > origin_maxwlktime) | (dwpt > dest_maxwlktime) | (twpt > transfer_maxwlktime) , 9999.00, twpt)
+    #    np.fill_diagonal(twpt, 9999.00)
+    #elif knr_flag == 'ktw':
+    #    twpt = np.where((dwpt > dest_maxwlktime)   | (twpt > transfer_maxwlktime) , 9999.00, twpt)
+    #    np.fill_diagonal(twpt, 9999.00)
+    #elif knr_flag == 'wtk':
+    #    twpt = np.where((owpt > origin_maxwlktime) | (twpt > transfer_maxwlktime) , 9999.00, twpt)
+    #    np.fill_diagonal(twpt, 9999.00)
+
+    # !!!!!! MASKING FOR COMPARISON WITH EMME (TEMPORARY) !!!!!!!
+    # Mask Transfer Walk Path time  GREATER THAN 20 MINUTES TOTAL WALK, GREATER THAN 30 MINUTES ORIGIN OR TRANSFER WAIT TIME
     if knr_flag == 'wtw':
-        wkt = np.minimum(wkt + act + egt , 9999.00)                     
-        wkt = np.where((wkt < 0.01) | (wkt > 20.0) , 9999.00, wkt)
-        np.fill_diagonal(wkt, 9999.00)
+        twpt = np.where((owpt + dwpt + twpt > 20), 9999.00, twpt)
+        np.fill_diagonal(twpt, 9999.00)
+        wowt = np.where((wowt > 30), 30.00, wowt)
+        wtwt = np.where((wtwt > 30), 30.00, wtwt)
     elif knr_flag == 'ktw':
-        wkt = np.minimum(wkt + egt , 9999.00)                     
-        wkt = np.where((wkt < 0.01) | (wkt > 20.0) , 9999.00, wkt)
-        np.fill_diagonal(wkt, 9999.00)
+        twpt = np.where((dwpt + twpt > 20), 9999.00, twpt)
+        np.fill_diagonal(twpt, 9999.00)
+        wowt = np.where((wowt > 30), 30.00, wowt)
+        wtwt = np.where((wtwt > 30), 30.00, wtwt)
     elif knr_flag == 'wtk':
-        wkt = np.minimum(wkt + act , 9999.00)                     
-        wkt = np.where((wkt < 0.01) | (wkt > 20.0) , 9999.00, wkt)
-        np.fill_diagonal(wkt, 9999.00)
+        twpt = np.where((owpt + twpt > 20), 9999.00, twpt)
+        np.fill_diagonal(twpt, 9999.00)
+        wowt = np.where((wowt > 30), 30.00, wowt)
+        wtwt = np.where((wtwt > 30), 30.00, wtwt)
+    # !!!!!! TEMPORARY !!!!!!
 
 
-    # Weighted origin wait time
-    wowt = np.where(wkt == 9999.00, 9999.00, wowt)
+    # MASKING: Set all matrices to have matrix cells = 9999.00 if twpt = 9999.00
+    owpt   = np.where(twpt == 9999.00, 9999.00, owpt)
+    dwpt   = np.where(twpt == 9999.00, 9999.00, dwpt)
+    ntr    = np.where(twpt == 9999.00, 9999.00, ntr)
+    nbr    = np.where(twpt == 9999.00, 9999.00, nbr)
+    wowt   = np.where(twpt == 9999.00, 9999.00, wowt)
+    wtwt   = np.where(twpt == 9999.00, 9999.00, wtwt)
+    ivtt   = np.where(twpt == 9999.00, 9999.00, ivtt)
+    ivtt_a = np.where(twpt == 9999.00, 9999.00, ivtt_a)
+    ivtt_b = np.where(twpt == 9999.00, 9999.00, ivtt_b)
+    ivtt_e = np.where(twpt == 9999.00, 9999.00, ivtt_e)
+    ivtt_l = np.where(twpt == 9999.00, 9999.00, ivtt_l)
+    ivtt_r = np.where(twpt == 9999.00, 9999.00, ivtt_r)
+    pla    = np.where(twpt == 9999.00, 9999.00, pla)
+    stc    = np.where(twpt == 9999.00, 9999.00, stc)
+    vtc    = np.where(twpt == 9999.00, 9999.00, vtc)
+
     # Perceived In-vehicle time by Mode
     if mtx_dseg == 'amPuT' or mtx_dseg == 'pmPuT':                      # Peak
-        ivtt_a = np.where(ivtt_a == 9999.00, 9999.00, ivtt_a * 0.95)
-        ivtt_l = np.where(ivtt_l == 9999.00, 9999.00, ivtt_l * 0.88)
-        ivtt_r = np.where(ivtt_r == 9999.00, 9999.00, ivtt_r * 0.88)
+        ivtt_a = np.where(ivtt_a == 9999.00, 9999.00, ivtt_a * config_data['PkIVPFa'])
+        ivtt_l = np.where(ivtt_l == 9999.00, 9999.00, ivtt_l * config_data['PkIVPFl'])
+        ivtt_r = np.where(ivtt_r == 9999.00, 9999.00, ivtt_r * config_data['PkIVPFr'])
     else:                                                               # Off-Peak
-        ivtt_a = np.where(ivtt_a == 9999.00, 9999.00, ivtt_a * 0.95)
-        ivtt_l = np.where(ivtt_l == 9999.00, 9999.00, ivtt_l * 0.86)
-        ivtt_r = np.where(ivtt_r == 9999.00, 9999.00, ivtt_r * 0.86)
+        ivtt_a = np.where(ivtt_a == 9999.00, 9999.00, ivtt_a * config_data['OpIVPFa'])
+        ivtt_l = np.where(ivtt_l == 9999.00, 9999.00, ivtt_l * config_data['OpIVPFl'])
+        ivtt_r = np.where(ivtt_r == 9999.00, 9999.00, ivtt_r * config_data['OpIVPFr'])
+
     # Number of boardings
     nbr = np.where(ntr == 9999.00, 9999.00, ntr + 1)
+
     # Stop type constant
     stc = np.where((pla == 9999.00) | (nbr == 9999.00) , 9999.00, pla / nbr)
     stc = np.where(stc == 9999.00, 0.00, stc)
+
     # In-Vehicle time
     ivtt = np.minimum(ivtt_a + ivtt_b + ivtt_e + ivtt_l + ivtt_r, 9999.00)
     np.fill_diagonal(ivtt, 9999.00)
-    # Out of vehicle time
-    #ovt = np.minimum(wowt + wtwt + wkt, 9999.00)
+
     # Vehicle type constant
     if mtx_dseg == 'amPuT' or mtx_dseg == 'pmPuT':                                                                                          # Peak
         vtc = np.where((ivtt == 9999.00) | (ivtt == 0.00), 9999.00, 
-                       ((0.0557 * ivtt_a) / ivtt) + ((0.000 * ivtt_e) / ivtt) + ((0.1858 * ivtt_l) / ivtt) + ((0.1858 * ivtt_r) / ivtt))
+                       ((config_data['PkVTCa'] * ivtt_a) / ivtt) + ((config_data['PkVTCe'] * ivtt_e) / ivtt) + ((config_data['PkVTCl'] * ivtt_l) / ivtt) + ((config_data['PkVTCr'] * ivtt_r) / ivtt))
     else:                                                                                                                                   # Off-Peak
         vtc = np.where((ivtt == 9999.00) | (ivtt == 0.00), 9999.00, 
-                       ((0.0432 * ivtt_a) / ivtt) + ((0.0984 * ivtt_e) / ivtt) + ((0.1442 * ivtt_l) / ivtt) + ((0.1442 * ivtt_r) / ivtt))
+                       ((config_data['OpVTCa'] * ivtt_a) / ivtt) + ((config_data['OpVTCe'] * ivtt_e) / ivtt) + ((config_data['OpVTCl'] * ivtt_l) / ivtt) + ((config_data['OpVTCr'] * ivtt_r) / ivtt))
 
     # Set matrices in Visum
-    h.SetMatrixRaw(Visum, {"CODE": "WKT"     , "DSegCode": mtx_dseg}, wkt   )  # Walk time
-    h.SetMatrixRaw(Visum, {"CODE": "ACT"     , "DSegCode": mtx_dseg}, act   )  # Access time
-    h.SetMatrixRaw(Visum, {"CODE": "EGT"     , "DSegCode": mtx_dseg}, egt   )  # Egress time
+    #h.SetMatrixRaw(Visum, {"CODE": "WKT"     , "DSegCode": mtx_dseg}, wkt   )  # Walk time
+    #h.SetMatrixRaw(Visum, {"CODE": "ACT"     , "DSegCode": mtx_dseg}, act   )  # Access time
+    #h.SetMatrixRaw(Visum, {"CODE": "EGT"     , "DSegCode": mtx_dseg}, egt   )  # Egress time
+
+    h.SetMatrixRaw(Visum, {"CODE": "TWPT"    , "DSegCode": mtx_dseg}, twpt  )  # Transfer Walk Path time    (formerly walk time)
+    h.SetMatrixRaw(Visum, {"CODE": "OWPT"    , "DSegCode": mtx_dseg}, owpt  )  # Origin Walk Path time      (formerly access time)
+    h.SetMatrixRaw(Visum, {"CODE": "DWPT"    , "DSegCode": mtx_dseg}, dwpt  )  # Destination Walk Path time (formerly egress time)
     h.SetMatrixRaw(Visum, {"CODE": "NTR"     , "DSegCode": mtx_dseg}, ntr   )  # Number of transfers
     h.SetMatrixRaw(Visum, {"CODE": "NBR"     , "DSegCode": mtx_dseg}, nbr   )  # Number of boardings
     h.SetMatrixRaw(Visum, {"CODE": "WOWT"    , "DSegCode": mtx_dseg}, wowt  )  # Weighted origin wait time
@@ -109,9 +179,7 @@ def putskim_postprocessing(mtx_dseg,knr_flag):
     h.SetMatrixRaw(Visum, {"CODE": "IVTT(r)" , "DSegCode": mtx_dseg}, ivtt_r)  # In-vehicle travel time (WES)
     h.SetMatrixRaw(Visum, {"CODE": "PLA"     , "DSegCode": mtx_dseg}, pla   )  # Stop type constant (raw sum)
     h.SetMatrixRaw(Visum, {"CODE": "STC"     , "DSegCode": mtx_dseg}, stc   )  # Stop type constant (final average)
-    #h.SetMatrixRaw(Visum, {"CODE": "OVT"     , "DSegCode": mtx_dseg}, ovt   )  # Out of vehicle time
-    h.SetMatrixRaw(Visum, {"CODE": "VTC"     , "DSegCode": mtx_dseg}, vtc )    # Vehicle type constant
-
+    h.SetMatrixRaw(Visum, {"CODE": "VTC"     , "DSegCode": mtx_dseg}, vtc   )  # Vehicle type constant
 
 
 # Read user inputs from Visum

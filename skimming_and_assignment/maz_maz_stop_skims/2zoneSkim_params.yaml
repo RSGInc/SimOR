@@ -3,25 +3,27 @@
 
 # Preprocessor settings
 preprocessing:
-    input_dir: data
+    # Visum automatically exports these files to Visum_Outputs 
+    input_dir: Visum_Outputs
     output_dir: input
     links_file: "Network_link.shp"
     nodes_file: "Network_node.shp"
-    maz_file: "MAZs_22333_2025-11-20.shp"
-    stops: "Stops.csv"
-    routes: "LineRoutes.csv"
-    network_epsg: 2913
+    maz_file: "MAZs_poi_surface.shp"
+    stops: "StopPointsTbl.csv"
+    routes: "LineRoutesTbl.csv"
+    network_epsg: 2913 # network crs
     walk_modes: ["wlk"] # TSYSSET modes to filter walk links
 
 # Skimming settings
 settings:
+    # Set maz walk and stop skims to True to run both
     run_maz_maz_walk: True
     run_maz_maz_bike: False
-    run_maz_stop_walk: False
+    run_maz_stop_walk: True
     maz_maz_walk_output: "maz_maz_walk.csv"
     maz_maz_bike_output: "maz_maz_bike.csv"
     maz_stop_walk_output: "maz_stop_walk.csv"
-    input_dir: input    # preprocessed data
+    input_dir: input    # output_dir of preprocessorsing
     output_dir: output
     epsg: 2838     # projected crs of project
 

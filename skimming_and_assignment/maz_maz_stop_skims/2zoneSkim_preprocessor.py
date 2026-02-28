@@ -163,7 +163,7 @@ def prepare_links(connectors, walk_network_links, walk_network_nodes):
     
     # Make sure they are the same crs
     if connectors.crs != walk_network_links.crs:
-        connectors = connectors.to_crs(walk_network_links)
+        connectors = connectors.to_crs(walk_network_links.crs)
 
     # Merge connectors with links
     keep_cols = ["FROMNODENO", "TONODENO", "geometry"]
@@ -190,8 +190,8 @@ def prepare_transit_routes_and_stops(inputs):
     stops = inputs.stops
     
     # Prepare routes
-    routes.rename(columns={"TSysCode":"Mode",
-                       "LineName":"Route_ID"}, inplace=True)
+    routes.rename(columns={"TSYSCODE":"Mode",
+                           "LINE":"Route_ID"}, inplace=True)
 
     # Create dictionary for mapping
     routes_mode_dict = dict(zip(routes["Route_ID"], routes["Mode"]))
@@ -200,7 +200,7 @@ def prepare_transit_routes_and_stops(inputs):
     # Convert coordinates to epsg 4326
     stops_gdf = gpd.GeoDataFrame(
         stops,
-        geometry = gpd.points_from_xy(stops["X-Coordinate"], stops["Y-Coordinate"]),
+        geometry = gpd.points_from_xy(stops["XCOORD"], stops["YCOORD"]),
         crs = inputs.epsg
     )
     stops_gdf = stops_gdf.to_crs(epsg=4326)
@@ -211,7 +211,7 @@ def prepare_transit_routes_and_stops(inputs):
         "StopID":"NO"}, inplace=True)
 
     # Explode mode - need route per row
-    stops_gdf["Route_ID"] = stops["Lines"].apply(lambda x: [i for i in x.split(",")])
+    stops_gdf["Route_ID"] = stops["LINES"].apply(lambda x: [i for i in x.split(",")])
     stops_gdf = stops_gdf.explode("Route_ID")
 
     # Format
@@ -242,7 +242,7 @@ def main(config_file):
     stops.to_csv(os.path.join(output_dir, "stops.csv"))
     
     elapsed = datetime.now() - start_time
-    print(f"Skim preprocessing complete! Total time: {elapsed}")
+    print(f"Non-motorized skim preprocessing complete! Total time: {elapsed}")
 
 if __name__ == "__main__":
     main(sys.argv[1])

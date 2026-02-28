@@ -8,14 +8,45 @@ import pandas as pd
 import os
 import VisumPy.helpers as h
 import openmatrix as omx
+import yaml
 
 
-def costskim_setup(period, mode, vot):
+# YAML file constants management
+# Get the folder where this script lives
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up directories to reach SimOR directory
+folder_a = script_dir
+while True:
+    if os.path.basename(folder_a) == "SimOR":
+        break
+    parent = os.path.dirname(folder_a)
+    if parent == folder_a:  # reached root directory
+        raise FileNotFoundError("Folder 'SimOR' not found in parent hierarchy.")
+    folder_a = parent
+
+# Read the path from the pointer file
+with open(os.path.join(folder_a, 'path_config.txt'), 'r') as f:
+    yaml_relative_path = f.read().strip()
+
+# Build the absolute path to the YAML file
+yaml_path = os.path.join(folder_a, yaml_relative_path)
+
+# Pull constants from the YAML file
+with open(yaml_path, 'r') as file:
+    config_data = yaml.safe_load(file)
+
+
+
+def prt_skim_setup(period, mode, vot):
     
-    # Links
-    # Pull AddVals for skimming
-    addval1     = h.GetMulti(Visum.Net.Links,r"ADDVAL1"    , activeOnly = True)  # TEMPORARY, NEED TO REPLACE WITH ACTUAL TRAVEL TIME BY PERIOD USING VDF 
-    addval2     = h.GetMulti(Visum.Net.Links,r"ADDVAL2"    , activeOnly = True)
+    # LINKS
+    # Pull Travel Time by period for skimming
+    EA_TTC      = h.GetMulti(Visum.Net.Links,r"EA_TTC"    , activeOnly = True)
+    AM_TTC      = h.GetMulti(Visum.Net.Links,r"AM_TTC"    , activeOnly = True)
+    MD_TTC      = h.GetMulti(Visum.Net.Links,r"MD_TTC"    , activeOnly = True)
+    PM_TTC      = h.GetMulti(Visum.Net.Links,r"PM_TTC"    , activeOnly = True)
+    EV_TTC      = h.GetMulti(Visum.Net.Links,r"EV_TTC"    , activeOnly = True)
     # Pull Toll Fields
     EA_SOV_TOLL = h.GetMulti(Visum.Net.Links,r"EA_SOV_TOLL", activeOnly = True)
     EA_SR2_TOLL = h.GetMulti(Visum.Net.Links,r"EA_SR2_TOLL", activeOnly = True)
@@ -45,7 +76,7 @@ def costskim_setup(period, mode, vot):
 
 
     # Make Visum list with link data
-    att_list = [addval1,addval2,
+    att_list = [EA_TTC,AM_TTC,MD_TTC,PM_TTC,EV_TTC,
                 EA_SOV_TOLL,EA_SR2_TOLL,EA_SR3_TOLL,EA_MT_TOLL,EA_HT_TOLL,
                 AM_SOV_TOLL,AM_SR2_TOLL,AM_SR3_TOLL,AM_MT_TOLL,AM_HT_TOLL,
                 MD_SOV_TOLL,MD_SR2_TOLL,MD_SR3_TOLL,MD_MT_TOLL,MD_HT_TOLL,
@@ -53,91 +84,83 @@ def costskim_setup(period, mode, vot):
                 EV_SOV_TOLL,EV_SR2_TOLL,EV_SR3_TOLL,EV_MT_TOLL,EV_HT_TOLL]
     
 	# Put Visum link list into dataframe
-    df = pd.DataFrame(np.column_stack(att_list), columns = ['addval1','addval2',
+    df = pd.DataFrame(np.column_stack(att_list), columns = [
+                'EA_TTC','AM_TTC','MD_TTC','PM_TTC','EV_TTC',
                 'EA_SOV_TOLL','EA_SR2_TOLL','EA_SR3_TOLL','EA_MT_TOLL','EA_HT_TOLL',
                 'AM_SOV_TOLL','AM_SR2_TOLL','AM_SR3_TOLL','AM_MT_TOLL','AM_HT_TOLL',
                 'MD_SOV_TOLL','MD_SR2_TOLL','MD_SR3_TOLL','MD_MT_TOLL','MD_HT_TOLL',
                 'PM_SOV_TOLL','PM_SR2_TOLL','PM_SR3_TOLL','PM_MT_TOLL','PM_HT_TOLL',
                 'EV_SOV_TOLL','EV_SR2_TOLL','EV_SR3_TOLL','EV_MT_TOLL','EV_HT_TOLL'])
-    
-    # TEMPORARY, NEED TO REPLACE WITH ACTUAL TRAVEL TIME BY PERIOD USING VDF AND VOLUME
-    df['time'] = df['addval1']
 
     # Mode VOTs
-    sov_low  = 3.39
-    sov_med  = 7.49
-    sov_high = 20.51
-    sr2_low  = 5.11
-    sr2_med  = 10.92
-    sr2_high = 27.30
-    sr3_low  = 7.76
-    sr3_med  = 16.82
-    sr3_high = 44.04
+    sov_low  = config_data['SOV_LOW_VOT']
+    sov_med  = config_data['SOV_MED_VOT']
+    sov_high = config_data['SOV_HI_VOT']
+    sr2_low  = config_data['SR2_LOW_VOT']
+    sr2_med  = config_data['SR2_MED_VOT']
+    sr2_high = config_data['SR2_HI_VOT']
+    sr3_low  = config_data['SR3_LOW_VOT']
+    sr3_med  = config_data['SR3_MED_VOT']
+    sr3_high = config_data['SR3_HI_VOT']
 
     # Set AddVal2 to Cost in Time
     # SOV, Low VOT
     if   mode == "SOV" and vot == "Low":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sov_low) * 3600               # Gen Cost (Time in Seconds)
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sov_low) * 3600               # Gen Cost (Time in Seconds)
     # SR2, Low VOT
     elif mode == "SR2" and vot == "Low":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sr2_low) * 3600               # Gen Cost (Time in Seconds)
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sr2_low) * 3600               # Gen Cost (Time in Seconds)
     # SR3, Low VOT
     elif mode == "SR3" and vot == "Low":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sr3_low) * 3600               # Gen Cost (Time in Seconds)
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sr3_low) * 3600               # Gen Cost (Time in Seconds)
     # SOV, Medium VOT
     elif mode == "SOV" and vot == "Medium":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sov_med) * 3600               # Gen Cost (Time in Seconds)
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sov_med) * 3600               # Gen Cost (Time in Seconds)
     # SR2, Medium VOT
     elif mode == "SR2" and vot == "Medium":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sr2_med) * 3600               # Gen Cost (Time in Seconds)
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sr2_med) * 3600               # Gen Cost (Time in Seconds)
     # SR3, Medium VOT
     elif mode == "SR3" and vot == "Medium":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sr3_med) * 3600               # Gen Cost (Time in Seconds)
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sr3_med) * 3600               # Gen Cost (Time in Seconds)
     # SOV, High VOT
     elif mode == "SOV" and vot == "High":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sov_high) * 3600              # Gen Cost (Time in Seconds)
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sov_high) * 3600              # Gen Cost (Time in Seconds)
     # SR2, High VOT
     elif mode == "SR2" and vot == "High":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sr2_high) * 3600              # Gen Cost (Time in Seconds)
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sr2_high) * 3600              # Gen Cost (Time in Seconds)
     # SR3, High VOT
     elif mode == "SR3" and vot == "High":
-        df['addval2'] = df['time'] + (df[period+'_'+mode+'_TOLL'] / sr3_high) * 3600              # Gen Cost (Time in Seconds)
-
-    
-    # Set tolls by period and mode
-    df['toll']    = df[period+'_'+mode+'_TOLL']                                                  # Money in Dollars 
+        df['GenCost'] = df[period+'_TTC'] + (df[period+'_'+mode+'_TOLL'] / sr3_high) * 3600              # Gen Cost (Time in Seconds)
+                                           
 
     # Set fields back in Visum
+    # Period Travel Time
+    h.SetMulti(Visum.Net.Links ,r"ADDVAL1", df[period+'_TTC'], activeOnly = True)   # Time in seconds
     # Gen Cost
-    h.SetMulti(Visum.Net.Links ,r"ADDVAL2", df['addval2'])
+    h.SetMulti(Visum.Net.Links ,r"ADDVAL2", df['GenCost'], activeOnly = True)       # Gen Cost (Time in Seconds)
     # Toll
     if mode == "SOV":
-        h.SetMulti(Visum.Net.Links ,r"TOLL_PRTSYS(S)", df['toll'])
+        h.SetMulti(Visum.Net.Links ,r"TOLL_PRTSYS(S)",   df[period+'_'+mode+'_TOLL'], activeOnly = True)   # Money in Dollars 
     elif mode == "SR2":
-        h.SetMulti(Visum.Net.Links ,r"TOLL_PRTSYS(SR2)", df['toll'])
+        h.SetMulti(Visum.Net.Links ,r"TOLL_PRTSYS(SR2)", df[period+'_'+mode+'_TOLL'], activeOnly = True)   # Money in Dollars 
     elif mode == "SR3":
-        h.SetMulti(Visum.Net.Links ,r"TOLL_PRTSYS(SR3)", df['toll'])
+        h.SetMulti(Visum.Net.Links ,r"TOLL_PRTSYS(SR3)", df[period+'_'+mode+'_TOLL'], activeOnly = True)   # Money in Dollars 
 
     
 
-
-
-    # REPEAT FOR CONNECTORS
-    # Pull AddVals for skimming
-    addval1     = h.GetMulti(Visum.Net.Connectors,r"ADDVAL1"    , activeOnly = True)  # TEMPORARY, NEED TO REPLACE WITH ACTUAL TRAVEL TIME BY PERIOD USING VDF
+    # CONNECTORS
+    # Pull Connector Time for skimming (set to Length / (20mph * 3600) in Network_Initialization.py for all PrT modes)
+    DefaultTime  = h.GetMulti(Visum.Net.Connectors,r"T0_TSYS(S)", activeOnly = True) 
 
     # Make Visum list with link data
-    att_list = [addval1]
+    att_list = [DefaultTime]
     
 	# Put Visum link list into dataframe
-    df = pd.DataFrame(np.column_stack(att_list), columns = ['addval1'])
-    
-    # TEMPORARY, NEED TO REPLACE WITH ACTUAL TRAVEL TIME BY PERIOD USING VDF AND VOLUME
-    df['time'] = df['addval1']
+    df = pd.DataFrame(np.column_stack(att_list), columns = ['DefaultTime'])
 
     # Set fields back in Visum
-    h.SetMulti(Visum.Net.Connectors ,r"ADDVAL1", df['time'])
-    h.SetMulti(Visum.Net.Connectors ,r"ADDVAL2", df['time'])
+    h.SetMulti(Visum.Net.Connectors ,r"ADDVAL1", df['DefaultTime'], activeOnly = True) # Travel time
+    h.SetMulti(Visum.Net.Connectors ,r"ADDVAL2", df['DefaultTime'], activeOnly = True) # GenCost = Travel time, no tolls on connectors
 
 
 
@@ -154,5 +177,5 @@ per  = procedure_codes[0]
 m    = procedure_codes[1]
 tval = procedure_codes[2]
 
-costskim_setup(per, m, tval)
+prt_skim_setup(per, m, tval)
 

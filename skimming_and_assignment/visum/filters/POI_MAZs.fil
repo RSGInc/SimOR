@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<FILTER VERSIONNO="2502">
+
+  <POI COMPLEMENT="0" USEFILTER="1">
+    <CONDITIONS>
+      <CONDITION COMPLEMENT="0" OPERATION="OP_NONE" USECONDITION="1">
+        <EQUALVAL ATTRIBUTE="CATNO" VALUE="25"/>
+      </CONDITION>
+    </CONDITIONS>
+  </POI>
+
+</FILTER>
