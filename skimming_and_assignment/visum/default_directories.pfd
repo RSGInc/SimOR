@@ -1,0 +1,134 @@
+﻿* Networks
+Netze                                           D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[net]                                                
+* Versions
+Versionen                                       D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[ver]                                                
+* OD demand data
+Nachfragedaten                                  D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[dmd]                                                
+* Project directories
+Projektverzeichnisse                            "%APPDATA%\PTV Vision\%MAINPROGVERSION%"                                          NotEditable:[pfd]                                                
+* Graphic parameters
+Grafikparameter                                 D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[gpa;gpax]                                           
+* Texts
+Texte                                           D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       txt                                                              
+* Procedure parameters
+Verfahrensparameter                             D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[xml]                                                
+* Attributes
+Attribute                                       D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       att                                                              
+* List layout
+Listen-Layout                                   D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[llax;lla]                                           
+* Filter
+Filter                                          D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\filters\NotEditable:[fil]                                                
+* Active network objects
+Aktive Netzelemente                             D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[ane]                                                
+* Shapefile
+Shapefile                                       D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[shp]                                                
+* Ridership data
+Fahrgastdaten                                   D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       *                                                                
+* Emme
+Emme                                            D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       emme                                                             
+* References
+Verknuepfungen                                  D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       *                                                                
+* Image files
+Bilddateien                                     D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[bmp;jpg;wmf;emf;gif;tiff;png]                       
+* SVG files
+SVG-Dateien                                     D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[svg]                                                
+* External control files
+Externe Steuerungsdateien                       D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[nse;rbc;sig]                                        
+* Script files
+Skript-Dateien                                  D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\scripts\NotEditable:[py;pys;vbs]                                         
+* PuT interface parameter files
+ÖV-Schnittstellen-Parameterdateien              D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[putp;puti;haf;xml]                                  
+* Screenshots
+Screenshots                                     D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[png;jpg;tiff;gif;bmp;emf;wmf]                       
+* Connection file
+Verbindungsdatei                                D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       con                                                              
+* Timetable graphic parameters
+Fahrplan-Grafikparameter                        D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[gpt;gpbe;gpgt;gptt]                                 
+* Timetable Editor Network Graph
+Fahrplaneditor Netzgraph                        D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       *                                                                
+* Route import
+Routen-Import                                   D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       rim                                                              
+* Legend parameters
+Legenden-Parameter                              D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[lgd]                                                
+* Backgrounds
+Hintergruende                                   D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[emf;wmf;bmp;dwg;dxf;ecw;jp2;jpg;png;svg;tif;gif]    
+* ICA files
+ICA-Dateien                                     D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       *                                                                
+* Additive-network-reading-para
+Additives-Netzlesen-Para                        D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[anrp;crcx]                                          
+* Script menu files
+Skriptmenue-Dateien                             D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       xml                                                              
+* DXF files
+DXF-Dateien                                     D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[dxf]                                                
+* ANM networks
+ANM-Netze                                       D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       anm                                                              
+* Additive-demand-reading-para
+Additives-Nachfragelesen-Para                   D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[adrp]                                               
+* Log files
+Log-Dateien                                     "%APPDATA%\PTV Vision\%MAINPROGVERSION%\Log"                                      *                                                                
+* ANM export parameter files
+ANM - Exportparameterdateien                    D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       anmp                                                             
+* ANM - routes
+ANM - Routen                                    D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       anmRoutes                                                        
+* UserVDF-DLLs
+UserVDF-DLLs                                    "%APPDATA%\PTV Vision\%MAINPROGVERSION%\UserVDF-DLLs\"                            NotEditable:[dll]                                                
+* Projections
+Projections                                     "%APPDATA%\PTV Vision\%MAINPROGVERSION%\Projections"                              NotEditable:[prj]                                                
+* Quick view layout
+Schnellansichts-Layout                          "%APPDATA%\PTV Vision\%MAINPROGVERSION%\QuickViewLayout"                          NotEditable:[qla]                                                
+* Visum AddIns
+Visum AddIns                                    "%APPDATA%\PTV Vision\%MAINPROGVERSION%\AddIns"                                   NotEditable:[vai]                                                
+* Matrices
+Matrizen                                        D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       mtx;mx;fma                                                       
+* Model transfer files
+Modelltransfer-Dateien                          D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[tra]                                                
+* Exported turn volumes
+Exportierte Knotenströme                        D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[png;svg;jpg;tiff;gif;bmp;emf;wmf]                   
+* Intervals
+Intervalle                                      D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       att;cod                                                          
+* Matrix editor layout
+Matrixeditor-Layout                             %MYDOCUMENTS%                                                                     mly                                                              
+* Graphic parameters signal time-space diagram
+Grafikparameter Grünbanddarstellung             D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[gptsd]                                              
+* Matrix editor graphic parameters
+Grafikparameter Matrixeditor                    D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[gpm]                                                
+* Parameters for matrix operations
+Parameter für Matrixoperationen                 D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       xml                                                              
+* User preferences
+Benutzereinstellungen                           D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       xml                                                              
+* Scenario management project
+Szenariomanagement-Projekt                      D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[vpdb;vpdbx]                                         
+* RailML files
+RailML-Dateien                                  D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[railml;xml]                                         
+* Access database
+Access-Datenbank                                D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[accdb]                                              
+* Synchro networks
+Synchro-Netze                                   D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       csv                                                              
+* Schematic line diagram: Layout
+Schematischer-Liniennetzplan-Layout             D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       xml                                                              
+* Graphic parameters: Transfers display of regular services
+Grafikparameter Umsteiger-Taktdarstellung       D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[gpta]                                               
+* VISTRO networks
+VISTRO-Netze                                    D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       vistro                                                           
+* Graphic parameters Schematic line diagram
+Grafikparameter Schematischer Liniennetzplan    D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[gpsld]                                              
+* Vistro scenario management project
+Vistro-Szenariomanagement-Projekt               D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[vistropdb;vistropdbx]                               
+* Other input data
+Sonstige Eingabedaten                           D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       *                                                                
+* Other output data
+Sonstige Ausgabedaten                           D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       *                                                                
+* Subnetwork generator parameters
+Teilnetzgenerator-Parameter                     D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       xml                                                              
+* Timetable layout
+Fahrplan-Layout                                 D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[tly;tlbe;tltt;tlgt;tlls;tlbs]                       
+* Global layouts
+Gesamtlayouts                                   D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[lay]                                                
+* Inpx networks
+Inpx-Netze                                      D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       inpx                                                             
+* SQLite database
+SQLite-Datenbank                                D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[sqlite3]                                            
+* Vistro update files
+Vistro-Update-Dateien                           D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[vistroupdate]                                       
+* Line construction
+Linienkonstruktion                              D:\U-Expansion\Projects\Clients\Oregon\SimOR\skimming_and_assignment\visum\       NotEditable:[lcx]                                                

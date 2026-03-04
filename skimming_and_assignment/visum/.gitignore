@@ -1,6 +1,7 @@
 *__pycache__*
 *.ver
 *.net
+*.7z
 log.txt
 /TransitNet
 /OldVersionFiles
