@@ -165,7 +165,7 @@ IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
     ECHO  Skipping Visum package installation.
 ) ELSE (
     ECHO  Installing tables, openmatrix, pyyaml into Visum Python...
-    "%VISUM_PYTHON_DIR%\python.exe" -m pip install tables openmatrix pyyaml --quiet
+    "%VISUM_PYTHON_DIR%\python.exe" -m pip install tables openmatrix pyyaml
     IF !ERRORLEVEL! NEQ 0 (
         ECHO  WARNING: Failed to install one or more Visum Python packages.
     ) ELSE (
