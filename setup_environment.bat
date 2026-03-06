@@ -16,6 +16,7 @@ SETLOCAL EnableDelayedExpansion
 :: User-configurable settings
 :: ---------------------------------------------------------------------------
 :: Set this to the folder containing Visum's bundled Python interpreter.
+:: IMPORTANT: Do not include a trailing backslash at the end of this path.
 :: Example: C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Python
 SET "VISUM_PYTHON_DIR=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Python"
 
@@ -160,8 +161,9 @@ ECHO [3/5] Setting up Visum Python packages...
 
 SET "VISUM_PACKAGE_STATUS=not checked"
 SET "VISUM_WRITE_TEST="
+SET "VISUM_PYTHON_EXE=%VISUM_PYTHON_DIR%\python.exe"
 
-IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
+IF NOT EXIST "%VISUM_PYTHON_EXE%" (
     ECHO  WARNING: Visum Python not found at:
     ECHO    %VISUM_PYTHON_DIR%
     ECHO  Please edit VISUM_PYTHON_DIR in this script to point to your Visum 2026 Python folder.
@@ -169,7 +171,7 @@ IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
     SET "VISUM_PACKAGE_STATUS=skipped (Visum Python not found)"
 ) ELSE (
     SET "VISUM_SITE_PACKAGES="
-    FOR /F "usebackq delims=" %%I IN (`"%VISUM_PYTHON_DIR%\python.exe" -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"`) DO SET "VISUM_SITE_PACKAGES=%%I"
+    FOR /F "delims=" %%I IN ('"%VISUM_PYTHON_EXE%" -c "import sysconfig; print(sysconfig.get_paths()[\"purelib\"])" 2^>nul') DO SET "VISUM_SITE_PACKAGES=%%I"
 
     IF NOT DEFINED VISUM_SITE_PACKAGES (
         ECHO  WARNING: Could not resolve Visum site-packages path.
@@ -180,7 +182,7 @@ IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
         ECHO    !VISUM_SITE_PACKAGES!
 
         ECHO  Checking whether required Visum packages are already importable...
-        "%VISUM_PYTHON_DIR%\python.exe" -c "import tables,openmatrix,yaml"
+        "%VISUM_PYTHON_EXE%" -c "import tables,openmatrix,yaml"
         IF !ERRORLEVEL! EQU 0 (
             ECHO  Required Visum packages are already available. Skipping install.
             SET "VISUM_PACKAGE_STATUS=already available"
@@ -211,7 +213,7 @@ IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
                     SET "VISUM_WRITE_TEST="
                     ECHO  Installing tables, openmatrix, pyyaml into:
                     ECHO    !VISUM_SITE_PACKAGES!
-                    "%VISUM_PYTHON_DIR%\python.exe" -m pip install --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
+                    "%VISUM_PYTHON_EXE%" -m pip install --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
                     IF !ERRORLEVEL! NEQ 0 (
                         ECHO  WARNING: Failed to install one or more Visum Python packages.
                         SET "VISUM_PACKAGE_STATUS=install failed"
