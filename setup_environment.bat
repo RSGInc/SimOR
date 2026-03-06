@@ -160,77 +160,78 @@ ECHO.
 ECHO [3/5] Setting up Visum Python packages...
 
 SET "VISUM_PACKAGE_STATUS=not checked"
-SET "VISUM_WRITE_TEST="
 SET "VISUM_PYTHON_EXE=%VISUM_PYTHON_DIR%\python.exe"
 
 IF NOT EXIST "%VISUM_PYTHON_EXE%" (
     ECHO  WARNING: Visum Python not found at:
     ECHO    %VISUM_PYTHON_DIR%
     ECHO  Please edit VISUM_PYTHON_DIR in this script to point to your Visum 2026 Python folder.
-    ECHO  Skipping Visum package installation.
     SET "VISUM_PACKAGE_STATUS=skipped (Visum Python not found)"
-) ELSE (
-    SET "VISUM_SITE_PACKAGES="
-    FOR /F "usebackq delims=" %%I IN (`"%VISUM_PYTHON_EXE%" -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"`) DO SET "VISUM_SITE_PACKAGES=%%I"
+    GOTO :VISUM_DONE
+)
 
-    IF NOT DEFINED VISUM_SITE_PACKAGES (
-        ECHO  WARNING: Could not resolve Visum site-packages path.
-        ECHO  Skipping Visum package installation.
-        SET "VISUM_PACKAGE_STATUS=skipped (could not resolve site-packages)"
-    ) ELSE (
-        ECHO  Resolved Visum site-packages path:
+:: Resolve site-packages path via temp file (handles spaces in paths)
+SET "VISUM_SITE_PACKAGES="
+SET "VISUM_SITE_FILE=%TEMP%\simor_visum_site_packages.txt"
+"%VISUM_PYTHON_EXE%" -c "import sysconfig; print(sysconfig.get_paths().get('purelib',''))" > "%VISUM_SITE_FILE%" 2>nul
+IF EXIST "%VISUM_SITE_FILE%" (
+    SET /P VISUM_SITE_PACKAGES=<"%VISUM_SITE_FILE%"
+    DEL /Q "%VISUM_SITE_FILE%" >nul 2>&1
+)
+
+IF NOT DEFINED VISUM_SITE_PACKAGES (
+    ECHO  WARNING: Could not resolve Visum site-packages path.
+    SET "VISUM_PACKAGE_STATUS=skipped (could not resolve site-packages)"
+    GOTO :VISUM_DONE
+)
+
+ECHO  Resolved Visum site-packages path:
+ECHO    !VISUM_SITE_PACKAGES!
+
+:: Check if packages are already importable
+"%VISUM_PYTHON_EXE%" -c "import tables,openmatrix,yaml" >nul 2>&1
+IF !ERRORLEVEL! EQU 0 (
+    ECHO  Required Visum packages are already available. Skipping install.
+    SET "VISUM_PACKAGE_STATUS=already available"
+    GOTO :VISUM_DONE
+)
+
+:: Ensure site-packages directory exists
+IF NOT EXIST "!VISUM_SITE_PACKAGES!" (
+    MKDIR "!VISUM_SITE_PACKAGES!" >nul 2>&1
+    IF !ERRORLEVEL! NEQ 0 (
+        ECHO  WARNING: Cannot create directory:
         ECHO    !VISUM_SITE_PACKAGES!
-
-        ECHO  Checking whether required Visum packages are already importable...
-        "%VISUM_PYTHON_EXE%" -c "import tables,openmatrix,yaml"
-        IF !ERRORLEVEL! EQU 0 (
-            ECHO  Required Visum packages are already available. Skipping install.
-            SET "VISUM_PACKAGE_STATUS=already available"
-        ) ELSE (
-            SET "VISUM_CAN_INSTALL=1"
-            IF NOT EXIST "!VISUM_SITE_PACKAGES!" (
-                MKDIR "!VISUM_SITE_PACKAGES!" >nul 2>&1
-                IF !ERRORLEVEL! NEQ 0 (
-                    ECHO  WARNING: Required Visum packages are missing and the script cannot create:
-                    ECHO    !VISUM_SITE_PACKAGES!
-                    ECHO  This usually means the current user does not have admin/write permissions.
-                    ECHO  Re-run this script as Administrator or ask IT to install these packages.
-                    SET "VISUM_CAN_INSTALL=0"
-                    SET "VISUM_PACKAGE_STATUS=missing packages, no write access"
-                )
-            )
-
-            IF "!VISUM_CAN_INSTALL!"=="1" (
-                SET "VISUM_WRITE_TEST=!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp"
-                >"!VISUM_WRITE_TEST!" ECHO write-test 2>nul
-                IF !ERRORLEVEL! NEQ 0 (
-                    ECHO  WARNING: Required Visum packages are missing, and this user cannot write to:
-                    ECHO    !VISUM_SITE_PACKAGES!
-                    ECHO  Re-run this script as Administrator or ask IT to install the packages.
-                    SET "VISUM_PACKAGE_STATUS=missing packages, no write access"
-                ) ELSE (
-                    DEL /Q "!VISUM_WRITE_TEST!" >nul 2>&1
-                    SET "VISUM_WRITE_TEST="
-                    ECHO  Installing tables, openmatrix, pyyaml into:
-                    ECHO    !VISUM_SITE_PACKAGES!
-                    "%VISUM_PYTHON_EXE%" -m pip install --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
-                    IF !ERRORLEVEL! NEQ 0 (
-                        ECHO  WARNING: Failed to install one or more Visum Python packages.
-                        SET "VISUM_PACKAGE_STATUS=install failed"
-                    ) ELSE (
-                        ECHO  Visum packages installed successfully.
-                        SET "VISUM_PACKAGE_STATUS=installed/updated"
-                    )
-                )
-            )
-        )
+        ECHO  Re-run as Administrator or ask IT to install these packages.
+        SET "VISUM_PACKAGE_STATUS=missing packages, no write access"
+        GOTO :VISUM_DONE
     )
 )
 
-:: cleaning up test file if it still exists for some reason
-IF DEFINED VISUM_WRITE_TEST (
-    IF EXIST "!VISUM_WRITE_TEST!" DEL /Q "!VISUM_WRITE_TEST!" >nul 2>&1
+:: Test write access
+>"!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" ECHO write-test 2>nul
+IF NOT EXIST "!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" (
+    ECHO  WARNING: Cannot write to:
+    ECHO    !VISUM_SITE_PACKAGES!
+    ECHO  Re-run as Administrator or ask IT to install these packages.
+    SET "VISUM_PACKAGE_STATUS=missing packages, no write access"
+    GOTO :VISUM_DONE
 )
+DEL /Q "!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" >nul 2>&1
+
+:: Install packages
+ECHO  Installing tables, openmatrix, pyyaml into:
+ECHO    !VISUM_SITE_PACKAGES!
+"%VISUM_PYTHON_EXE%" -m pip install --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
+IF !ERRORLEVEL! NEQ 0 (
+    ECHO  WARNING: Failed to install one or more Visum Python packages.
+    SET "VISUM_PACKAGE_STATUS=install failed"
+) ELSE (
+    ECHO  Visum packages installed successfully.
+    SET "VISUM_PACKAGE_STATUS=installed/updated"
+)
+
+:VISUM_DONE
 ECHO.
 
 :: ============================================================================
