@@ -16,8 +16,8 @@ SETLOCAL EnableDelayedExpansion
 :: User-configurable settings
 :: ---------------------------------------------------------------------------
 :: Set this to the folder containing Visum's bundled Python interpreter.
-:: Example: C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python
-SET "VISUM_PYTHON_DIR=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python"
+:: Example: C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Python
+SET "VISUM_PYTHON_DIR=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Python"
 
 :: Set to Y to clone and install sandag_parking (oregon_metro branch), N to skip
 :: (optional dependency, only needed if you want to regenerate parking cost data)
