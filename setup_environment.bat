@@ -171,7 +171,7 @@ IF NOT EXIST "%VISUM_PYTHON_EXE%" (
     SET "VISUM_PACKAGE_STATUS=skipped (Visum Python not found)"
 ) ELSE (
     SET "VISUM_SITE_PACKAGES="
-    FOR /F "delims=" %%I IN ('"%VISUM_PYTHON_EXE%" -c "import sysconfig; print(sysconfig.get_paths()[\"purelib\"])" 2^>nul') DO SET "VISUM_SITE_PACKAGES=%%I"
+    FOR /F "usebackq delims=" %%I IN (`"%VISUM_PYTHON_EXE%" -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"`) DO SET "VISUM_SITE_PACKAGES=%%I"
 
     IF NOT DEFINED VISUM_SITE_PACKAGES (
         ECHO  WARNING: Could not resolve Visum site-packages path.
