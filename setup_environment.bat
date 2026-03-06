@@ -158,19 +158,76 @@ ECHO.
 :: ============================================================================
 ECHO [3/5] Setting up Visum Python packages...
 
+SET "VISUM_PACKAGE_STATUS=not checked"
+SET "VISUM_WRITE_TEST="
+
 IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
     ECHO  WARNING: Visum Python not found at:
     ECHO    %VISUM_PYTHON_DIR%
     ECHO  Please edit VISUM_PYTHON_DIR in this script to point to your Visum 2026 Python folder.
     ECHO  Skipping Visum package installation.
+    SET "VISUM_PACKAGE_STATUS=skipped (Visum Python not found)"
 ) ELSE (
-    ECHO  Installing tables, openmatrix, pyyaml into Visum Python...
-    "%VISUM_PYTHON_DIR%\python.exe" -m pip install tables openmatrix pyyaml
-    IF !ERRORLEVEL! NEQ 0 (
-        ECHO  WARNING: Failed to install one or more Visum Python packages.
+    SET "VISUM_SITE_PACKAGES="
+    FOR /F "usebackq delims=" %%I IN (`"%VISUM_PYTHON_DIR%\python.exe" -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"`) DO SET "VISUM_SITE_PACKAGES=%%I"
+
+    IF NOT DEFINED VISUM_SITE_PACKAGES (
+        ECHO  WARNING: Could not resolve Visum site-packages path.
+        ECHO  Skipping Visum package installation.
+        SET "VISUM_PACKAGE_STATUS=skipped (could not resolve site-packages)"
     ) ELSE (
-        ECHO  Visum packages installed successfully.
+        ECHO  Resolved Visum site-packages path:
+        ECHO    !VISUM_SITE_PACKAGES!
+
+        ECHO  Checking whether required Visum packages are already importable...
+        "%VISUM_PYTHON_DIR%\python.exe" -c "import tables,openmatrix,yaml"
+        IF !ERRORLEVEL! EQU 0 (
+            ECHO  Required Visum packages are already available. Skipping install.
+            SET "VISUM_PACKAGE_STATUS=already available"
+        ) ELSE (
+            SET "VISUM_CAN_INSTALL=1"
+            IF NOT EXIST "!VISUM_SITE_PACKAGES!" (
+                MKDIR "!VISUM_SITE_PACKAGES!" >nul 2>&1
+                IF !ERRORLEVEL! NEQ 0 (
+                    ECHO  WARNING: Required Visum packages are missing and the script cannot create:
+                    ECHO    !VISUM_SITE_PACKAGES!
+                    ECHO  This usually means the current user does not have admin/write permissions.
+                    ECHO  Re-run this script as Administrator or ask IT to install these packages.
+                    SET "VISUM_CAN_INSTALL=0"
+                    SET "VISUM_PACKAGE_STATUS=missing packages, no write access"
+                )
+            )
+
+            IF "!VISUM_CAN_INSTALL!"=="1" (
+                SET "VISUM_WRITE_TEST=!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp"
+                >"!VISUM_WRITE_TEST!" ECHO write-test 2>nul
+                IF !ERRORLEVEL! NEQ 0 (
+                    ECHO  WARNING: Required Visum packages are missing, and this user cannot write to:
+                    ECHO    !VISUM_SITE_PACKAGES!
+                    ECHO  Re-run this script as Administrator or ask IT to install the packages.
+                    SET "VISUM_PACKAGE_STATUS=missing packages, no write access"
+                ) ELSE (
+                    DEL /Q "!VISUM_WRITE_TEST!" >nul 2>&1
+                    SET "VISUM_WRITE_TEST="
+                    ECHO  Installing tables, openmatrix, pyyaml into:
+                    ECHO    !VISUM_SITE_PACKAGES!
+                    "%VISUM_PYTHON_DIR%\python.exe" -m pip install --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
+                    IF !ERRORLEVEL! NEQ 0 (
+                        ECHO  WARNING: Failed to install one or more Visum Python packages.
+                        SET "VISUM_PACKAGE_STATUS=install failed"
+                    ) ELSE (
+                        ECHO  Visum packages installed successfully.
+                        SET "VISUM_PACKAGE_STATUS=installed/updated"
+                    )
+                )
+            )
+        )
     )
+)
+
+:: cleaning up test file if it still exists for some reason
+IF DEFINED VISUM_WRITE_TEST (
+    IF EXIST "!VISUM_WRITE_TEST!" DEL /Q "!VISUM_WRITE_TEST!" >nul 2>&1
 )
 ECHO.
 
@@ -280,6 +337,7 @@ ECHO.
 ECHO  PYTHON_ACTIVITYSIM  = %PYTHON_ACTIVITYSIM%
 ECHO  PYTHON_MAZ_SKIMMING = %PYTHON_MAZ_SKIMMING%
 ECHO  PYTHON_VISUM        = %PYTHON_VISUM%
+ECHO  VISUM_PACKAGES      = %VISUM_PACKAGE_STATUS%
 IF DEFINED PYTHON_PARKING (
     ECHO  PYTHON_PARKING     = !PYTHON_PARKING!
 ) ELSE (
@@ -296,6 +354,7 @@ ENDLOCAL & (
     SET "PYTHON_MAZ_SKIMMING=%PYTHON_MAZ_SKIMMING%"
     SET "PYTHON_VISUM=%PYTHON_VISUM%"
     SET "PYTHON_PARKING=%PYTHON_PARKING%"
+    SET "VISUM_PACKAGE_STATUS=%VISUM_PACKAGE_STATUS%"
     SET "EXT_DIR=%EXT_DIR%"
     SET "BASE_DIR=%BASE_DIR%"
     SET "PATH=%PATH%"
