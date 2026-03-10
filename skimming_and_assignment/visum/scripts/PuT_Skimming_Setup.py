@@ -306,6 +306,13 @@ def put_skim_setup(period):
         h.SetMulti(Visum.Net.Nodes ,r"brdco", df['n_brdco'])
 
 
+        ## Set field on “Transfer and walktimes within stop” object 
+        #penalties = h.GetMulti(Visum.Net.StopAreaWalkTimes, r"FROMSTOPAREA\NODE\BRDCO", activeOnly = True)
+        #h.SetMulti(Visum.Net.StopAreaWalkTimes ,r"TIME(I)", penalties)
+        #h.SetMulti(Visum.Net.StopAreaWalkTimes ,r"TIME(W)", penalties)
+        
+
+
     def dwelltime():
 
         # Pull attributes

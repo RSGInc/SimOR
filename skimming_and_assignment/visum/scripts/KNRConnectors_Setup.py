@@ -41,8 +41,6 @@ with open(yaml_path, 'r') as file:
 PRIO = 20480
 _TABLE = "KnRConstraints"
 SCALEFACTOR = config_data['SCALEFACTOR']  # 5280
-#CON_VEH_SPEED = config_data['Connector_Vehicle_Speed'] # 20 mph
-#CON_WLK_SPEED = config_data['Walk_Speed'] # 3.5 mph
 
 # FN = os.path.join(Visum.GetPath(2), "taz_connectors.json")
 FN = os.path.join(Visum.GetPath(2), "connectors_knr.net")
