@@ -16,8 +16,9 @@ SETLOCAL EnableDelayedExpansion
 :: User-configurable settings
 :: ---------------------------------------------------------------------------
 :: Set this to the folder containing Visum's bundled Python interpreter.
-:: Example: C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python
-SET "VISUM_PYTHON_DIR=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Junction_Preview\Python"
+:: IMPORTANT: Do not include a trailing backslash at the end of this path.
+:: Example: C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Python
+SET "VISUM_PYTHON_DIR=C:\Program Files\PTV Vision\PTV Visum 2026\Exe\Python"
 
 :: Set to Y to clone and install sandag_parking (oregon_metro branch), N to skip
 :: (optional dependency, only needed if you want to regenerate parking cost data)
@@ -158,20 +159,79 @@ ECHO.
 :: ============================================================================
 ECHO [3/5] Setting up Visum Python packages...
 
-IF NOT EXIST "%VISUM_PYTHON_DIR%\python.exe" (
+SET "VISUM_PACKAGE_STATUS=not checked"
+SET "VISUM_PYTHON_EXE=%VISUM_PYTHON_DIR%\python.exe"
+
+IF NOT EXIST "%VISUM_PYTHON_EXE%" (
     ECHO  WARNING: Visum Python not found at:
     ECHO    %VISUM_PYTHON_DIR%
     ECHO  Please edit VISUM_PYTHON_DIR in this script to point to your Visum 2026 Python folder.
-    ECHO  Skipping Visum package installation.
-) ELSE (
-    ECHO  Installing tables, openmatrix, pyyaml into Visum Python...
-    "%VISUM_PYTHON_DIR%\python.exe" -m pip install tables openmatrix pyyaml --quiet
+    SET "VISUM_PACKAGE_STATUS=skipped (Visum Python not found)"
+    GOTO :VISUM_DONE
+)
+
+:: Resolve site-packages path via temp file (handles spaces in paths)
+SET "VISUM_SITE_PACKAGES="
+SET "VISUM_SITE_FILE=%TEMP%\simor_visum_site_packages.txt"
+"%VISUM_PYTHON_EXE%" -c "import sysconfig; print(sysconfig.get_paths().get('purelib',''))" > "%VISUM_SITE_FILE%" 2>nul
+IF EXIST "%VISUM_SITE_FILE%" (
+    SET /P VISUM_SITE_PACKAGES=<"%VISUM_SITE_FILE%"
+    DEL /Q "%VISUM_SITE_FILE%" >nul 2>&1
+)
+
+IF NOT DEFINED VISUM_SITE_PACKAGES (
+    ECHO  WARNING: Could not resolve Visum site-packages path.
+    SET "VISUM_PACKAGE_STATUS=skipped (could not resolve site-packages)"
+    GOTO :VISUM_DONE
+)
+
+ECHO  Resolved Visum site-packages path:
+ECHO    !VISUM_SITE_PACKAGES!
+
+:: Check if packages are already importable
+"%VISUM_PYTHON_EXE%" -c "import tables,openmatrix,yaml" >nul 2>&1
+IF !ERRORLEVEL! EQU 0 (
+    ECHO  Required Visum packages are already available. Skipping install.
+    SET "VISUM_PACKAGE_STATUS=already available"
+    GOTO :VISUM_DONE
+)
+
+:: Ensure site-packages directory exists
+IF NOT EXIST "!VISUM_SITE_PACKAGES!" (
+    MKDIR "!VISUM_SITE_PACKAGES!" >nul 2>&1
     IF !ERRORLEVEL! NEQ 0 (
-        ECHO  WARNING: Failed to install one or more Visum Python packages.
-    ) ELSE (
-        ECHO  Visum packages installed successfully.
+        ECHO  WARNING: Cannot create directory:
+        ECHO    !VISUM_SITE_PACKAGES!
+        ECHO  Re-run as Administrator or ask IT to install these packages.
+        SET "VISUM_PACKAGE_STATUS=missing packages, no write access"
+        GOTO :VISUM_DONE
     )
 )
+
+:: Test write access
+>"!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" ECHO write-test 2>nul
+IF NOT EXIST "!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" (
+    ECHO  WARNING: Cannot write to:
+    ECHO    !VISUM_SITE_PACKAGES!
+    ECHO  Re-run as Administrator or ask IT to install these packages.
+    SET "VISUM_PACKAGE_STATUS=missing packages, no write access"
+    GOTO :VISUM_DONE
+)
+DEL /Q "!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" >nul 2>&1
+
+:: Install packages
+ECHO  Installing tables, openmatrix, pyyaml into:
+ECHO    !VISUM_SITE_PACKAGES!
+"%VISUM_PYTHON_EXE%" -m pip install --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
+IF !ERRORLEVEL! NEQ 0 (
+    ECHO  WARNING: Failed to install one or more Visum Python packages.
+    SET "VISUM_PACKAGE_STATUS=install failed"
+) ELSE (
+    ECHO  Visum packages installed successfully.
+    SET "VISUM_PACKAGE_STATUS=installed/updated"
+)
+
+:VISUM_DONE
 ECHO.
 
 :: ============================================================================
@@ -280,6 +340,7 @@ ECHO.
 ECHO  PYTHON_ACTIVITYSIM  = %PYTHON_ACTIVITYSIM%
 ECHO  PYTHON_MAZ_SKIMMING = %PYTHON_MAZ_SKIMMING%
 ECHO  PYTHON_VISUM        = %PYTHON_VISUM%
+ECHO  VISUM_PACKAGES      = %VISUM_PACKAGE_STATUS%
 IF DEFINED PYTHON_PARKING (
     ECHO  PYTHON_PARKING     = !PYTHON_PARKING!
 ) ELSE (
@@ -296,6 +357,7 @@ ENDLOCAL & (
     SET "PYTHON_MAZ_SKIMMING=%PYTHON_MAZ_SKIMMING%"
     SET "PYTHON_VISUM=%PYTHON_VISUM%"
     SET "PYTHON_PARKING=%PYTHON_PARKING%"
+    SET "VISUM_PACKAGE_STATUS=%VISUM_PACKAGE_STATUS%"
     SET "EXT_DIR=%EXT_DIR%"
     SET "BASE_DIR=%BASE_DIR%"
     SET "PATH=%PATH%"
