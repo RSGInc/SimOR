@@ -219,10 +219,11 @@ IF NOT EXIST "!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" (
 )
 DEL /Q "!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" >nul 2>&1
 
-:: Install packages
+:: Install packages (--isolated avoids user-level config redirecting to user site-packages)
+SET "PYTHONNOUSERSITE=1"
 ECHO  Installing tables, openmatrix, pyyaml into:
 ECHO    !VISUM_SITE_PACKAGES!
-"%VISUM_PYTHON_EXE%" -m pip install --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
+"%VISUM_PYTHON_EXE%" -m pip install --isolated --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
 IF !ERRORLEVEL! NEQ 0 (
     ECHO  WARNING: Failed to install one or more Visum Python packages.
     SET "VISUM_PACKAGE_STATUS=install failed"
