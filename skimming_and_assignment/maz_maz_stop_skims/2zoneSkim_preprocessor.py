@@ -272,14 +272,25 @@ def prepare_transit_routes_and_stops(inputs):
     stops_gdf.rename(columns = {
         "StopID":"NO"}, inplace=True)
 
+    # Remove NaNs
+    stops_gdf = stops_gdf[stops_gdf["LINES"].notna()]
+    
     # Explode mode - need route per row
-    stops_gdf["Route_ID"] = stops["LINES"].apply(lambda x: [i for i in x.split(",")])
+    stops_gdf["Route_ID"] = stops_gdf["LINES"].apply(lambda x: [i for i in x.split(",")])
     stops_gdf = stops_gdf.explode("Route_ID")
 
     # Format
     keep_cols = ["NO", "Route_ID","Latitude", "Longitude"]
     
     return routes, stops_gdf[keep_cols]
+
+def write_outputs(nodes, links, routes, stops, output_dir):
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    os.makedirs(output_dir, exist_ok=True)
+    nodes.to_file(os.path.join(output_dir, "walk_nodes.shp"))
+    links.to_file(os.path.join(output_dir, "walk_links.shp"))
+    routes.to_csv(os.path.join(output_dir, "routes.csv"), index=False)
+    stops.to_csv(os.path.join(output_dir, "stops.csv"), index=False)
 
 def main(config_file):
     print("Starting non-motorized skim preprocessing....")
@@ -294,15 +305,10 @@ def main(config_file):
     links = prepare_links(connectors, walk_network_links, nodes)
     routes, stops = prepare_transit_routes_and_stops(inputs)
     
-    # Export
+    # Export outputs
     output_dir = config.config["preprocessing"]["output_dir"]
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    os.makedirs(output_dir, exist_ok=True)
-    nodes.to_file(os.path.join(output_dir, "nodes.shp"))
-    links.to_file(os.path.join(output_dir, "links.shp"))
-    routes.to_csv(os.path.join(output_dir, "routes.csv"))
-    stops.to_csv(os.path.join(output_dir, "stops.csv"))
-    
+    write_outputs(nodes, links, routes, stops, output_dir)
+
     elapsed = datetime.now() - start_time
     print(f"Non-motorized skim preprocessing complete! Total time: {elapsed}")
 
