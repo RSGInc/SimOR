@@ -20,6 +20,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 from datetime import datetime
+from pyproj import CRS
 from shapely.geometry import LineString
 
 class ConfigLoader():
@@ -28,7 +29,7 @@ class ConfigLoader():
         self.config = self.load_config()
         
     def load_config(self):
-        os.chdir(os.path.dirname(__file__))
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
         with open(self.config_file, "r") as file:
             return yaml.load(file, Loader = yaml.FullLoader)
 
@@ -38,7 +39,8 @@ class DataLoader():
         self.links = None
         self.mazs = None
         self.nodes = None
-        self.epsg = None
+        self.source_crs = None
+        self.target_crs = None
         self.routes = None
         self.stops = None
         self.walk_modes = None
@@ -50,11 +52,71 @@ class DataLoader():
         self.links = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["links_file"]))
         self.nodes = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["nodes_file"])).rename(columns = {"NO":"NODE_NO"})
         self.mazs = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["maz_file"])).rename(columns = {"MAZ_NO":"MAZ"})
-        self.epsg = self.config["preprocessing"]["network_epsg"]
         self.routes = pd.read_csv(os.path.join(input_dir, self.config["preprocessing"]["routes"]))
         self.stops = pd.read_csv(os.path.join(input_dir, self.config["preprocessing"]["stops"]))
         self.walk_modes = self.config["preprocessing"]["walk_modes"]
+        self.source_crs = self._infer_source_crs()
+        self.target_crs = self._infer_proj_crs()
+        self.links = self._ensure_projected_feet(self.links, "Links")
+        self.nodes = self._ensure_projected_feet(self.nodes, "Nodes")
+        self.mazs = self._ensure_projected_feet(self.mazs, "MAZs")
         self.maz_centroids = self._get_maz_centroids()
+
+    def _infer_source_crs(self):
+        for layer, gdf in (("links", self.links), ("nodes", self.nodes), ("MAZs", self.mazs)):
+            if gdf.crs is not None:
+                print(f"Using {layer} CRS as source CRS reference: {gdf.crs}")
+                return CRS.from_user_input(gdf.crs)
+
+    def _infer_proj_crs(self):
+        reference_layer = next(gdf for gdf in (self.mazs, self.links, self.nodes) if gdf.crs is not None)
+        utm_crs_meters = reference_layer.estimate_utm_crs()
+
+        if utm_crs_meters is None:
+            raise ValueError("Unable to determine a UTM CRS from the input geometries.")
+
+        utm_proj4 = utm_crs_meters.to_proj4()
+        if "+units=m" in utm_proj4:
+            utm_proj4 = utm_proj4.replace("+units=m", "+units=us-ft")
+        elif "+to_meter=1" in utm_proj4:
+            utm_proj4 = utm_proj4.replace("+to_meter=1", "+units=us-ft")
+        else:
+            utm_proj4 = f"{utm_proj4} +units=us-ft"
+
+        target_crs = CRS.from_proj4(utm_proj4)
+        print(f"Inferred projected CRS in feet: {target_crs}")
+        return target_crs
+
+    def _is_projected_in_feet(self, crs):
+        if crs is None:
+            return False
+
+        crs = CRS.from_user_input(crs)
+        if not crs.is_projected:
+            return False
+
+        foot_unit_names = {"foot", "feet", "us survey foot", "foot_us", "us foot"}
+        for axis in crs.axis_info:
+            if axis.unit_name and axis.unit_name.lower() in foot_unit_names:
+                return True
+
+        return False
+
+    def _ensure_projected_feet(self, gdf, layer):
+        source_crs = CRS.from_user_input(gdf.crs)
+        if self._is_projected_in_feet(source_crs):
+            print(f"{layer} are already projected coordinates in feet: {source_crs}")
+            if source_crs != self.target_crs:
+                print(f"{layer} use a different feet-based CRS. Converting to {self.target_crs}")
+                return gdf.to_crs(self.target_crs)
+            return gdf
+
+        if source_crs.is_projected:
+            print(f"{layer} are projected, but not in feet. Converting to {self.target_crs}")
+        else:
+            print(f"{layer} are not projected. Converting to {self.target_crs}")
+
+        return gdf.to_crs(self.target_crs)
         
     def _get_maz_centroids(self):
         """
@@ -201,7 +263,7 @@ def prepare_transit_routes_and_stops(inputs):
     stops_gdf = gpd.GeoDataFrame(
         stops,
         geometry = gpd.points_from_xy(stops["XCOORD"], stops["YCOORD"]),
-        crs = inputs.epsg
+        crs = inputs.source_crs
     )
     stops_gdf = stops_gdf.to_crs(epsg=4326)
     stops_gdf["Latitude"] = stops_gdf.geometry.y

@@ -87,11 +87,12 @@ class NetworkBuilder:
         """
         # Read and process nodes
         nodes = gpd.read_file(os.path.join(model_inputs, config['mmms']['shapefile_node_name']))
-        nodes = cls._process_nodes(nodes, config)
+        network_crs = cls._infer_network_crs(nodes)
+        nodes = cls._process_nodes(nodes, config, network_crs)
         
         # Read and process links
         links = gpd.read_file(os.path.join(model_inputs, config['mmms']['shapefile_name']))
-        links = cls._process_links(links, config)
+        links = cls._process_links(links, network_crs)
 
         # Read and process stops and routes
         stops = pd.read_csv(os.path.join(model_inputs, config['stop_attributes']['file']))
@@ -103,12 +104,16 @@ class NetworkBuilder:
                             left_on=config['stop_attributes']['rid_field'],
                             right_on=config['route_attributes']['rid_field'])
         network = cls._build_network(nodes, links, config)
-        stops = cls.process_transit_stops(stops, network, nodes, config) 
+        stops = cls.process_transit_stops(stops, network, nodes, config, network_crs) 
         
         return cls(nodes, links, stops, routes, config)
+
+    @staticmethod
+    def _infer_network_crs(nodes: gpd.GeoDataFrame):
+        return nodes.crs
     
     @staticmethod
-    def _process_nodes(nodes: gpd.GeoDataFrame, config: dict) -> gpd.GeoDataFrame:
+    def _process_nodes(nodes: gpd.GeoDataFrame, config: dict, crs) -> gpd.GeoDataFrame:
         """
         Process raw nodes GeoDataFrame by projecting and adding coordinates.
 
@@ -126,14 +131,13 @@ class NetworkBuilder:
                 - NodeLev_ID as index
                 - X and Y columns containing coordinates
         """
-        crs = config['settings']['epsg']
         nodes = nodes.to_crs(crs).set_index(config['stop_attributes']['id_field'])
         nodes['X'] = nodes.geometry.x
         nodes['Y'] = nodes.geometry.y
         return nodes
     
     @staticmethod
-    def _process_links(links: gpd.GeoDataFrame, config: dict) -> gpd.GeoDataFrame:
+    def _process_links(links: gpd.GeoDataFrame, crs) -> gpd.GeoDataFrame:
         """
         Process raw links GeoDataFrame.
         
@@ -143,30 +147,12 @@ class NetworkBuilder:
         Returns:
             Processed links GeoDataFrame
         """
-        return links.to_crs(config['settings']['epsg'])
+        return links.to_crs(crs)
     
     @classmethod
     def _build_network(cls, nodes: gpd.GeoDataFrame, links: gpd.GeoDataFrame, config: dict) -> pdna.Network:
         """Build pandana network from nodes and links"""
         mmms = config['mmms'] 
-        # nodes.index = nodes.index.astype('int32')
-        # links.index = links.index.astype('int32')
-        # links[mmms['mmms_link_ref_id']] = links[mmms['mmms_link_ref_id']].astype('int32')
-        # links[mmms['mmms_link_nref_id']] = links[mmms['mmms_link_nref_id']].astype('int32')
-        
-        # links[mmms['mmms_link_ref_id']] = links[mmms['mmms_link_ref_id']].astype('float64') 
-        # links[mmms['mmms_link_nref_id']] = links[mmms['mmms_link_nref_id']].astype('float64')
-        
-        # print(links[mmms['mmms_link_ref_id']].dtype)
-        # print(links[mmms['mmms_link_nref_id']].dtype)
-        # print(links[mmms['mmms_link_len']].dtype) 
-        # print("Before: ", links.index.dtype)
-        # links.index = links.index.astype('int32')
-        # print("After: ", links.index.dtype)
-        # print("NaN's:", links.isna().sum())
-        
-        # links[mmms['mmms_link_len']] = links[mmms['mmms_link_len']].astype('int32')
-        
         return pdna.Network(
             nodes.X,
             nodes.Y,
@@ -249,7 +235,7 @@ class NetworkBuilder:
         return centroids
     
     @staticmethod    
-    def _process_stop_geometry(stops: pd.DataFrame, config: dict) -> gpd.GeoDataFrame:
+    def _process_stop_geometry(stops: pd.DataFrame, crs) -> gpd.GeoDataFrame:
         """
         Convert stops to GeoDataFrame and project coordinates.
 
@@ -259,7 +245,6 @@ class NetworkBuilder:
         Returns:
             gpd.GeoDataFrame: Projected stops with updated coordinates
         """
-        crs = config['settings']['epsg']
         pd.set_option('display.float_format', lambda x: '%.9f' % x)
         
         gpd_stops = gpd.GeoDataFrame(
@@ -299,7 +284,6 @@ class NetworkBuilder:
     
     @staticmethod
     def _assign_transit_modes(stops: pd.DataFrame, config: dict) -> pd.DataFrame:
-        # FIXME: Add mode dict to configs
         """
         Assign simplified transit modes to stops.
         
@@ -322,9 +306,9 @@ class NetworkBuilder:
 
     @classmethod
     def process_transit_stops(cls, stops: pd.DataFrame, network: pdna.Network,
-                              nodes: pd.DataFrame, config: dict) -> pd.DataFrame:
+                              nodes: pd.DataFrame, config: dict, crs) -> pd.DataFrame:
         """Process transit stops using provided network."""
-        gpd_stops = cls._process_stop_geometry(stops, config)
+        gpd_stops = cls._process_stop_geometry(stops, crs)
         stops = cls._assign_network_nodes_to_stops(stops, gpd_stops, network, nodes)
         stops = cls._assign_transit_modes(stops, config)
         return stops
