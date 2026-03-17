@@ -8,7 +8,7 @@ preprocessing:
     output_dir: input
     links_file: "Network_link.shp"
     nodes_file: "Network_node.shp"
-    maz_file: "MAZs_poi_surface.shp"
+    maz_file: "MAZ_SKATS_final.shp"
     stops: "StopPointsTbl.csv"
     routes: "LineRoutesTbl.csv"
     walk_modes: ["wlk"] # TSYSSET modes to filter walk links

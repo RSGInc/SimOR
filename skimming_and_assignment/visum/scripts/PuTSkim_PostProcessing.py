@@ -76,41 +76,47 @@ def putskim_postprocessing(mtx_dseg,knr_flag):
 
     # Process matrices
     # Set maximum walk time allowed
-    wlkspeed            = config_data['Walk_Speed']
+    wlkspeed            = Visum.Net.AttValue(r"Walk_Speed")
     origin_maxwlktime   = 1.00 * (60 / wlkspeed) # Minutes to walk 1 mile
     dest_maxwlktime     = 1.00 * (60 / wlkspeed) # Minutes to walk 1 mile
     transfer_maxwlktime = 0.25 * (60 / wlkspeed) # Minutes to walk 0.25 miles
 
-    ## CHANGE TO BE MAX WALK DISTANCE BY Transfer Walk Path time (0.25 mi), Origin Walk Path time (1 mi), Destination Walk Path time (1 mi)
-    ## Mask Transfer Walk Path time
-    #if knr_flag == 'wtw':
-    #    twpt = np.where((owpt > origin_maxwlktime) | (dwpt > dest_maxwlktime) | (twpt > transfer_maxwlktime) , 9999.00, twpt)
-    #    np.fill_diagonal(twpt, 9999.00)
-    #elif knr_flag == 'ktw':
-    #    twpt = np.where((dwpt > dest_maxwlktime)   | (twpt > transfer_maxwlktime) , 9999.00, twpt)
-    #    np.fill_diagonal(twpt, 9999.00)
-    #elif knr_flag == 'wtk':
-    #    twpt = np.where((owpt > origin_maxwlktime) | (twpt > transfer_maxwlktime) , 9999.00, twpt)
-    #    np.fill_diagonal(twpt, 9999.00)
+    # Flag for which walk masking to run (New for Visum or Old for Emme)
+    updated_walkskim_masking = 0
+    
+    if updated_walkskim_masking == 1:
+        # CHANGE TO BE MAX WALK DISTANCE BY Transfer Walk Path time (0.25 mi), Origin Walk Path time (1 mi), Destination Walk Path time (1 mi)
+        # Mask Transfer Walk Path time
+        if knr_flag == 'wtw':
+            twpt = np.where((owpt > origin_maxwlktime) | (dwpt > dest_maxwlktime) | (twpt > transfer_maxwlktime) , 9999.00, twpt)
+            np.fill_diagonal(twpt, 9999.00)
+        elif knr_flag == 'ktw':
+            twpt = np.where((dwpt > dest_maxwlktime)   | (twpt > transfer_maxwlktime) , 9999.00, twpt)
+            np.fill_diagonal(twpt, 9999.00)
+        elif knr_flag == 'wtk':
+            twpt = np.where((owpt > origin_maxwlktime) | (twpt > transfer_maxwlktime) , 9999.00, twpt)
+            np.fill_diagonal(twpt, 9999.00)
 
-    # !!!!!! MASKING FOR COMPARISON WITH EMME (TEMPORARY) !!!!!!!
-    # Mask Transfer Walk Path time  GREATER THAN 20 MINUTES TOTAL WALK, GREATER THAN 30 MINUTES ORIGIN OR TRANSFER WAIT TIME
-    if knr_flag == 'wtw':
-        twpt = np.where((owpt + dwpt + twpt > 20), 9999.00, twpt)
-        np.fill_diagonal(twpt, 9999.00)
-        wowt = np.where((wowt > 30), 30.00, wowt)
-        wtwt = np.where((wtwt > 30), 30.00, wtwt)
-    elif knr_flag == 'ktw':
-        twpt = np.where((dwpt + twpt > 20), 9999.00, twpt)
-        np.fill_diagonal(twpt, 9999.00)
-        wowt = np.where((wowt > 30), 30.00, wowt)
-        wtwt = np.where((wtwt > 30), 30.00, wtwt)
-    elif knr_flag == 'wtk':
-        twpt = np.where((owpt + twpt > 20), 9999.00, twpt)
-        np.fill_diagonal(twpt, 9999.00)
-        wowt = np.where((wowt > 30), 30.00, wowt)
-        wtwt = np.where((wtwt > 30), 30.00, wtwt)
-    # !!!!!! TEMPORARY !!!!!!
+    
+    if updated_walkskim_masking == 0:
+        # !!!!!! MASKING FOR COMPARISON WITH EMME (TEMPORARY) !!!!!!!
+        # Mask Transfer Walk Path time  GREATER THAN 20 MINUTES TOTAL WALK, GREATER THAN 30 MINUTES ORIGIN OR TRANSFER WAIT TIME
+        if knr_flag == 'wtw':
+            twpt = np.where((owpt + dwpt + twpt > 20), 9999.00, twpt)
+            np.fill_diagonal(twpt, 9999.00)
+            wowt = np.where((wowt > 30), 30.00, wowt)
+            wtwt = np.where((wtwt > 30), 30.00, wtwt)
+        elif knr_flag == 'ktw':
+            twpt = np.where((dwpt + twpt > 20), 9999.00, twpt)
+            np.fill_diagonal(twpt, 9999.00)
+            wowt = np.where((wowt > 30), 30.00, wowt)
+            wtwt = np.where((wtwt > 30), 30.00, wtwt)
+        elif knr_flag == 'wtk':
+            twpt = np.where((owpt + twpt > 20), 9999.00, twpt)
+            np.fill_diagonal(twpt, 9999.00)
+            wowt = np.where((wowt > 30), 30.00, wowt)
+            wtwt = np.where((wtwt > 30), 30.00, wtwt)
+        # !!!!!! TEMPORARY !!!!!!
 
 
     # MASKING: Set all matrices to have matrix cells = 9999.00 if twpt = 9999.00

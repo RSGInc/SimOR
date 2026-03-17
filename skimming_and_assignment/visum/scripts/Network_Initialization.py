@@ -41,9 +41,9 @@ with open(yaml_path, 'r') as file:
 def net_initialization():
 
     # Constants from Config.yaml
-    walk_speed              = config_data['Walk_Speed']              # 3.0 mph
-    connector_vehicle_speed = config_data['Connector_Vehicle_Speed'] # 20 mph
-    intrazonal_vehicle_speed = config_data['Intrazonal_Vehicle_Speed'] # 33.3333 mph
+    walk_speed               =    Visum.Net.AttValue(r"Walk_Speed")                #config_data['Walk_Speed']              # 3.0 mph
+    connector_vehicle_speed  =    Visum.Net.AttValue(r"Connector_Vehicle_Speed")   #config_data['Connector_Vehicle_Speed'] # 20 mph
+    intrazonal_vehicle_speed =    Visum.Net.AttValue(r"Intrazonal_Vehicle_Speed")  #config_data['Intrazonal_Vehicle_Speed'] # 33.3333 mph
 
     # LINKS
     # Pull Attributes
