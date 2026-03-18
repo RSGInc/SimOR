@@ -190,7 +190,7 @@ ECHO    !VISUM_SITE_PACKAGES!
 
 :: Check if packages are already importable
 SET "PYTHONNOUSERSITE=1"
-"%VISUM_PYTHON_EXE%" -c "import tables,openmatrix,yaml" >nul 2>&1
+"%VISUM_PYTHON_EXE%" -c "import tables,openmatrix,yaml,pandas,scipy; assert pandas.__version__.startswith('2.3'); assert scipy.__version__.startswith('1.16')" >nul 2>&1
 IF !ERRORLEVEL! EQU 0 (
     ECHO  Required Visum packages are already available. Skipping install.
     SET "VISUM_PACKAGE_STATUS=already available"
@@ -221,9 +221,9 @@ IF NOT EXIST "!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" (
 DEL /Q "!VISUM_SITE_PACKAGES!\.__simor_write_test__.tmp" >nul 2>&1
 
 :: Install packages (--isolated avoids user-level config redirecting to user site-packages)
-ECHO  Installing tables, openmatrix, pyyaml into:
+ECHO  Installing tables, openmatrix, pyyaml, pandas 2.3.x, and scipy 1.16.x into:
 ECHO    !VISUM_SITE_PACKAGES!
-"%VISUM_PYTHON_EXE%" -m pip install --isolated --upgrade tables openmatrix pyyaml --target "!VISUM_SITE_PACKAGES!"
+"%VISUM_PYTHON_EXE%" -m pip install --isolated --upgrade tables openmatrix pyyaml pandas==2.3.* scipy==1.16.* --target "!VISUM_SITE_PACKAGES!"
 IF !ERRORLEVEL! NEQ 0 (
     ECHO  WARNING: Failed to install one or more Visum Python packages.
     SET "VISUM_PACKAGE_STATUS=install failed"
