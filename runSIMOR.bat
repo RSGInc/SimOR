@@ -65,11 +65,11 @@ ECHO Non-motorized skims complete.
 :: Run ActivitySim -- full integration not yet implemented
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ECHO.
-@REM ECHO Running ActivitySim preprocessor.
-@REM CD /D "%MODEL_DIR%"
-@REM "%PYTHON_ACTIVITYSIM%" preprocessor.py preprocessor_settings.yaml
-@REM IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
-@REM ECHO ActivitySim preprocessor complete.
+ECHO Running ActivitySim preprocessor.
+CD /D "%MODEL_DIR%"
+"%PYTHON_ACTIVITYSIM%" preprocessor.py preprocessor_settings.yaml
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
+ECHO ActivitySim preprocessor complete.
 
 ECHO.
 ECHO Running ActivitySim (test cropped example)
