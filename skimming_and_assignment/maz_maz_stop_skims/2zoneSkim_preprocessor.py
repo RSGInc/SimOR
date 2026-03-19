@@ -51,7 +51,7 @@ class DataLoader():
         input_dir = self.config["preprocessing"]["input_dir"]
         self.links = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["links_file"]))
         self.nodes = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["nodes_file"])).rename(columns = {"NO":"NODE_NO"})
-        self.mazs = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["maz_file"])).rename(columns = {"MAZ_NO":"MAZ"})
+        self.mazs = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["maz_file"]))
         self.routes = pd.read_csv(os.path.join(input_dir, self.config["preprocessing"]["routes"]))
         self.stops = pd.read_csv(os.path.join(input_dir, self.config["preprocessing"]["stops"]))
         self.walk_modes = self.config["preprocessing"]["walk_modes"]

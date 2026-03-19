@@ -4,11 +4,11 @@
 # Preprocessor settings
 preprocessing:
     # Visum automatically exports these files to Visum_Outputs 
-    input_dir: Visum_Outputs_SKATS
+    input_dir: Visum_Outputs
     output_dir: input
     links_file: "Network_link.shp"
     nodes_file: "Network_node.shp"
-    maz_file: "MAZ_SKATS_final.shp"
+    maz_file: "MAZ_poi_surface.shp"
     stops: "StopPointsTbl.csv"
     routes: "LineRoutesTbl.csv"
     walk_modes: ["wlk"] # TSYSSET modes to filter walk links
