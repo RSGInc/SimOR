@@ -47,6 +47,20 @@
             "program": "preprocessor.py",
             "console": "integratedTerminal",
             "args": "preprocessor_settings.yaml"
-        }
+        },
+        {
+            "name": "Run SKATS",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs_skats",
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/skats",
+                "-o", "outputs/skats",
+            ]
+        },
     ]
 }
