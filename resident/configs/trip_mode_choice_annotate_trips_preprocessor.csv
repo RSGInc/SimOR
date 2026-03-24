@@ -179,15 +179,15 @@ no long walks,walkAvailable,"np.where((walk_time_skims < max_walk_time),1,0) * n
 #,,
 ,walk_local_available,(odt_skims['WTW_TIV']>0)&(tourWTran)
 # FIXME need updated PNR availability,,
-,knr_local_available,((df.outbound & (odt_skims['KTW_TIV']>0)) | (~df.outbound & (odt_skims['WTK_TIV']>0)))&(tourKNR)
+,knr_local_available,"((df.outbound & (odt_skims['KTW_TIV']>0)) | (~df.outbound & (odt_skims['WTK_TIV']>0)))&(tourKNR) if KNR_available else 0"
 ,bike_local_available,(odt_skims['WTW_TIV']>0)&(tourBNR)
 #access egress distances,,
 ,origin_local_dist,"reindex(land_use.walk_dist_local_bus, origin)"
 ,origin_micro_local_dist,"reindex(land_use.micro_dist_local_bus, origin)"
 ,dest_local_dist,"reindex(land_use.walk_dist_local_bus, destination)"
 ,dest_micro_local_dist,"reindex(land_use.micro_dist_local_bus, destination)"
-,micro_local_dist_tncout,"odt_skims['KTW_ACC']/60 * driveSpeed"
-,micro_local_dist_tncin,"odt_skims['WTK_EGR']/60 * driveSpeed"
+,micro_local_dist_tncout,"odt_skims['KTW_ACC']/60 * driveSpeed if KNR_available else 0"
+,micro_local_dist_tncin,"odt_skims['WTK_EGR']/60 * driveSpeed if KNR_available else 0"
 #access egress times,,
 ,origin_local_time,origin_local_dist * 60/walkSpeed
 ,dest_local_time,dest_local_dist * 60/walkSpeed
@@ -245,3 +245,16 @@ microtransit/nev egress transfer,mtnev_egr_xfer_out,microtransit_local_egress_av
 microtransit/nev egress transfer,mtnev_egr_xfer_in,microtransit_local_egress_available_in | nev_local_egress_available_in
 #,,
 transit subsidi pass discount,transitSubsidyPassDiscount,"np.where(df.transit_pass_subsidy | df.transit_pass_ownership,0,1)"
+#KNR times
+,ktw_odt_ivt,"odt_skims['KTW_TIV'] if KNR_available else 0"
+,ktw_odt_fwt,"odt_skims['KTW_FWT'] if KNR_available else 0"
+,ktw_odt_xwt,"odt_skims['KTW_XWT'] if KNR_available else 0"
+,ktw_odt_xfr,"odt_skims['KTW_XFR'] if KNR_available else 0"
+,ktw_odt_acc,"odt_skims['KTW_ACC'] if KNR_available else 0"
+,ktw_odt_aux,"odt_skims['KTW_AUX'] if KNR_available else 0"
+,wtk_odt_egr,"odt_skims['WTK_EGR'] if KNR_available else 0"
+,wtk_odt_tiv,"odt_skims['WTK_TIV'] if KNR_available else 0"
+,wtk_odt_fwt,"odt_skims['WTK_FWT'] if KNR_available else 0"
+,wtk_odt_xwt,"odt_skims['WTK_XWT'] if KNR_available else 0"
+,wtw_odt_xfr,"odt_skims['WTK_XFR'] if KNR_available else 0"
+,wtk_odt_aux,"odt_skims['WTK_AUX'] if KNR_available else 0"

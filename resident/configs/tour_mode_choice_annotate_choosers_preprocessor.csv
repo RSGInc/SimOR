@@ -168,8 +168,8 @@ Determining Tour Origin,origin,df.origin if 'origin' in df.columns else df.home_
 Determining Tour Destination,destination,df.destination if 'destination' in df.columns else df.alt_dest,
 #access egress distances,,,
 ,origin_local_dist,"reindex(land_use.walk_dist_local_bus, origin)",
-,origin_micro_local_dist_tncout,"odt_skims['KTW_ACC']/60 * driveSpeed",
-,origin_micro_local_dist_tncin,"odt_skims['WTK_ACC']/60 * driveSpeed",
+,origin_micro_local_dist_tncout,"odt_skims['KTW_ACC']/60 * driveSpeed if KNR_available else 0",
+,origin_micro_local_dist_tncin,"odt_skims['WTK_ACC']/60 * driveSpeed if KNR_available else 0",
 ,dest_local_dist,"reindex(land_use.walk_dist_local_bus, destination)",
 ,dest_micro_local_dist,"reindex(land_use.micro_dist_local_bus, destination)",
 #access egress times,,,
@@ -177,8 +177,18 @@ Determining Tour Destination,destination,df.destination if 'destination' in df.c
 ,dest_local_time,dest_local_dist * 60/walkSpeed,
 #,,,
 ,walk_local_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0),
-,knr_local_available,(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0),
-,tnc_local_available,(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0),
+,knr_local_available,"(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0) if KNR_available else 0",
+,tnc_local_available,"(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0) if KNR_available else 0",
+#KNR times
+,knr_total_tiv,"(odt_skims['KTW_TIV'] + dot_skims['WTK_TIV']) if KNR_available else 0",
+,knr_total_fwt,"(odt_skims['KTW_FWT']) + (dot_skims['WTK_FWT']) if KNR_available else 0"
+,knr_total_xwt,"(odt_skims['KTW_XWT'] + dot_skims['WTK_XWT']) if KNR_available else 0"
+,knr_acc_egg_time,"(odt_skims['KTW_ACC'] + dot_skims['WTK_EGR']) if KNR_available else 0"
+,knr_other_walk_time,"(odt_skims['KTW_AUX'] + dot_skims['WTK_AUX']) if KNR_available else 0",
+,ktw_odt_xfr,"odt_skims['KTW_XFR'] if KNR_available else 0"
+,wtk_odt_xfr,"dot_skims['WTK_XFR'] if KNR_available else 0"
+,knr_stop_constant,"(odt_skims['KTW_RST'] + dot_skims['WTK_RST']) if KNR_available else 0"
+,knr_veh_constant,"(odt_skims['KTW_VTC'] + dot_skims['WTK_VTC']) if KNR_available else 0"
 # Micromobility times,,,
 ebike time inbound,ebike_time_inb,bike_time_inb * bikeSpeed / ebikeSpeed,
 ebike time outbound,ebike_time_out,bike_time_out * bikeSpeed / ebikeSpeed,
