@@ -1,17 +1,17 @@
 # This script prepares inputs for 2zoneSkim.py using Visum outputs:
-# - Links: [TSYSSET, TYPNO]
-# - Nodes: [NO]
-# - MAZs: (provided separately)
-# - Transit stops: transit stops with list of routes; [STOP_ID, Lines, X-Coordinate, Y-Coordinate]
-# - Routes/Lines: [LineName, TSysCode]
+# - Links: [NO, FROMNODENO, TONODENO, TSYSSET, TYPENO]
+# - Nodes: [NO, XCOORD, YCOORD]
+# - MAZs: [MAZ, TAZ]
+# - Transit stops: transit stops with list of routes: [NO, LINES, XCOORD, YCOORD]
+# - Routes/Lines: [LINE, TSYSCODE]
 
 # And generates the following outputs:
 # - MAZ centroids
 # - Connectors: from MAZ centorid to nearest node on walk network
-# - Nodes: network nodes + MAZ centroids (consistent node numbering); [MAZ, NO]
-# - Links: links + connectors (consistent node numbering; [FROMNODENO, TONODENO]
+# - Nodes: walk network nodes + MAZ centroids (consistent node numbering); [MAZ, NO]
+# - Links: walk links + connectors (consistent node numbering; [FROMNODENO, TONODENO]
 # - Routes: one route per row; [Route_ID, Mode]
-# - Stops: one stop per row; [NO, Latitute, Longitute, Route_ID]
+# - Stops: one stop per row; [NO, Route_ID, Latitute, Longitute]
 
 import yaml
 import os

@@ -1,6 +1,7 @@
 # Recommend to use SANDAG's python environment: 
 # https://github.com/SANDAG/ABM/blob/main/src/asim/scripts/environment.yml
 
+# =====================
 # Preprocessor settings
 preprocessing:
     # Visum automatically exports these files to Visum_Outputs 
@@ -13,6 +14,7 @@ preprocessing:
     routes: "LineRoutesTbl.csv"
     walk_modes: ["wlk"] # TSYSSET modes to filter walk links
 
+# ==================
 # Skimming settings
 settings:
     # Set maz walk and stop skims to True to run both
