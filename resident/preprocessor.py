@@ -414,7 +414,9 @@ def get_intersection_count(
     pd.DataFrame
         Updated land_use with intersection counts
     
-    """   
+    """ 
+    print("Counting intersections for each MAZ...")  
+    
     # Load settings 
     nodes_file = settings.nodes_file
     links_file = settings.links_file
@@ -596,6 +598,7 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
     if settings.count_intersections:
         land_use['totint'] = np.where(has_acres, land_use['icnt_nearby'], 0)
     else:
+        print(f"Intersection counts provided. Using '{settings.icnt_col}' for 'totint'.")
         land_use['totint'] = land_use[settings.icnt_col]
     
     # Drop temporary nearby columns
@@ -715,6 +718,7 @@ def create_flat_fare_skim(settings: PreprocessorSettings, land_use: pd.DataFrame
     -------
     omx with matrices fare__[time_of_day]
     """
+    print("Preprocessing flat-fare skim matrix.")
     if settings.flat_fare_rate is None:
         print("No flat-fare rate provided, skipping flat-fare skim creation.")
         return 

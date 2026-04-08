@@ -49,6 +49,24 @@
             "args": "preprocessor_settings.yaml"
         },
         {
+            "name": "Run MAZ Skim Preprocessor",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/skimming_and_assignment/maz_maz_stop_skims",
+            "program": "2zoneSkim_preprocessor.py",
+            "console": "integratedTerminal",
+            "args": "2zoneSkim_params.yaml"
+        },
+        {
+            "name": "Run MAZ Skims",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/skimming_and_assignment/maz_maz_stop_skims",
+            "program": "2zoneSkim.py",
+            "console": "integratedTerminal",
+            "args": "2zoneSkim_params.yaml"
+        },
+        {
             "name": "Run SKATS",
             "type": "debugpy",
             "request": "launch",
