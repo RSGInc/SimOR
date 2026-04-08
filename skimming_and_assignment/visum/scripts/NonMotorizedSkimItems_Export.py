@@ -132,7 +132,7 @@ def transittbls_export():
     stoppoints_df = pd.DataFrame(np.column_stack(stoppoints_list), columns = ['NO', 'XCOORD', 'YCOORD', 'LINES'])
 
     # Export link table as csv
-    stoppoints_df.to_csv(nonmotorizedinputs_path + "/StopPointsTbl.csv")
+    stoppoints_df.to_csv(nonmotorizedinputs_path + "/StopPointsTbl.csv", index=False)
       
     
 
@@ -147,7 +147,7 @@ def transittbls_export():
     lineroutes_df = pd.DataFrame(np.column_stack(lineroutes_list), columns = ['LINE', 'TSYSCODE'])
 
     # Export link table as csv
-    lineroutes_df.to_csv(nonmotorizedinputs_path + "/LineRoutesTbl.csv")
+    lineroutes_df.to_csv(nonmotorizedinputs_path + "/LineRoutesTbl.csv", index=False)
     
 
 
