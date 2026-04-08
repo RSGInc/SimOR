@@ -104,10 +104,11 @@ def network_shp_export():
     maz_shp_export_params.SetAttValue("ONLYACTIVE", 1) 
     maz_shp_export_params.ClearLayout()
     maz_shp_export_params.AddColumn("MAZ")
+    maz_shp_export_params.AddColumn("TAZ")
     
     Visum.IO.ExportShapefile(nonmotorizedinputs_path + "/MAZ.shp", maz_shp_export_params) 
   
-    # MAZs csv
+    # MAZ csv
     # Create export csv parameters object
     poi_list = Visum.Workbench.Lists.CreatePOIList
     poi_list.AddDefaultColumns()
