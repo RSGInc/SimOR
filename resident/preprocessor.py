@@ -268,9 +268,9 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
     pd.DataFrame
         Updated land_use with ACRES field
     """
+    # Drop exisiting ACRES col
     if "ACRES" in land_use.columns:
-        print("ACRES already exists in land_use")
-        return land_use
+        land_use = land_use.drop(columns=["ACRES"], axis=1)
     
     if maz_shp_file is None:
         print("Warning: ACRES field not found and no maz_shp_file provided, skipping")
@@ -539,10 +539,12 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
     print(f"Reading MAZ walk file: {settings.maz_maz_walk_file}")
     maz_maz_walk = pd.read_csv(settings.maz_maz_walk_file)
     
+    # Drop existing density columns, accounting for case
     new_cols = ['empden', 'retempden', 'duden', 'popden', 'popempdenpermi', 'totint']
+    lower_cols = {col.lower(): col for col in land_use.columns}
     for col in new_cols:
-        if col in land_use.columns:
-            land_use = land_use.drop(col, axis=1)
+        if col in lower_cols:
+            land_use = land_use.drop(lower_cols[col], axis=1)
     
     # Count intersections per MAZ
     if settings.count_intersections:
