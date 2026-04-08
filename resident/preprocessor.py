@@ -37,6 +37,7 @@ class PreprocessorSettings:
     keep_link_types: dict = None
     count_intersections: bool = True
     icnt_col: str = None
+    exp_parking_costs_file: str = None
     
     def __post_init__(self):
         # Convert strings to Path objects
@@ -739,6 +740,40 @@ def create_flat_fare_skim(settings: PreprocessorSettings, land_use: pd.DataFrame
             
         flat_fare_skim.create_mapping('taz', taz_ids)
     print(f"Saved flat-fare skim TOD file to {output_fare_skim_file_name}")
+    
+def add_exp_costs(land_use: pd.DataFrame, settings: PreprocessorSettings, ) -> pd.DataFrame:
+    """
+    Adds expected parking costs exp_hourly, exp_daily, exp_monthly,
+    if file is provided.
+    
+    Parameters
+    ----------
+    settings : PreprocessorSettings
+        Configuration settings for the preprocessor
+    land_use:
+        Land use table with MAZ column
+        
+    Returns
+    -------
+    land_use:
+        Updated dataframe with [exp_hourly, exp_daily, exp_monthly]
+    """
+    
+    if settings.exp_parking_costs_file is None:
+        print("No expected parking costs file provided. Skipping adding exp costs.")
+        return land_use
+    
+    exp_costs = pd.read_csv(settings.exp_parking_costs_file).rename(columns = {'mgra': 'MAZ'}).set_index('MAZ')
+    cost_cols = [col for col in exp_costs.columns if 'exp' in col]
+    land_use = pd.merge(
+        land_use, 
+        exp_costs[cost_cols], 
+        left_index=True,
+        right_index=True, 
+        how='left',
+        validate='1:1')
+    print(f"Added columns to land_use: {cost_cols}")
+    return land_use
     
 def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
