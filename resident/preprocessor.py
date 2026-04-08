@@ -781,8 +781,8 @@ def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFra
     # Calculate land use densities
     land_use = get_density(land_use, settings)
     
-    # Quick fix: create PNR_SPACES
-    land_use['PNR_SPACES'] = 0
+    # Add exp parking costs
+    land_use = add_exp_costs(land_use, settings)
     
     # Write output files
     write_output(
