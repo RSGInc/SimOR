@@ -76,7 +76,7 @@
             "args": [
                 "-c", "configs_skats",
                 "-c", "configs", // check the settings.yaml file for run settings!
-                "-d", "model_data/skats",
+                "-d", "model_data/skats/data_full",
                 "-o", "outputs/skats",
             ],
         },
