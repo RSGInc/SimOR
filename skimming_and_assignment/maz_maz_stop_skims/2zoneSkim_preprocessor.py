@@ -136,14 +136,6 @@ def create_centroid_connectors(inputs):
     maz_centroids = inputs.maz_centroids
     nodes = inputs.nodes[["geometry", "NODE_NO"]]    
     
-    # Clean ODOT network
-    # FIXME: move somewhere more visible like config yaml
-    links["TSYSSET"] = np.where(
-        (links["TYPENO"] == 0) & (links["TSYSSET"].isna()),
-        "wlk",
-        links["TSYSSET"]
-    )
-    
     walk_modes = "|".join(inputs.walk_modes)
     walk_network_links = links[links["TSYSSET"].str.contains(walk_modes, na=False)] 
 
