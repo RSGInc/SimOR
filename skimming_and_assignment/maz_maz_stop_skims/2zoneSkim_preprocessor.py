@@ -45,6 +45,7 @@ class DataLoader():
         self.stops = None
         self.walk_modes = None
         self.maz_centroids = None
+        self.two_way_network = None
         self.load_data()
         
     def load_data(self):
@@ -61,6 +62,7 @@ class DataLoader():
         self.nodes = self._ensure_projected_feet(self.nodes, "Nodes")
         self.mazs = self._ensure_projected_feet(self.mazs, "MAZs")
         self.maz_centroids = self._get_maz_centroids()
+        self.two_way_network = self.config['preprocessing']['two_way_network']
 
     def _infer_source_crs(self):
         for layer, gdf in (("links", self.links), ("nodes", self.nodes), ("MAZs", self.mazs)):
@@ -276,6 +278,20 @@ def prepare_transit_routes_and_stops(inputs):
     
     return routes, stops_gdf[keep_cols]
 
+def make_two_way_network(links):
+    """
+    Collapse directional walk links to one undirected link per node pair.
+
+    For walk links, if one direction allows walking, we assume the reverse
+    direction is also walkable even if it is not explicitly coded.
+    """
+    links = links.copy()
+    links["link_pair"] = list(zip(links["FROMNODENO"], links["TONODENO"]))
+    links["link_pair"] = links["link_pair"].apply(lambda pair: tuple(sorted(pair)))
+    links = links.drop_duplicates(subset="link_pair", keep="first")
+    return links.drop(columns="link_pair")
+
+
 def write_outputs(nodes, links, routes, stops, output_dir):
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     os.makedirs(output_dir, exist_ok=True)
@@ -295,6 +311,10 @@ def main(config_file):
     connectors, walk_network_nodes, walk_network_links = create_centroid_connectors(inputs)
     nodes = prepare_nodes(inputs, walk_network_nodes)
     links = prepare_links(connectors, walk_network_links, nodes)
+    
+    if inputs.two_way_network:
+        links = make_two_way_network(links)
+        
     routes, stops = prepare_transit_routes_and_stops(inputs)
     
     # Export outputs
