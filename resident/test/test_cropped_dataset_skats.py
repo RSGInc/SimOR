@@ -14,6 +14,7 @@ def test_cropped_example():
     file_path = os.path.join(resident_dir, "simulation.py")
 
     run_args = [
+        "-c", os.path.join(resident_dir, "configs_skats"),
         "-c", os.path.join(resident_dir, "configs"),
         "-d", os.path.join(resident_dir, "model_data/skats/data_cropped"),
         "-o", os.path.join(resident_dir, "outputs/test")
