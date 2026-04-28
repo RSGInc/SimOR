@@ -82,7 +82,7 @@ def putskim_postprocessing(mtx_dseg,knr_flag):
     transfer_maxwlktime = 0.25 * (60 / wlkspeed) # Minutes to walk 0.25 miles
 
     # Flag for which walk masking to run (New for Visum or Old for Emme)
-    updated_walkskim_masking = 0
+    updated_walkskim_masking = 1
     
     if updated_walkskim_masking == 1:
         # CHANGE TO BE MAX WALK DISTANCE BY Transfer Walk Path time (0.25 mi), Origin Walk Path time (1 mi), Destination Walk Path time (1 mi)

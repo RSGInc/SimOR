@@ -78,15 +78,7 @@
                 "-c", "configs", // check the settings.yaml file for run settings!
                 "-d", "model_data/skats/data_full",
                 "-o", "outputs/skats",
-            ],
-        },
-        {
-            "name": "Run Expected Parking",
-            "type": "debugpy",
-            "request": "launch",
-            "cwd": "${workspaceFolder}/ext_dependencies/sandag_parking",
-            "program": "run.py",
-            "console": "integratedTerminal",
+            ]
         },
     ]
 }

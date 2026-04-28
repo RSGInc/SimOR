@@ -1,18 +1,23 @@
-# Recommend to use SANDAG's python environment: 
-# https://github.com/SANDAG/ABM/blob/main/src/asim/scripts/environment.yml
+# MAZ non-motorized skims settings
 
 # =====================
 # Preprocessor settings
 preprocessing:
-    # Visum automatically exports these files to Visum_Outputs 
-    input_dir: Visum_Outputs_SKATS
+    # Visum automatically exports nodes, links, maz, stop, and routes to Visum_Outputs 
+    input_dir: Visum_Outputs
     output_dir: input
     links_file: "Network_link.shp"
     nodes_file: "Network_node.shp"
     maz_file: "MAZ_poi_surface.shp"
     stops: "StopPointsTbl.csv"
     routes: "LineRoutesTbl.csv"
-    walk_modes: ["wlk"] # TSYSSET modes to filter walk links
+    walk_modes: ["PED"] # TSYSSET modes to filter walk links
+    # Network directionality
+    # True: if walk network should have one link for each direction
+    # False: if walk network should have one link per direction
+    # Recommend setting to True if network links are not perfectly coded
+    # with both directions explicitly coded to allow walk
+    two_way_network: True 
 
 # ==================
 # Skimming settings
@@ -54,7 +59,9 @@ modes:
 mmms: 
     shapefile_name: "walk_links.shp"
     shapefile_node_name: "walk_nodes.shp"
-    two_way_network: False   # True if links are bidirectional, False if one link per direction
+    # two_way_network: True if links are bidirectional, False if one link per direction
+    # Must be consistent with preprocessing two_way_network config (ln 20)
+    two_way_network: True   
     mmms_link_ref_id: "FROMNODENO" 
     mmms_link_nref_id: "TONODENO"
     mmms_link_id: "NO"  # not used
