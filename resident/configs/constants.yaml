@@ -351,3 +351,5 @@ OpVTCa: 0.0432
 OpVTCe: 0.0984
 OpVTCl: 0.1442
 OpVTCr: 0.1442
+
+KNR_available: True
