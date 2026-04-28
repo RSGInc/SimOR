@@ -30,7 +30,6 @@ person type,ptype,"pd.Series(PTYPE_NONWORK, index=persons.index)"
 # FIXME are these rules for preschoolers still wanted?,,
 is_student,is_student,"np.isin(pstudent, [PSTUDENT_GRADE_OR_HIGH, PSTUDENT_UNIVERSITY])"
 preschool age can go to preschool,is_student,"np.where(persons.age > GRADE_SCHOOL_MIN_AGE, is_student, True)"
-preschool age can go to preschool,pstudent,"np.where(persons.age > GRADE_SCHOOL_MIN_AGE, pstudent, PSTUDENT_GRADE_OR_HIGH)"
 is_preschool,_is_preschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age <= GRADE_SCHOOL_MIN_AGE)
 is_gradeschool,_is_gradeschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age <= GRADE_SCHOOL_MAX_AGE) & (persons.age > GRADE_SCHOOL_MIN_AGE)
 is_highschool,_is_highschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age > GRADE_SCHOOL_MAX_AGE)
