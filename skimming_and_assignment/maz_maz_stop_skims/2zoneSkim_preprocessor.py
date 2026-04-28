@@ -1,17 +1,17 @@
 # This script prepares inputs for 2zoneSkim.py using Visum outputs:
-# - Links: [TSYSSET, TYPNO]
-# - Nodes: [NO]
-# - MAZs: (provided separately)
-# - Transit stops: transit stops with list of routes; [STOP_ID, Lines, X-Coordinate, Y-Coordinate]
-# - Routes/Lines: [LineName, TSysCode]
+# - Links: [NO, FROMNODENO, TONODENO, TSYSSET, TYPENO]
+# - Nodes: [NO, XCOORD, YCOORD]
+# - MAZs: [MAZ, TAZ]
+# - Transit stops: transit stops with list of routes: [NO, LINES, XCOORD, YCOORD]
+# - Routes/Lines: [LINE, TSYSCODE]
 
 # And generates the following outputs:
 # - MAZ centroids
 # - Connectors: from MAZ centorid to nearest node on walk network
-# - Nodes: network nodes + MAZ centroids (consistent node numbering); [MAZ, NO]
-# - Links: links + connectors (consistent node numbering; [FROMNODENO, TONODENO]
+# - Nodes: walk network nodes + MAZ centroids (consistent node numbering); [MAZ, NO]
+# - Links: walk links + connectors (consistent node numbering; [FROMNODENO, TONODENO]
 # - Routes: one route per row; [Route_ID, Mode]
-# - Stops: one stop per row; [NO, Latitute, Longitute, Route_ID]
+# - Stops: one stop per row; [NO, Route_ID, Latitute, Longitute]
 
 import yaml
 import os
@@ -20,6 +20,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 from datetime import datetime
+from pyproj import CRS
 from shapely.geometry import LineString
 
 class ConfigLoader():
@@ -28,7 +29,7 @@ class ConfigLoader():
         self.config = self.load_config()
         
     def load_config(self):
-        os.chdir(os.path.dirname(__file__))
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
         with open(self.config_file, "r") as file:
             return yaml.load(file, Loader = yaml.FullLoader)
 
@@ -38,23 +39,86 @@ class DataLoader():
         self.links = None
         self.mazs = None
         self.nodes = None
-        self.epsg = None
+        self.source_crs = None
+        self.target_crs = None
         self.routes = None
         self.stops = None
         self.walk_modes = None
         self.maz_centroids = None
+        self.two_way_network = None
         self.load_data()
         
     def load_data(self):
         input_dir = self.config["preprocessing"]["input_dir"]
         self.links = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["links_file"]))
         self.nodes = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["nodes_file"])).rename(columns = {"NO":"NODE_NO"})
-        self.mazs = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["maz_file"])).rename(columns = {"MAZ_NO":"MAZ"})
-        self.epsg = self.config["preprocessing"]["network_epsg"]
+        self.mazs = gpd.read_file(os.path.join(input_dir, self.config["preprocessing"]["maz_file"]))
         self.routes = pd.read_csv(os.path.join(input_dir, self.config["preprocessing"]["routes"]))
         self.stops = pd.read_csv(os.path.join(input_dir, self.config["preprocessing"]["stops"]))
         self.walk_modes = self.config["preprocessing"]["walk_modes"]
+        self.source_crs = self._infer_source_crs()
+        self.target_crs = self._infer_proj_crs()
+        self.links = self._ensure_projected_feet(self.links, "Links")
+        self.nodes = self._ensure_projected_feet(self.nodes, "Nodes")
+        self.mazs = self._ensure_projected_feet(self.mazs, "MAZs")
         self.maz_centroids = self._get_maz_centroids()
+        self.two_way_network = self.config['preprocessing']['two_way_network']
+
+    def _infer_source_crs(self):
+        for layer, gdf in (("links", self.links), ("nodes", self.nodes), ("MAZs", self.mazs)):
+            if gdf.crs is not None:
+                print(f"Using {layer} CRS as source CRS reference: {gdf.crs}")
+                return CRS.from_user_input(gdf.crs)
+
+    def _infer_proj_crs(self):
+        reference_layer = next(gdf for gdf in (self.mazs, self.links, self.nodes) if gdf.crs is not None)
+        utm_crs_meters = reference_layer.estimate_utm_crs()
+
+        if utm_crs_meters is None:
+            raise ValueError("Unable to determine a UTM CRS from the input geometries.")
+
+        utm_proj4 = utm_crs_meters.to_proj4()
+        if "+units=m" in utm_proj4:
+            utm_proj4 = utm_proj4.replace("+units=m", "+units=us-ft")
+        elif "+to_meter=1" in utm_proj4:
+            utm_proj4 = utm_proj4.replace("+to_meter=1", "+units=us-ft")
+        else:
+            utm_proj4 = f"{utm_proj4} +units=us-ft"
+
+        target_crs = CRS.from_proj4(utm_proj4)
+        print(f"Inferred projected CRS in feet: {target_crs}")
+        return target_crs
+
+    def _is_projected_in_feet(self, crs):
+        if crs is None:
+            return False
+
+        crs = CRS.from_user_input(crs)
+        if not crs.is_projected:
+            return False
+
+        foot_unit_names = {"foot", "feet", "us survey foot", "foot_us", "us foot"}
+        for axis in crs.axis_info:
+            if axis.unit_name and axis.unit_name.lower() in foot_unit_names:
+                return True
+
+        return False
+
+    def _ensure_projected_feet(self, gdf, layer):
+        source_crs = CRS.from_user_input(gdf.crs)
+        if self._is_projected_in_feet(source_crs):
+            print(f"{layer} are already projected coordinates in feet: {source_crs}")
+            if source_crs != self.target_crs:
+                print(f"{layer} use a different feet-based CRS. Converting to {self.target_crs}")
+                return gdf.to_crs(self.target_crs)
+            return gdf
+
+        if source_crs.is_projected:
+            print(f"{layer} are projected, but not in feet. Converting to {self.target_crs}")
+        else:
+            print(f"{layer} are not projected. Converting to {self.target_crs}")
+
+        return gdf.to_crs(self.target_crs)
         
     def _get_maz_centroids(self):
         """
@@ -73,14 +137,6 @@ def create_centroid_connectors(inputs):
     links = inputs.links[["NO", "FROMNODENO", "TONODENO", "TYPENO", "TSYSSET", "geometry"]]
     maz_centroids = inputs.maz_centroids
     nodes = inputs.nodes[["geometry", "NODE_NO"]]    
-    
-    # Clean ODOT network
-    # FIXME: move somewhere more visible like config yaml
-    links["TSYSSET"] = np.where(
-        (links["TYPENO"] == 0) & (links["TSYSSET"].isna()),
-        "wlk",
-        links["TSYSSET"]
-    )
     
     walk_modes = "|".join(inputs.walk_modes)
     walk_network_links = links[links["TSYSSET"].str.contains(walk_modes, na=False)] 
@@ -163,7 +219,7 @@ def prepare_links(connectors, walk_network_links, walk_network_nodes):
     
     # Make sure they are the same crs
     if connectors.crs != walk_network_links.crs:
-        connectors = connectors.to_crs(walk_network_links)
+        connectors = connectors.to_crs(walk_network_links.crs)
 
     # Merge connectors with links
     keep_cols = ["FROMNODENO", "TONODENO", "geometry"]
@@ -190,8 +246,8 @@ def prepare_transit_routes_and_stops(inputs):
     stops = inputs.stops
     
     # Prepare routes
-    routes.rename(columns={"TSysCode":"Mode",
-                       "LineName":"Route_ID"}, inplace=True)
+    routes.rename(columns={"TSYSCODE":"Mode",
+                           "LINE":"Route_ID"}, inplace=True)
 
     # Create dictionary for mapping
     routes_mode_dict = dict(zip(routes["Route_ID"], routes["Mode"]))
@@ -200,8 +256,8 @@ def prepare_transit_routes_and_stops(inputs):
     # Convert coordinates to epsg 4326
     stops_gdf = gpd.GeoDataFrame(
         stops,
-        geometry = gpd.points_from_xy(stops["X-Coordinate"], stops["Y-Coordinate"]),
-        crs = inputs.epsg
+        geometry = gpd.points_from_xy(stops["XCOORD"], stops["YCOORD"]),
+        crs = inputs.source_crs
     )
     stops_gdf = stops_gdf.to_crs(epsg=4326)
     stops_gdf["Latitude"] = stops_gdf.geometry.y
@@ -210,14 +266,39 @@ def prepare_transit_routes_and_stops(inputs):
     stops_gdf.rename(columns = {
         "StopID":"NO"}, inplace=True)
 
+    # Remove NaNs
+    stops_gdf = stops_gdf[stops_gdf["LINES"].notna()]
+    
     # Explode mode - need route per row
-    stops_gdf["Route_ID"] = stops["Lines"].apply(lambda x: [i for i in x.split(",")])
+    stops_gdf["Route_ID"] = stops_gdf["LINES"].apply(lambda x: [i for i in x.split(",")])
     stops_gdf = stops_gdf.explode("Route_ID")
 
     # Format
     keep_cols = ["NO", "Route_ID","Latitude", "Longitude"]
     
     return routes, stops_gdf[keep_cols]
+
+def make_two_way_network(links):
+    """
+    Collapse directional walk links to one undirected link per node pair.
+
+    For walk links, if one direction allows walking, we assume the reverse
+    direction is also walkable even if it is not explicitly coded.
+    """
+    links = links.copy()
+    links["link_pair"] = list(zip(links["FROMNODENO"], links["TONODENO"]))
+    links["link_pair"] = links["link_pair"].apply(lambda pair: tuple(sorted(pair)))
+    links = links.drop_duplicates(subset="link_pair", keep="first")
+    return links.drop(columns="link_pair")
+
+
+def write_outputs(nodes, links, routes, stops, output_dir):
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    os.makedirs(output_dir, exist_ok=True)
+    nodes.to_file(os.path.join(output_dir, "walk_nodes.shp"))
+    links.to_file(os.path.join(output_dir, "walk_links.shp"))
+    routes.to_csv(os.path.join(output_dir, "routes.csv"), index=False)
+    stops.to_csv(os.path.join(output_dir, "stops.csv"), index=False)
 
 def main(config_file):
     print("Starting non-motorized skim preprocessing....")
@@ -230,19 +311,18 @@ def main(config_file):
     connectors, walk_network_nodes, walk_network_links = create_centroid_connectors(inputs)
     nodes = prepare_nodes(inputs, walk_network_nodes)
     links = prepare_links(connectors, walk_network_links, nodes)
+    
+    if inputs.two_way_network:
+        links = make_two_way_network(links)
+        
     routes, stops = prepare_transit_routes_and_stops(inputs)
     
-    # Export
+    # Export outputs
     output_dir = config.config["preprocessing"]["output_dir"]
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    os.makedirs(output_dir, exist_ok=True)
-    nodes.to_file(os.path.join(output_dir, "nodes.shp"))
-    links.to_file(os.path.join(output_dir, "links.shp"))
-    routes.to_csv(os.path.join(output_dir, "routes.csv"))
-    stops.to_csv(os.path.join(output_dir, "stops.csv"))
-    
+    write_outputs(nodes, links, routes, stops, output_dir)
+
     elapsed = datetime.now() - start_time
-    print(f"Skim preprocessing complete! Total time: {elapsed}")
+    print(f"Non-motorized skim preprocessing complete! Total time: {elapsed}")
 
 if __name__ == "__main__":
     main(sys.argv[1])

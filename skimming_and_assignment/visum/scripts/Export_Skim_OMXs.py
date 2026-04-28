@@ -11,10 +11,12 @@ import openmatrix as omx
 
 
 
-def omx_export(mtx_code, corename, mtx_dseg, omx_fn):
-
-    omx_file = omx.open_file(omx_fn, 'a')
+def omx_export(x, mtx_code, corename, mtx_dseg, omx_fn):
+    
+    
+    # Below exports the matrices as OMX files succesfully
     # Pull matrix out but close .omx file if there is an error
+    omx_file = omx.open_file(omx_fn, 'a')
     try:
         mx = h.GetMatrixRaw(Visum, {"CODE": mtx_code , "DSegCode": mtx_dseg})
     except Exception as e:
@@ -62,5 +64,5 @@ for x in range(len(procedure_codes)):
     filename = procedure_codes[x][3]
 
 
-    omx_export(code, core, dsegcode, proj_dir + "outputs\\skims\\" + filename)
+    omx_export(x, code, core, dsegcode, proj_dir + "outputs\\skims\\" + filename)
 

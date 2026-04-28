@@ -52,13 +52,3 @@ dseg = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")
 prtskim_postprocessing(dseg)
 
 
-## Pull "Code" field from procedure sequence containing Code, DSegCode, and filename
-#procedure_code = Visum.Procedures.OperationExecutor.GetCurrentOperation().AttValue("CODE")   # Example: outputs a string like -> '[["mfamsov","PuT","AM2_SOV.omx"],["mfmdMpe","PuT","MD1_MPE.omx"]]'
-#procedure_codes = eval(procedure_code)   # Example: outputs a list of lists like -> [["mfamsov","PuT","AM2_SOV.omx"],["mfmdMpe","PuT","MD1_MPE.omx"]]
-#
-## Loop thru each matrix set in the "Code" field and export
-#for x in range(len(procedure_codes)):
-#    dsegcode = procedure_codes[x][0]
-#
-#    prtskim_postprocessing(dsegcode)
-

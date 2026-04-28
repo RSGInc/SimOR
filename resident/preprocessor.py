@@ -28,6 +28,7 @@ class PreprocessorSettings:
     maz_stop_walk_file: str = None  # Path to MAZ stop walk distances file
     fare_skim_input_file: str = None  # Path to non-TOD segmented fare skim matrix file
     times_of_day: list[str] = field(default_factory=lambda: ["EA", "AM", "MD", "PM", "EV"])
+    flat_fare_rate: float = None
     maz_maz_walk_file: str = None
     nodes_file: str = None
     links_file: str = None
@@ -36,6 +37,7 @@ class PreprocessorSettings:
     keep_link_types: dict = None
     count_intersections: bool = True
     icnt_col: str = None
+    exp_parking_costs_file: str = None
     
     def __post_init__(self):
         # Convert strings to Path objects
@@ -63,6 +65,11 @@ def load_data(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFram
     households = pd.read_csv(settings.data_dir / settings.households_file)
     persons = pd.read_csv(settings.data_dir / settings.persons_file)
     land_use = pd.read_csv(settings.data_dir / settings.land_use_file)
+    land_use = land_use.rename(
+        columns = {
+            'ENROLLGRADEKTO8': 'ENROLLGRADEKto8',
+            'ENROLLGRADE9TO12': 'ENROLLGRADE9to12'
+        })
     return households, persons, land_use
 
 
@@ -437,7 +444,9 @@ def get_intersection_count(
     pd.DataFrame
         Updated land_use with intersection counts
     
-    """   
+    """ 
+    print("Counting intersections for each MAZ...")  
+    
     # Load settings 
     nodes_file = settings.nodes_file
     links_file = settings.links_file
@@ -613,6 +622,7 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
     if settings.count_intersections:
         land_use['totint'] = np.where(has_acres, land_use['icnt_nearby'], 0)
     else:
+        print(f"Intersection counts provided. Using '{settings.icnt_col}' for 'totint'.")
         land_use['totint'] = land_use[settings.icnt_col]
     
     # Drop temporary nearby columns
@@ -651,7 +661,7 @@ def write_output(
     overwriting = settings.output_dir is None
     
     # Write households
-    households_path = output_dir / settings.households_file
+    households_path = output_dir / 'households.csv'
     if overwriting and dataframes_equal(households, original_households):
         print(f"No changes to households, skipping write")
     else:
@@ -659,7 +669,7 @@ def write_output(
         print(f"Saved households to {households_path}")
     
     # Write persons
-    persons_path = output_dir / settings.persons_file
+    persons_path = output_dir / 'persons.csv'
     if overwriting and dataframes_equal(persons, original_persons):
         print(f"No changes to persons, skipping write")
     else:
@@ -667,7 +677,7 @@ def write_output(
         print(f"Saved persons to {persons_path}")
     
     # Write land_use (include MAZ index as a column)
-    land_use_path = output_dir / settings.land_use_file
+    land_use_path = output_dir / 'land_use.csv'
     if overwriting and dataframes_equal(land_use, original_land_use):
         print(f"No changes to land_use, skipping write")
     else:
@@ -719,7 +729,75 @@ def preprocess_fare_skim(settings: PreprocessorSettings) -> None:
 
     input_fare_skim_file.close()
 
-
+def create_flat_fare_skim(settings: PreprocessorSettings, land_use: pd.DataFrame):
+    """
+    Create fares.omx for flat rate.
+    
+    Parameters
+    ----------
+    settings : PreprocessorSettings
+        Configuration settings for the preprocessor
+    
+    Returns
+    -------
+    omx with matrices fare__[time_of_day]
+    """
+    print("Preprocessing flat-fare skim matrix.")
+    if settings.flat_fare_rate is None:
+        print("No flat-fare rate provided, skipping flat-fare skim creation.")
+        return 
+    
+    # Get TAZ IDs from land_use
+    taz_ids = np.sort(land_use['TAZ'].unique())
+    n_zones = len(taz_ids)
+    
+    # Create falt fare matrix
+    fare_matrix = np.full((n_zones, n_zones), settings.flat_fare_rate, dtype=np.float32)
+    
+    output_fare_skim_file_name = settings.output_dir / "fares.omx"
+    with omx.open_file(output_fare_skim_file_name, 'w') as flat_fare_skim:
+        for time_period in settings.times_of_day:
+            tod_matrix_name = f"fare__{time_period}"
+            flat_fare_skim[tod_matrix_name] = fare_matrix
+            print(f"\tAdded matrix {tod_matrix_name} to fare skim TOD file")
+            
+        flat_fare_skim.create_mapping('taz', taz_ids)
+    print(f"Saved flat-fare skim TOD file to {output_fare_skim_file_name}")
+    
+def add_exp_costs(land_use: pd.DataFrame, settings: PreprocessorSettings, ) -> pd.DataFrame:
+    """
+    Adds expected parking costs exp_hourly, exp_daily, exp_monthly,
+    if file is provided.
+    
+    Parameters
+    ----------
+    settings : PreprocessorSettings
+        Configuration settings for the preprocessor
+    land_use:
+        Land use table with MAZ column
+        
+    Returns
+    -------
+    land_use:
+        Updated dataframe with [exp_hourly, exp_daily, exp_monthly]
+    """
+    
+    if settings.exp_parking_costs_file is None:
+        print("No expected parking costs file provided. Skipping adding exp costs.")
+        return land_use
+    
+    exp_costs = pd.read_csv(settings.exp_parking_costs_file).rename(columns = {'mgra': 'MAZ'}).set_index('MAZ')
+    cost_cols = [col for col in exp_costs.columns if 'exp' in col]
+    land_use = pd.merge(
+        land_use, 
+        exp_costs[cost_cols], 
+        left_index=True,
+        right_index=True, 
+        how='left',
+        validate='1:1')
+    print(f"Added columns to land_use: {cost_cols}")
+    return land_use
+    
 def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Main preprocessing function.
@@ -761,6 +839,9 @@ def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFra
     # Calculate land use densities
     land_use = get_density(land_use, settings)
     
+    # Add exp parking costs
+    land_use = add_exp_costs(land_use, settings)
+    
     # Write output files
     write_output(
         settings,
@@ -774,6 +855,8 @@ def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFra
 
     # Preprocess fare skim matrix into TOD format if needed
     preprocess_fare_skim(settings)
+    # Create flat-fare skim with TOD format if needed
+    create_flat_fare_skim(settings, land_use)
     
     return households, persons, land_use
 

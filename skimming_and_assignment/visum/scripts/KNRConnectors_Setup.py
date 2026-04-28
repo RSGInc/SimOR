@@ -9,13 +9,39 @@ import csv
 import os
 import VisumPy.helpers as h
 import pandas as pd
+import yaml
+
+
+# YAML file constants management
+# Get the folder where this script lives
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up directories to reach SimOR directory
+folder_a = script_dir
+while True:
+    if os.path.basename(folder_a) == "SimOR":
+        break
+    parent = os.path.dirname(folder_a)
+    if parent == folder_a:  # reached root directory
+        raise FileNotFoundError("Folder 'SimOR' not found in parent hierarchy.")
+    folder_a = parent
+
+# Read the path from the pointer file
+with open(os.path.join(folder_a, 'path_config.txt'), 'r') as f:
+    yaml_relative_path = f.read().strip()
+
+# Build the absolute path to the YAML file
+yaml_path = os.path.join(folder_a, yaml_relative_path)
+
+# Pull constants from the YAML file
+with open(yaml_path, 'r') as file:
+    config_data = yaml.safe_load(file)
+
+
 PRIO = 20480
-
-
 _TABLE = "KnRConstraints"
-SCALEFACTOR = 5280
+SCALEFACTOR = config_data['SCALEFACTOR']  # 5280
 
-CONSPEED = 30 #mph
 # FN = os.path.join(Visum.GetPath(2), "taz_connectors.json")
 FN = os.path.join(Visum.GetPath(2), "connectors_knr.net")
 
@@ -79,15 +105,6 @@ def create_knr_connectors():
                     break 
         
         result[taz] = list(connector_nodes)
-        
-        # THIS IS HOW CONNECTORS ARE ADDED USING COM - BUT THIS IS TOO SLOW: SO USE NET FILE BATCHING INSTEAD.
-        # for node in connector_nodes:
-        #     if Visum.Net.Connectors.ExistsByKey(node, taz):
-        #         Visum.Log(PRIO, "{} -> {} | already exists!".format(taz, node))
-        #         Visum.Net.Connectors.SourceItemByKey(taz, node).SetAttValue("TypeNo", 7)
-        #     else:
-        #         connector = Visum.Net.AddConnector(taz, node)
-        #         connector.SetAttValue("TypeNo", 10)
 
         # GENERATE NET FILE BATCH TABLE FOR CONNECTORS. 
         # need to preserve original connectors esp: walk to destination(?)
@@ -128,18 +145,6 @@ def create_knr_connectors():
     df_unique = df_filtered.groupby('zoneno').agg(length_max=('length', 'max')).reset_index()
     df = pd.merge(df, df_unique, on='zoneno', how='left')
     h.SetMulti(Visum.Net.Connectors,r"LENGTH"    ,df['length_max'])
-    
-    ## Set Length for new connectors for direction not already set (using Visum calculated length)
-    #length   = h.GetMulti(Visum.Net.Connectors,r"LENGTH"    , activeOnly = True)
-    #zoneno   = h.GetMulti(Visum.Net.Connectors,r"ZONENO"    , activeOnly = True)
-    #nodeno   = h.GetMulti(Visum.Net.Connectors,r"NODENO"    , activeOnly = True)
-    #att_list = [length,zoneno,nodeno]
-    #df = pd.DataFrame(np.column_stack(att_list), columns = ['length','zoneno','nodeno'])
-    #df[['zoneno','nodeno']] = df[['zoneno','nodeno']].astype(str)
-    #df['concat'] = df['zoneno'] + df['nodeno']
-    #df_unique = df.groupby('concat').agg(length_max=('length', 'max')).reset_index()
-    #df = pd.merge(df, df_unique, on='concat', how='left')
-    #h.SetMulti(Visum.Net.Connectors,r"LENGTH"    ,df['length_max'])
 
 
 
@@ -160,52 +165,42 @@ def set_connector_properties(knrdirection):
     # Pull attributes
     connector_type_dir = Visum.Net.Connectors.GetMultipleAttributes(["TypeNo", "Direction", "Length", "TSYS_HOLDING"])
     connector_tsys = []
-    connector_time = []     
+    #connector_time = []     
     # we assume here that KNR is not open on any connector to start
     for typeno, direction, distance, tsys_hold in connector_type_dir:
         if knrdirection == "KTW":    
             if direction == 1: # Origin, leaving a zone
                 if typeno in [7, 10]:
                     connector_tsys.append("i")
-                    connector_time.append([3600*distance/CONSPEED, 999999])
                 else:
                     connector_tsys.append("")
-                    connector_time.append([999999, 999999])
             
             elif direction == 2: # Destination, entering a zone
                 if typeno == 10:
                     # a knr drive only connector- so no walk on this.
                     connector_tsys.append("")
-                    connector_time.append([999999, 999999])
                 else:
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
                     connector_tsys.append(tsys_hold)
-                    connector_time.append([999999, 3600*distance/2.5])
         elif knrdirection == "WTK":    
             if direction == 2: # Destination, entering a zone
                 if typeno in [7, 10]:
                     connector_tsys.append("i")
-                    connector_time.append([3600*distance/CONSPEED, 999999])
                 else:
                     connector_tsys.append("")
-                    connector_time.append([999999, 999999])
             elif direction == 1: # Origin, leaving a zone
                 if typeno == 10:
                     # a knr drive only connector- so no walk on this.
                     connector_tsys.append("")
-                    connector_time.append([999999, 999999])
                 else:
                     # could be a walk destination connector, 
                     # we assume here that KNR is not open on any connector to start so keep Tsys the way it was (else: could also set to 'w')
                     connector_tsys.append(tsys_hold)
-                    connector_time.append([999999, 3600*distance/2.5])
         elif knrdirection == "WTW":
             connector_tsys.append(tsys_hold)
-            connector_time.append([999999, 3600*distance/2.5])
     
     h.SetMulti(Visum.Net.Connectors, "TSysSet", connector_tsys)
-    Visum.Net.Connectors.SetMultipleAttributes(["T0_TSYS(I)", "T0_TSYS(W)"], connector_time)
 
 
 

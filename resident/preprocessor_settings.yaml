@@ -10,14 +10,23 @@ maz_shp_file: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\me
 maz_stop_walk_file: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\maz_stop_walk.csv
 maz_maz_walk_file:  C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\maz_maz_walk.csv
 
-# non-TOD segmented skim file processed into skims.omx segmented by TOD with matrices fare__[time_of_day]
-fare_skim_input_file: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\raw\2024MetroTransitCashFares.omx
+# Variable-fare transit skims
+# Non-TOD segmented transit fare skim file processed into fares.omx segmented by TOD with matrices fare__[time_of_day]
+fare_skim_input_file: 
 times_of_day: ["EA", "AM", "MD", "PM", "EV"]
+
+# Flat-fare transit skims
+# Add value to create flat-rate fares.omx, leave empty if skim does not need to be created
+flat_fare_rate: 1.60
 
 # Land use settings
 nodes_file: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\raw\Network_node.shp
 links_file: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\raw\Network_link.shp
 density_radius: 0.50 # walk radius (miles) for density calculations
+
+# If expected parking costs were calculated, add expected parking costs
+# Leave empty if exp costs do not need to be added
+exp_parking_costs_file: C:\Documents\expected_parking_data.csv
 
 # Intersection counts
 count_intersections: True 
@@ -27,23 +36,48 @@ count_intersections: True
 # Network filter for intersection counts
 # Specify col name and values to filter on
 link_filter_col: TYPENO
+
+# SKATS
 keep_link_types: [  
-  0,  # uknown
-  # 1,  # transit
-  # 2,  # walk to transit (asserted length)
-  # 3,  # walk to transit (actual length)
-  # 4,  # WES PnR connection
-  # 10, # freeway
-  # 19, # freeway hov
-  # 20, # highway 
-  30, # arterial
-  40, # intersection expansion link
-  51, # intersection approach
-  61, # CBD grid
-  # 70, # offramp
-  # 71, # metered ramp
-  # 79, # onramp
-  # 80, # bike facility
-  # 81, # bike facility
-  # 82  # bike facility
+  1,  # 1
+  # 11, # ramps 
+  # 12, # ramps dr
+  # 20, # princ intersate
+  # 21, # princ state highway
+  22, # princ parkway
+  31, # major art parkway
+  32, # major art
+  33, # rural arterial
+  41, # minor arterial
+  51, # collector urban
+  52, # collector rural major
+  53, # collector rural minor
+  61, # local urban
+  62, # local rural
+  68, # urban street low speed
+  69, # rural street low speed
+  # 71, # driveway
+  # 99  # no car 
 ]
+
+# Metro
+# keep_link_types: [  
+#   0,  # uknown
+#   # 1,  # transit
+#   # 2,  # walk to transit (asserted length)
+#   # 3,  # walk to transit (actual length)
+#   # 4,  # WES PnR connection
+#   # 10, # freeway
+#   # 19, # freeway hov
+#   # 20, # highway 
+#   30, # arterial
+#   40, # intersection expansion link
+#   51, # intersection approach
+#   61, # CBD grid
+#   # 70, # offramp
+#   # 71, # metered ramp
+#   # 79, # onramp
+#   # 80, # bike facility
+#   # 81, # bike facility
+#   # 82  # bike facility
+# ]
