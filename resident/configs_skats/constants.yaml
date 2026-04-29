@@ -1,0 +1,4 @@
+inherit_settings: True
+KNR_available: False
+
+model_region_name: "SKATS"

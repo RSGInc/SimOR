@@ -352,4 +352,6 @@ OpVTCe: 0.0984
 OpVTCl: 0.1442
 OpVTCr: 0.1442
 
-KNR_available: True
+# model region constants
+KNR_available: True  # SKATS does not have KNR, so set to False in configs_skats/constants.yaml
+model_region_name: "Metro"
