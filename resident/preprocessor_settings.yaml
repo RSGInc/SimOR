@@ -29,9 +29,9 @@ density_radius: 0.50 # walk radius (miles) for density calculations
 exp_parking_costs_file: C:\Documents\expected_parking_data.csv
 
 # Intersection counts
-count_intersections: True 
+count_intersections: False 
 # If count_intersections is False, provide col name with intersection counts
-# icnt_col: INTHMI
+icnt_col: INTHMI
 
 # Network filter for intersection counts
 # Specify col name and values to filter on
