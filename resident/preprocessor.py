@@ -76,13 +76,12 @@ def load_data(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFram
 def set_land_use_maz_index(land_use: pd.DataFrame) -> pd.DataFrame:
     """Infer the MAZ column, rename it to 'MAZ', and set it as the index.
     
-    Searches for common MAZ column name variations (MAZ, MAZ_ID, MAZ_NO)
-    and standardizes to 'MAZ' as the DataFrame index.
+    Searches for MAZ column name in land_use and sets 'MAZ' as the DataFrame index.
     
     Parameters
     ----------
     land_use : pd.DataFrame
-        Land use table with an MAZ-like column
+        Land use table with an 'MAZ' column or MAZ-like index
         
     Returns
     -------
@@ -95,23 +94,17 @@ def set_land_use_maz_index(land_use: pd.DataFrame) -> pd.DataFrame:
         print("land_use index already set to MAZ")
         return land_use
     
-    # Search for a MAZ-like column
-    maz_col = None
-    for col in land_use.columns:
-        if col.upper() in ['MAZ', 'MAZ_ID', 'MAZ_NO']:
-            maz_col = col
-            break
+    # IF MAZ is not already the index, ensure MAZ is a column
+    maz_cols = [col for col in land_use.columns if 'MAZ' in col.upper()]
     
-    if maz_col is None:
+    if 'MAZ' not in land_use.columns:
         raise RuntimeError(
-            f"Could not identify MAZ column in land_use. "
-            f"Available columns: {list(land_use.columns)}"
+            f"'MAZ' column not in land_use. Must add 'MAZ' column.\n"
+            + (f"Available MAZ columns are: {maz_cols}. Change MAZ column name to 'MAZ'." if maz_cols else "")
         )
-    
-    # Rename to 'MAZ' if needed, then set as index
-    if maz_col != 'MAZ':
-        land_use = land_use.rename(columns={maz_col: 'MAZ'})
-        print(f"Renamed land_use column '{maz_col}' to 'MAZ'")
+        
+    if 'MAZ' in land_use.columns and len(maz_cols) > 1:
+        print(f"Warning: Multiple MAZ columns identified in land use csv: {maz_cols}. Defaulting to 'MAZ'.")
     
     land_use = land_use.set_index('MAZ')
     print(f"Set land_use index to 'MAZ' ({len(land_use)} zones)")
@@ -276,9 +269,9 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
     pd.DataFrame
         Updated land_use with ACRES field
     """
+    # Drop exisiting ACRES col
     if "ACRES" in land_use.columns:
-        print("ACRES already exists in land_use")
-        return land_use
+        land_use = land_use.drop(columns=["ACRES"], axis=1)
     
     if maz_shp_file is None:
         print("Warning: ACRES field not found and no maz_shp_file provided, skipping")
@@ -287,21 +280,17 @@ def add_acres(land_use: pd.DataFrame, maz_shp_file: str = None) -> pd.DataFrame:
     print(f"Reading shapefile: {maz_shp_file}")
     gdf = gpd.read_file(maz_shp_file)
     
-    # Identify the MAZ ID column in the shapefile
-    # Common variations: MAZ, MAZ_ID, maz, ID, etc.
-    maz_col = None
-    for col in gdf.columns:
-        if col.upper() in ['MAZ', 'MAZ_ID', 'ID', 'MAZ_NO']:
-            maz_col = col
-            break
+    # Ensure MAZ column is in shapefile
+    maz_cols = [col for col in gdf.columns if 'MAZ' in col.upper()]
     
-    if maz_col is None:
-        print(f"Warning: Could not identify MAZ ID column in shapefile")
-        print(f"Available columns: {list(gdf.columns)}")
-        return land_use
+    if 'MAZ' not in gdf.columns:
+        raise RuntimeError(
+            f"'MAZ' column not in land use shapefile. Must add 'MAZ' column.\n"
+            + (f"Available MAZ columns are: {maz_cols}. Change MAZ column name to 'MAZ'." if maz_cols else "")
+        )
     
-    gdf = gdf.rename(columns={maz_col: 'MAZ'})
-    print(f"Using '{maz_col}' as MAZ identifier")
+    if 'MAZ' in gdf.columns and len(maz_cols) > 1:
+        print(f"Warning: Multiple MAZ columns identified in land use shapefile: {maz_cols}. Defaulting to 'MAZ'.")
     
     # Calculate area in acres
     # Convert to appropriate CRS if needed (shapefile should be in projected coordinates)
@@ -454,6 +443,17 @@ def get_intersection_count(
     print(f"Reading maz_shp_file: {maz_shp_file}")
     maz = gpd.read_file(settings.maz_shp_file)
     
+    # Ensure MAZ is a column in land use shapefile
+    maz_cols = [col for col in maz.columns if 'MAZ' in col.upper()]
+    if 'MAZ' not in maz.columns:
+        raise RuntimeError(
+            f"'MAZ' column not in land use shapefile. Must add 'MAZ' column.\n"
+            + (f"Available MAZ columns are: {maz_cols}. Change MAZ column name to 'MAZ'." if maz_cols else "")
+        )
+        
+    if 'MAZ' in maz.columns and len(maz_cols) > 1:
+        print(f"Warning: Multiple MAZ columns identified in land use shapefile: {maz_cols}. Defaulting to 'MAZ'.")
+    
     links[filter_col] = pd.to_numeric(links[filter_col], errors='coerce')
     
     # Check crs
@@ -495,18 +495,11 @@ def get_intersection_count(
     intersections = pd.merge(intersections_temp, nodes[['NO', 'XCOORD', 'YCOORD']], left_on='N', right_on='NO', how='left')
     intersections = intersections[['N', 'XCOORD', 'YCOORD']]
     intersections = intersections.rename(columns = {'XCOORD':'X', 'YCOORD':'Y'})
-
-    # Find MAZ col in maz_shp
-    maz_col = None
-    for col in maz.columns:
-        if col.upper() in ['MAZ', 'MAZ_NO', 'MAZ_ID', 'ID']:
-            maz_col = col
-            break
     
     # Find maz centroids
     maz['XCOORD'] = maz.geometry.centroid.x
     maz['YCOORD'] = maz.geometry.centroid.y
-    maz_nodes = maz[[maz_col] + ['XCOORD', 'YCOORD']]
+    maz_nodes = maz[['MAZ', 'XCOORD', 'YCOORD']]
     maz_nodes.columns = ['MAZ', 'X', 'Y']
 
     # Find nearest maz for each intersection
@@ -549,10 +542,12 @@ def get_density(land_use: pd.DataFrame, settings: PreprocessorSettings,) -> pd.D
     print(f"Reading MAZ walk file: {settings.maz_maz_walk_file}")
     maz_maz_walk = pd.read_csv(settings.maz_maz_walk_file)
     
+    # Drop existing density columns, accounting for case
     new_cols = ['empden', 'retempden', 'duden', 'popden', 'popempdenpermi', 'totint']
+    lower_cols = {col.lower(): col for col in land_use.columns}
     for col in new_cols:
-        if col in land_use.columns:
-            land_use = land_use.drop(col, axis=1)
+        if col in lower_cols:
+            land_use = land_use.drop(lower_cols[col], axis=1)
     
     # Count intersections per MAZ
     if settings.count_intersections:

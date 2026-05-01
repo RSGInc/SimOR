@@ -24,7 +24,7 @@ person type,ptype,"pd.Series(PTYPE_NONWORK, index=persons.index)"
 ,ptype,"np.where(persons.age >= 65, PTYPE_RETIRED, ptype)"
 ,ptype,"np.where(pemploy == 2, PTYPE_PART, ptype)"
 ,ptype,"np.where(pemploy == 1,  PTYPE_FULL, ptype)"
-,ptype,"np.where((persons.age >= 5) & ((persons.age < 18) | ((persons.age == 18) & (pstudent == 1)))), PTYPE_SCHOOL, ptype)"
+,ptype,"np.where((persons.age >= 5) & ((persons.age < 18) | ((persons.age == 18) & (pstudent == 1))), PTYPE_SCHOOL, ptype)"
 ,ptype,"np.where(persons.age < 5, PTYPE_PRESCHOOL, ptype)"
 ,ptype,"np.where(pstudent == 2, PTYPE_UNIVERSITY, ptype)"
 # FIXME are these rules for preschoolers still wanted?,,
