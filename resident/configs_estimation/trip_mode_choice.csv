@@ -87,7 +87,7 @@ util_is_PNR_transit,Only allowed to take PNR transit on PNR tours,tourPNR,-999,-
 # util_PNR_LOC - Female,PNR_LOC - Female,@(df.female),,,,,,,coef_female_tran,,,,,,,,
 # util_PNR_LOC - Destination Employment Density,PNR_LOC - Destination Employment Density,dMGRAEmpDen,,,,,,,coef_dEmpDen_dTran,,,,,,,,
 #,,,,,,,,,,,,,,,,,
-util_KNR_LOC_Unavailable,KNR_LOC - Unavailable,(knr_local_available == False)|(KNR_available==0),,,,,,,,-999,,,,,,,
+util_KNR_LOC_Unavailable,KNR_LOC - Unavailable,@(df.knr_local_available == False)|(KNR_available==0),,,,,,,,-999,,,,,,,
 util_KNR_LOC_In_vehicle_time_out,KNR_LOC - In-vehicle time,@(odt_skims['KTW_TIV']) * df.time_factor  * df.outbound,,,,,,,,coef_ivt,,,,,,,
 util_KNR_LOC_iwait_time,KNR_LOC - First iwait time,@(odt_skims['KTW_FWT']) * df.time_factor  * df.outbound,,,,,,,,coef_wait,,,,,,,
 util_KNR_LOC_transfer_wait_time,KNR_LOC - transfer wait time,@(odt_skims['KTW_XWT']) * df.time_factor  * df.outbound,,,,,,,,coef_xwait,,,,,,,
