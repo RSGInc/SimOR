@@ -122,11 +122,15 @@ class DataLoader():
         
     def _get_maz_centroids(self):
         """
-        Find centroids of MAZ polygons
+        Find centroids of MAZ polygons and assing node IDs
         """
-        centroids = self.mazs[["MAZ", "geometry"]].copy()
+        centroids = self.mazs[["MAZ", "geometry"]].copy().sort_values("MAZ")
         centroids["centroid_geom"] = centroids["geometry"].centroid
         centroids = centroids[["MAZ", "centroid_geom"]].rename(columns={"centroid_geom":"geometry"}) 
+        
+        # Renumber
+        start_no = self.nodes["NODE_NO"].max() + 1
+        centroids["NO"] = np.arange(start_no, start_no + len(centroids))
         return centroids
 
 def create_centroid_connectors(inputs):
@@ -166,15 +170,10 @@ def create_centroid_connectors(inputs):
     )
 
     # Rename columns
-    connectors = centroids_to_nearest_node[["MAZ", "NODE_NO", "connector"]].rename(
-        columns={"connector": "geometry"}
+    connectors = centroids_to_nearest_node[["MAZ", "NO", "NODE_NO", "connector"]].rename(
+        columns={"connector": "geometry", "NO": "MAZ_NO"}
     )
     connectors = gpd.GeoDataFrame(connectors, geometry="geometry", crs=walk_network_nodes.crs)
-
-    # Create new node id"s for MAZ centroids
-    no_range = np.arange(nodes["NODE_NO"].max() + 1, nodes["NODE_NO"].max() + 1 + len(maz_centroids))
-    connectors = connectors.sort_values(by = "MAZ")
-    connectors["MAZ_NO"] = no_range
     
     return connectors, walk_network_nodes, walk_network_links
 
@@ -192,11 +191,6 @@ def prepare_nodes(inputs, walk_network_nodes):
 
     # Add MAZ column
     walk_network_nodes["MAZ"] = 0
-    
-    # Add node numbering consistent with links/connectors
-    no_range = np.arange(walk_network_nodes["NO"].max() + 1, walk_network_nodes["NO"].max() + 1 + len(maz_centroids))
-    maz_centroids = maz_centroids.sort_values(by = "MAZ")
-    maz_centroids["NO"] = no_range
 
     # Join walk nodes with MAZ centroids
     nodes_merged = pd.concat([walk_network_nodes[[ "geometry", "NO", "MAZ"]], maz_centroids[["geometry", "NO", "MAZ"]]], ignore_index=True)
