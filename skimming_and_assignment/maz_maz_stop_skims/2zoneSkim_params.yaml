@@ -11,13 +11,18 @@ preprocessing:
     maz_file: "MAZ_poi_surface.shp"
     stops: "StopPointsTbl.csv"
     routes: "LineRoutesTbl.csv"
-    walk_modes: ["PED"] # TSYSSET modes to filter walk links
+    walk_modes: ["wlk"] # TSYSSET modes to filter walk links
     # Network directionality
-    # True: if walk network should have one link for each direction
+    # True: if walk network should bi-directional
     # False: if walk network should have one link per direction
     # Recommend setting to True if network links are not perfectly coded
-    # with both directions explicitly coded to allow walk
-    two_way_network: True 
+    # with both directions coded to allow walk
+    two_way_network: False 
+    # Optional transit crs. Use for LCOG. Leave blank otherwise.
+    # When set, stops are snapped to the nearest node in nodes_file to align
+    # them with the pedestrian network if the original stop coordinates came
+    # from a different network.
+    transit_stops_crs: 32027
 
 # ==================
 # Skimming settings
