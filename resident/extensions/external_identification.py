@@ -39,6 +39,7 @@ class ExternalIdentificationSettings(LogitComponentSettings, extra="forbid"):
     preprocessor: PreprocessorSettings | None = None
 
     EXTERNAL_WORKER_ALT: int | None = 0
+    EXTERNAL_TOUR_ALT: int | None = 0
 
 
 def determine_closest_external_station(
@@ -279,12 +280,10 @@ def set_external_tour_variables(state, tours, choices, model_settings, trace_lab
 
     if external_col_name is not None:
         tours[external_col_name] = (
-            (choices == 0).reindex(tours.index).fillna(False).astype(bool)
+            (choices == model_settings.EXTERNAL_TOUR_ALT).reindex(tours.index).fillna(False).astype(bool)
         )
     if internal_col_name is not None:
-        tours[internal_col_name] = (
-            (choices == 1).reindex(tours.index).fillna(True).astype(bool)
-        )
+        tours[internal_col_name] = ~tours[external_col_name]
 
     # - annotate tours table
     if "annotate_tours" in model_settings:
