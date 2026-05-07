@@ -21,7 +21,7 @@ util_availability,Availability of transit pass,transit_subsidy_available==False,
 util_ft_ASC,ptype_ft calibration constant,@df.ptype == 1,0,coef_ft_asc
 util_pt_ASC,ptype_pt calibration constant,@df.ptype == 2,0,coef_pt_asc
 util_un_ASC,ptype_un calibration constant,@df.ptype == 3,0,coef_un_asc
-util_transit_ivt_home_to_work_walk_peak,Walk-transit home to work peak availability,@df.transit_ivt_home_to_work_walk_peak,0,coef_transit_ivt_home_to_work_walk_peak
-util_transit_ivt_home_to_work_drive_peak,Drive-transit home to work peak availability,@df.transit_ivt_home_to_work_drive_peak,0,coef_transit_ivt_home_to_work_drive_peak
-util_transit_ivt_home_to_school_walk_peak,Walk-transit home to school peak availability,@df.transit_ivt_home_to_school_walk_peak,0,coef_transit_ivt_home_to_school_walk_peak
-util_transit_ivt_home_to_school_drive_peak,Drive-transit home to school peak availability,@df.transit_ivt_home_to_school_drive_peak,0,coef_transit_ivt_home_to_school_drive_peak
+util_transit_ivt_home_to_work_walk_peak,Walk-transit home to work peak availability,@df.transit_ivt_home_to_work_walk_peak.fillna(0),0,coef_transit_ivt_home_to_work_walk_peak
+util_transit_ivt_home_to_work_drive_peak,Drive-transit home to work peak availability,@df.transit_ivt_home_to_work_drive_peak.fillna(0),0,coef_transit_ivt_home_to_work_drive_peak
+util_transit_ivt_home_to_school_walk_peak,Walk-transit home to school peak availability,@df.transit_ivt_home_to_school_walk_peak.fillna(0),0,coef_transit_ivt_home_to_school_walk_peak
+util_transit_ivt_home_to_school_drive_peak,Drive-transit home to school peak availability,@df.transit_ivt_home_to_school_drive_peak.fillna(0),0,coef_transit_ivt_home_to_school_drive_peak
