@@ -216,50 +216,57 @@ def check_ids(
 
 def add_tothhs(land_use: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame:
     """Add TOTHHS (total households per zone) to land_use if not present.
+    Ensures TOTHHS values match the count of households in each MAZ, 
+    and that the MAZ zones align between the two tables.
     
     Expects land_use to be indexed by MAZ.
     """
+    tothhs = (
+        households.groupby("MAZ")
+        .size()
+        .reindex(land_use.index)
+        .fillna(0)
+        .astype(int)
+    )
+
     if "TOTHHS" not in land_use.columns:
-        tothhs = (
-            households.groupby("MAZ")
-            .size()
-            .reindex(land_use.index)
-            .fillna(0)
-            .astype(int)
-        )
         land_use["TOTHHS"] = tothhs
         print("Added TOTHHS to land_use")
     else:
-        print("TOTHHS already exists in land_use")
+        assert land_use["TOTHHS"].equals(tothhs), "Existing TOTHHS column does not match calculated values"
+
     return land_use
 
 
 def add_totpop(land_use: pd.DataFrame, persons: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame:
     """Add TOTPOP (total population per zone) to land_use if not present.
+    Ensures TOTPOP values match the count of persons in each MAZ,
+    and that the MAZ zones align between the two tables.
     
     Expects land_use to be indexed by MAZ.
     """
-    if "TOTPOP" not in land_use.columns:
-        # Join persons to households to get MAZ
-        if "MAZ" not in persons.columns:
-            persons_with_zone = persons.merge(
-                households[["household_id", "MAZ"]],
-                on="household_id",
-                how="left"
-            )
-        else:
-            persons_with_zone = persons
-        totpop = (
-            persons_with_zone.groupby("MAZ")
-            .size()
-            .reindex(land_use.index)
-            .fillna(0)
-            .astype(int)
+    # Join persons to households to get MAZ
+    if "MAZ" not in persons.columns:
+        persons_with_zone = persons.merge(
+            households[["household_id", "MAZ"]],
+            on="household_id",
+            how="left"
         )
+    else:
+        persons_with_zone = persons
+    totpop = (
+        persons_with_zone.groupby("MAZ")
+        .size()
+        .reindex(land_use.index)
+        .fillna(0)
+        .astype(int)
+    )
+
+    if "TOTPOP" not in land_use.columns:
         land_use["TOTPOP"] = totpop
         print("Added TOTPOP to land_use")
     else:
-        print("TOTPOP already exists in land_use")
+        assert land_use["TOTPOP"].equals(totpop), "Existing TOTPOP column does not match calculated values"
     return land_use
 
 
