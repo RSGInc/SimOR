@@ -1,0 +1,98 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Full Example",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/metro/data_full",
+                "-o", "outputs/full",
+            ]
+        },
+        {
+            "name": "Run Cropped Example",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/metro/data_cropped",
+                "-o", "outputs/cropped",
+            ]
+        },
+        {
+            "name": "Run Visum_Runner.py",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/skimming_and_assignment/visum",
+            "program": "Visum_Runner.py",
+            "console": "integratedTerminal",
+            "args": ["skims"]
+        },
+        {
+            "name": "Run Preprocessor",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "preprocessor.py",
+            "console": "integratedTerminal",
+            "args": "preprocessor_settings.yaml"
+        },
+        {
+            "name": "Run MAZ Skim Preprocessor",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/skimming_and_assignment/maz_maz_stop_skims",
+            "program": "2zoneSkim_preprocessor.py",
+            "console": "integratedTerminal",
+            "args": "2zoneSkim_params.yaml"
+        },
+        {
+            "name": "Run MAZ Skims",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/skimming_and_assignment/maz_maz_stop_skims",
+            "program": "2zoneSkim.py",
+            "console": "integratedTerminal",
+            "args": "2zoneSkim_params.yaml"
+        },
+        {
+            "name": "Run SKATS",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs_skats",
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/skats/data_full",
+                "-o", "outputs/skats",
+            ]
+        },
+        {
+            "name": "Run SKATS Cropped",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs_skats",
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/skats/data_cropped",
+                "-o", "outputs/skats_cropped",
+            ]
+        },
+    ]
+}

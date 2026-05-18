@@ -1,0 +1,17 @@
+<?xml  version = "1.0"  encoding = "UTF-8"?>
+<FILTER  VERSIONNO = "1100">
+  <LINK
+    USEFILTER = "1"
+    COMPLEMENT = "0"
+    UNDIRECTED = "0">
+    <CONDITIONS>
+      <CONDITION
+        OPERATION = "OP_NONE"
+        COMPLEMENT = "0"
+        ATTRIBUTE = "TRUCK_PATH"
+        FROMRANGE = "2.0000"
+        TORANGE = "2.0000"
+      />      
+    </CONDITIONS>
+  </LINK>
+</FILTER>

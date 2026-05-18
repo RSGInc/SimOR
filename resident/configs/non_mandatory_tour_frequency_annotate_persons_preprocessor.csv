@@ -1,0 +1,24 @@
+Description,Target,Expression
+#,,
+,low_income,persons.income<=30000
+,medium_low_income,(persons.income > 30000) & (persons.income <= 60000)
+,medium_income,(persons.income > 60000) & (persons.income <= 100000)
+,medium_high_income,(persons.income > 100000) & (persons.income <= 150000)
+,high_income,(persons.income > 150000)
+,total_hours_available_7am_to_10pm,"person_available_periods(persons, start_bin=8, end_bin=37, continuous=False) / 2"
+,consecutive_hours_available_7am_to_10pm,"person_available_periods(persons, start_bin=8, end_bin=37, continuous=True) / 2"
+,log_total_hours_available_7am_to_10pm,"np.log1p(total_hours_available_7am_to_10pm)"
+#,,
+# joint tour counts per persons,,
+join joint tour participants with tour purpose,_JOINT_TOURS_PERSONS,"pd.merge(joint_tour_participants[['person_id', 'tour_id']], tours.reset_index()[['tour_id', 'tour_type']], on='tour_id', how='left')"
+,num_person_joint_tours,"reindex_i(_JOINT_TOURS_PERSONS.groupby(['person_id']).size(), persons.index)"
+,_TOUR_COUNT,"lambda query, tours, persons: tours.query(query).groupby('person_id').size().reindex(persons.index).fillna(0).astype(np.int8)"
+# non_mandatory tour frequency extension,,
+,_INDIV_TOURS,tours[tours.tour_category!='joint']
+,num_mandatory_tours,"_TOUR_COUNT('(tour_category == \'mandatory\')', tours, persons)"
+,num_school_escort_tours,"_TOUR_COUNT('(tour_category == \'non_mandatory\') & (tour_type == \'escort\')', tours, persons)"
+,has_mandatory_tour,(num_mandatory_tours > 0) * 1
+,has_joint_tour,(num_person_joint_tours > 0) * 1
+,has_school_escort_tour,(num_school_escort_tours > 0) * 1
+,has_previous_tour,((has_mandatory_tour + has_joint_tour + has_school_escort_tour) > 0) * 1
+,retiredHh,"np.where(df.num_retired_adults == df.hhsize, 1, 0)"

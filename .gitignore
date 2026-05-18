@@ -1,0 +1,20 @@
+*__pycache__*
+.vscode/*
+resident/model_data/metro/data_full/*
+resident/model_data/skats/data_full/*
+resident/outputs/*
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+Metro_outputs/
+
+skimming_and_assignment/visum/*.ver
+
+# External dependencies managed by setup_environment.bat
+ext_dependencies/*/

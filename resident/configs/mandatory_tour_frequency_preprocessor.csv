@@ -1,0 +1,4 @@
+Description,Target,Expression
+HHT from households,_HHT,"reindex(households.HHT, persons.household_id)"
+non_family,non_family,_HHT.isin(HHT_NONFAMILY)
+family,family,_HHT.isin(HHT_FAMILY)

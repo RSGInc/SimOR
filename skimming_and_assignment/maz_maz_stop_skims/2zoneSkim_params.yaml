@@ -1,0 +1,80 @@
+# MAZ non-motorized skims settings
+
+# =====================
+# Preprocessor settings
+preprocessing:
+    # Visum automatically exports nodes, links, maz, stop, and routes to Visum_Outputs 
+    input_dir: Visum_Outputs
+    output_dir: input
+    links_file: "Network_link.shp"
+    nodes_file: "Network_node.shp"
+    maz_file: "MAZ_poi_surface.shp"
+    stops: "StopPointsTbl.csv"
+    routes: "LineRoutesTbl.csv"
+    walk_modes: ["wlk"] # TSYSSET modes to filter walk links
+    # Network directionality
+    # True: if walk network should bi-directional
+    # False: if walk network should have one link per direction
+    # Recommend setting to True if network links are not perfectly coded
+    # with both directions coded to allow walk
+    two_way_network: False 
+    # Optional transit crs. Use for LCOG. Leave blank otherwise.
+    # When set, stops are snapped to the nearest node in nodes_file to align
+    # them with the pedestrian network if the original stop coordinates came
+    # from a different network.
+    transit_stops_crs: 32027
+
+# ==================
+# Skimming settings
+settings:
+    # Set maz walk and stop skims to True to run both
+    run_maz_maz_walk: True
+    run_maz_maz_bike: False
+    run_maz_stop_walk: True
+    maz_maz_walk_output: "maz_maz_walk.csv"
+    maz_maz_bike_output: "maz_maz_bike.csv"
+    maz_stop_walk_output: "maz_stop_walk.csv"
+    input_dir: input    # output_dir of preprocessor
+    output_dir: output
+
+# Stop attributes CSV, expectd in input_dir
+# One stop (row) per transit route
+stop_attributes:
+    file: "stops.csv"
+    id_field: "NO"
+    x_field: "Latitude"     # epsg:4326
+    y_field: "Longitude"    # epsg:4326
+    rid_field: "Route_ID"
+
+# Route attributes CSV, expected in input_dir
+route_attributes:
+    file: "routes.csv"
+    rid_field: "Route_ID"
+    mode: "Mode"
+
+# Modes
+modes:
+    prm_modes: ['a', 'l', 'r']  # premium
+    local_modes: ['b', 'e']
+
+# Network and nodes shp, expected in input_dir
+# Network must include connector links
+# Nodes must include connector centroids (MAZ centroids) as nodes
+# Node id must be consistent across network and node files
+mmms: 
+    shapefile_name: "walk_links.shp"
+    shapefile_node_name: "walk_nodes.shp"
+    # two_way_network: True if links are bidirectional, False if one link per direction
+    # Must be consistent with preprocessing two_way_network config (ln 20)
+    two_way_network: True   
+    mmms_link_ref_id: "FROMNODENO" 
+    mmms_link_nref_id: "TONODENO"
+    mmms_link_id: "NO"  # not used
+    mmms_link_len: "length"    # feet
+    mmms_node_maz_id: "MAZ"
+    max_maz_maz_walk_dist_feet: 15840   # int
+    max_maz_maz_bike_dist_feet: 26400   # int
+    max_maz_local_bus_stop_walk_dist_feet: 3960     # int
+    max_maz_premium_transit_stop_walk_dist_feet: 6600   # int
+    walk_speed_mph: 3.0    # float
+    drive_speed_mph: 25.0   # float

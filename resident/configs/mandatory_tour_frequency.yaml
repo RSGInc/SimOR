@@ -1,0 +1,15 @@
+
+SPEC: mandatory_tour_frequency.csv
+COEFFICIENTS: mandatory_tour_frequency_coeffs.csv
+
+preprocessor:
+  SPEC: mandatory_tour_frequency_preprocessor
+  DF: persons
+  TABLES:
+    - households
+
+annotate_persons:
+  SPEC: annotate_persons_mtf
+  DF: persons
+  TABLES:
+    - tours
