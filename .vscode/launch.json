@@ -94,5 +94,19 @@
                 "-o", "outputs/skats",
             ]
         },
+        {
+            "name": "Run SKATS Cropped",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs_skats",
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/skats/data_cropped",
+                "-o", "outputs/skats_cropped",
+            ]
+        },
     ]
 }

@@ -17,6 +17,12 @@ SET "MODEL_DIR=%BASE_DIR%\resident"
 SET "VISUM_VERSION_FILE=Metro_Model_v1_AllStreetsNetwork_MasterTransit_Visum26.ver"
 SET "PROCEDURE_SEQ=%SKIM_DIR%\visum\config\visum_metro\SkimSequence_Metro.xml"
 
+:: If separate pedestrian network provided, specify here. Leave empty otherwise.
+@REM SET "VISUM_PED_VERSION_FILE=OSM_LCOG_DKS_v7.ver"
+@REM SET "PED_PROCEDURE_SEQ=%SKIM_DIR%\visum\config\visum_lcog\SkimSequence_AllStreets_Export.xml"
+SET "VISUM_PED_VERSION_FILE="
+SET "PED_PROCEDURE_SEQ="
+
 :: ---------------------------------------------------------------------------
 :: Run environment setup (installs dependencies & exports Python paths)
 :: ---------------------------------------------------------------------------
@@ -47,6 +53,15 @@ CD /D "%SKIM_DIR%\visum"
 "%PYTHON_VISUM%" Visum_Runner.py "%VISUM_VERSION_FILE%" "%PROCEDURE_SEQ%"
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 ECHO Motorized skims complete.
+
+IF DEFINED VISUM_PED_VERSION_FILE (
+    ECHO.
+    ECHO Exporting pedestrian network from: %VISUM_PED_VERSION_FILE%
+    CD /D "%SKIM_DIR%\visum"
+    "%PYTHON_VISUM%" Visum_Runner.py "%VISUM_PED_VERSION_FILE%" "%PED_PROCEDURE_SEQ%"
+    IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
+    ECHO Pedestrian network exported.
+)
 
 :: Run non-motorized skims in Python
 ECHO.

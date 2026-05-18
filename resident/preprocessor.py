@@ -138,7 +138,8 @@ def set_land_use_maz_index(land_use: pd.DataFrame) -> pd.DataFrame:
 
 def check_ids(
     households: pd.DataFrame, 
-    persons: pd.DataFrame
+    persons: pd.DataFrame,
+    fix_duplicates: bool = False,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Check if household_id is unique. If not, create new unique IDs.
@@ -175,107 +176,122 @@ def check_ids(
     if num_duplicates == 0:
         print("All household_id values are unique")
         return households, persons
-    
-    print(
-        f"Found {num_duplicates} rows with duplicate household_id values:\n\t \
-            {households[duplicate_mask].sort_values('household_id')}"
-    )
 
-    # Save original household_id
-    households["non_unique_household_id"] = households["household_id"]
-    persons["non_unique_household_id"] = persons["household_id"]
-    
-    # Create new unique IDs for each duplicate row
-    # Start new IDs from max existing ID + 1
-    max_id = households["household_id"].max()
-    
-    # Assign a unique new ID to EACH row that has a duplicate household_id
-    # (not just unique combinations, since same household_id + MAZ can appear multiple times)
-    num_duplicates_to_fix = duplicate_mask.sum()
-    households.loc[duplicate_mask, "household_id"] = range(
-        max_id + 1, max_id + 1 + num_duplicates_to_fix
-    )
-    
-    # Update persons table
-    # Join persons with households to get MAZ, then map to new household_id
-    persons_with_maz = persons.merge(
-        households[["household_id", "non_unique_household_id", "MAZ"]].drop_duplicates(),
-        left_on="non_unique_household_id",
-        right_on="non_unique_household_id",
-        how="left",
-        suffixes=("_old", "")
-    )
-    
-    # For persons that matched, use the new household_id
-    if "household_id_old" in persons_with_maz.columns:
-        persons_with_maz["household_id"] = persons_with_maz["household_id"].fillna(
-            persons_with_maz["household_id_old"]
+    elif not fix_duplicates:
+        print(
+            f"Error: Found {num_duplicates} rows with duplicate household_id values:\n\t \
+                {households[duplicate_mask].sort_values('household_id')}"
         )
-        persons_with_maz = persons_with_maz.drop(columns=["household_id_old"])
-    
-    # Drop the MAZ column we added from the merge (keep original if exists)
-    if "MAZ" in persons.columns:
-        persons_with_maz = persons_with_maz.drop(columns=["MAZ"])
-    
-    persons = persons_with_maz
-    
-    # Verify the fix
-    remaining_duplicates = households.duplicated(subset=["household_id"], keep=False).sum()
-    if remaining_duplicates > 0:
-        print(f"Warning: {remaining_duplicates} duplicate household_id values remain")
+        raise RuntimeError("Duplicate household_id values found. Set fix_duplicates=True to automatically create unique IDs.")
     else:
-        print(f"Successfully created unique household_id values")
-        print(f"Original IDs saved to 'non_unique_household_id' column")
     
-    return households, persons
+        print(
+            f"Found {num_duplicates} rows with duplicate household_id values:\n\t \
+                {households[duplicate_mask].sort_values('household_id')}"
+        )
+
+        # Save original household_id
+        households["non_unique_household_id"] = households["household_id"]
+        persons["non_unique_household_id"] = persons["household_id"]
+        
+        # Create new unique IDs for each duplicate row
+        # Start new IDs from max existing ID + 1
+        max_id = households["household_id"].max()
+        
+        # Assign a unique new ID to EACH row that has a duplicate household_id
+        # (not just unique combinations, since same household_id + MAZ can appear multiple times)
+        num_duplicates_to_fix = duplicate_mask.sum()
+        households.loc[duplicate_mask, "household_id"] = range(
+            max_id + 1, max_id + 1 + num_duplicates_to_fix
+        )
+        
+        # Update persons table
+        # Join persons with households to get MAZ, then map to new household_id
+        persons_with_maz = persons.merge(
+            households[["household_id", "non_unique_household_id", "MAZ"]].drop_duplicates(),
+            left_on="non_unique_household_id",
+            right_on="non_unique_household_id",
+            how="left",
+            suffixes=("_old", "")
+        )
+        
+        # For persons that matched, use the new household_id
+        if "household_id_old" in persons_with_maz.columns:
+            persons_with_maz["household_id"] = persons_with_maz["household_id"].fillna(
+                persons_with_maz["household_id_old"]
+            )
+            persons_with_maz = persons_with_maz.drop(columns=["household_id_old"])
+        
+        # Drop the MAZ column we added from the merge (keep original if exists)
+        if "MAZ" in persons.columns:
+            persons_with_maz = persons_with_maz.drop(columns=["MAZ"])
+        
+        persons = persons_with_maz
+        
+        # Verify the fix
+        remaining_duplicates = households.duplicated(subset=["household_id"], keep=False).sum()
+        if remaining_duplicates > 0:
+            print(f"Warning: {remaining_duplicates} duplicate household_id values remain")
+        else:
+            print(f"Successfully created unique household_id values")
+            print(f"Original IDs saved to 'non_unique_household_id' column")
+        
+        return households, persons
 
 
 def add_tothhs(land_use: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame:
     """Add TOTHHS (total households per zone) to land_use if not present.
+    Ensures TOTHHS values match the count of households in each MAZ, 
+    and that the MAZ zones align between the two tables.
     
     Expects land_use to be indexed by MAZ.
     """
+    tothhs = (
+        households.groupby("MAZ")
+        .size()
+        .reindex(land_use.index)
+        .fillna(0)
+        .astype(int)
+    )
+
     if "TOTHHS" not in land_use.columns:
-        tothhs = (
-            households.groupby("MAZ")
-            .size()
-            .reindex(land_use.index)
-            .fillna(0)
-            .astype(int)
-        )
         land_use["TOTHHS"] = tothhs
         print("Added TOTHHS to land_use")
     else:
-        print("TOTHHS already exists in land_use")
+        assert land_use["TOTHHS"].equals(tothhs), "Existing TOTHHS column does not match calculated values"
+
     return land_use
 
 
 def add_totpop(land_use: pd.DataFrame, persons: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame:
     """Add TOTPOP (total population per zone) to land_use if not present.
+    Ensures TOTPOP values match the count of persons in each MAZ,
+    and that the MAZ zones align between the two tables.
     
     Expects land_use to be indexed by MAZ.
     """
-    if "TOTPOP" not in land_use.columns:
-        # Join persons to households to get MAZ
-        if "MAZ" not in persons.columns:
-            persons_with_zone = persons.merge(
-                households[["household_id", "MAZ"]],
-                on="household_id",
-                how="left"
-            )
-        else:
-            persons_with_zone = persons
-        totpop = (
-            persons_with_zone.groupby("MAZ")
-            .size()
-            .reindex(land_use.index)
-            .fillna(0)
-            .astype(int)
+    # Join persons to households to get MAZ
+    if "MAZ" not in persons.columns:
+        persons_with_zone = persons.merge(
+            households[["household_id", "MAZ"]],
+            on="household_id",
+            how="left"
         )
+    else:
+        persons_with_zone = persons
+    totpop = (
+        persons_with_zone.groupby("MAZ")
+        .size()
+        .reindex(land_use.index)
+        .fillna(0)
+        .astype(int)
+    )
+
+    if "TOTPOP" not in land_use.columns:
         land_use["TOTPOP"] = totpop
         print("Added TOTPOP to land_use")
     else:
-        print("TOTPOP already exists in land_use")
+        assert land_use["TOTPOP"].equals(totpop), "Existing TOTPOP column does not match calculated values"
     return land_use
 
 

@@ -13,6 +13,9 @@
 # - Routes: one route per row; [Route_ID, Mode]
 # - Stops: one stop per row; [NO, Route_ID, Latitute, Longitute]
 
+# If transit stops were coded in a different (not pedestrian) network,
+# script snaps those stops to the nearest pedestrian network
+
 import yaml
 import os
 import sys
@@ -46,6 +49,7 @@ class DataLoader():
         self.walk_modes = None
         self.maz_centroids = None
         self.two_way_network = None
+        self.transit_stop_snapping = None
         self.load_data()
         
     def load_data(self):
@@ -63,6 +67,7 @@ class DataLoader():
         self.mazs = self._ensure_projected_feet(self.mazs, "MAZs")
         self.maz_centroids = self._get_maz_centroids()
         self.two_way_network = self.config['preprocessing']['two_way_network']
+        self.transit_stops_crs = self.config["preprocessing"].get("transit_stops_crs")
 
     def _infer_source_crs(self):
         for layer, gdf in (("links", self.links), ("nodes", self.nodes), ("MAZs", self.mazs)):
@@ -122,11 +127,15 @@ class DataLoader():
         
     def _get_maz_centroids(self):
         """
-        Find centroids of MAZ polygons
+        Find centroids of MAZ polygons and assing node IDs
         """
-        centroids = self.mazs[["MAZ", "geometry"]].copy()
+        centroids = self.mazs[["MAZ", "geometry"]].copy().sort_values("MAZ")
         centroids["centroid_geom"] = centroids["geometry"].centroid
         centroids = centroids[["MAZ", "centroid_geom"]].rename(columns={"centroid_geom":"geometry"}) 
+        
+        # Renumber
+        start_no = self.nodes["NODE_NO"].max() + 1
+        centroids["NO"] = np.arange(start_no, start_no + len(centroids))
         return centroids
 
 def create_centroid_connectors(inputs):
@@ -155,7 +164,7 @@ def create_centroid_connectors(inputs):
 
     # Create connector polyline from centroid to nearest node
     centroids_to_nearest_node = centroids_to_nearest_node.merge(
-        nodes[["NODE_NO", "geometry"]],
+        walk_network_nodes[["NODE_NO", "geometry"]],
         on="NODE_NO",
         how="left",
         suffixes=("_left", "_right")
@@ -166,15 +175,10 @@ def create_centroid_connectors(inputs):
     )
 
     # Rename columns
-    connectors = centroids_to_nearest_node[["MAZ", "NODE_NO", "connector"]].rename(
-        columns={"connector": "geometry"}
+    connectors = centroids_to_nearest_node[["MAZ", "NO", "NODE_NO", "connector"]].rename(
+        columns={"connector": "geometry", "NO": "MAZ_NO"}
     )
     connectors = gpd.GeoDataFrame(connectors, geometry="geometry", crs=walk_network_nodes.crs)
-
-    # Create new node id"s for MAZ centroids
-    no_range = np.arange(nodes["NODE_NO"].max() + 1, nodes["NODE_NO"].max() + 1 + len(maz_centroids))
-    connectors = connectors.sort_values(by = "MAZ")
-    connectors["MAZ_NO"] = no_range
     
     return connectors, walk_network_nodes, walk_network_links
 
@@ -192,11 +196,6 @@ def prepare_nodes(inputs, walk_network_nodes):
 
     # Add MAZ column
     walk_network_nodes["MAZ"] = 0
-    
-    # Add node numbering consistent with links/connectors
-    no_range = np.arange(walk_network_nodes["NO"].max() + 1, walk_network_nodes["NO"].max() + 1 + len(maz_centroids))
-    maz_centroids = maz_centroids.sort_values(by = "MAZ")
-    maz_centroids["NO"] = no_range
 
     # Join walk nodes with MAZ centroids
     nodes_merged = pd.concat([walk_network_nodes[[ "geometry", "NO", "MAZ"]], maz_centroids[["geometry", "NO", "MAZ"]]], ignore_index=True)
@@ -240,7 +239,7 @@ def prepare_links(connectors, walk_network_links, walk_network_nodes):
 
 def prepare_transit_routes_and_stops(inputs):
     """ 
-    Rename Routes cols and 
+    Rename Routes cols and Stops
     """
     routes = inputs.routes
     stops = inputs.stops
@@ -249,23 +248,26 @@ def prepare_transit_routes_and_stops(inputs):
     routes.rename(columns={"TSYSCODE":"Mode",
                            "LINE":"Route_ID"}, inplace=True)
 
-    # Create dictionary for mapping
-    routes_mode_dict = dict(zip(routes["Route_ID"], routes["Mode"]))
-    
     # Prepare stops
-    # Convert coordinates to epsg 4326
+    if inputs.transit_stops_crs:
+        stops_crs = inputs.transit_stops_crs
+    else: stops_crs = inputs.source_crs
+    
     stops_gdf = gpd.GeoDataFrame(
         stops,
         geometry = gpd.points_from_xy(stops["XCOORD"], stops["YCOORD"]),
-        crs = inputs.source_crs
+        crs = stops_crs
     )
+
+    # Snap transit stop to different network
+    if inputs.transit_stops_crs:
+        stops_gdf = snap_transit_stops_to_nodes(stops_gdf, inputs.nodes)
+
+    # Convert coordinates to epsg 4326
     stops_gdf = stops_gdf.to_crs(epsg=4326)
     stops_gdf["Latitude"] = stops_gdf.geometry.y
     stops_gdf["Longitude"] = stops_gdf.geometry.x
-
-    stops_gdf.rename(columns = {
-        "StopID":"NO"}, inplace=True)
-
+    
     # Remove NaNs
     stops_gdf = stops_gdf[stops_gdf["LINES"].notna()]
     
@@ -277,6 +279,31 @@ def prepare_transit_routes_and_stops(inputs):
     keep_cols = ["NO", "Route_ID","Latitude", "Longitude"]
     
     return routes, stops_gdf[keep_cols]
+
+
+def snap_transit_stops_to_nodes(stops_gdf, nodes):
+    """
+    Snap transit stops to the nearest node of input network.
+    """
+
+    print("Snapping transit stops to nearest nodes.")
+
+    if stops_gdf.crs != nodes.crs:
+        stops_gdf = stops_gdf.to_crs(nodes.crs)
+
+    snapped_stops = gpd.sjoin_nearest(
+        stops_gdf,
+        nodes[["geometry"]],
+        how="left",
+        distance_col="distance",
+    )
+
+    snapped_stops["geometry"] = snapped_stops["index_right"].map(nodes.geometry)
+    snapped_stops = snapped_stops.drop(
+        columns=["index_right", "distance"],
+        errors="ignore",
+    )
+    return snapped_stops
 
 def make_two_way_network(links):
     """
