@@ -12,12 +12,23 @@ maz_maz_walk_file:  C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_d
 
 # Variable-fare transit skims
 # Non-TOD segmented transit fare skim file processed into fares.omx segmented by TOD with matrices fare__[time_of_day]
+# If None, fare skims will be created with a flat fare rate for all time periods as defined below in the transit_fare_system section
 fare_skim_input_file: 
 times_of_day: ["EA", "AM", "MD", "PM", "EV"]
 
 # Flat-fare transit skims
-# Add value to create flat-rate fares.omx, leave empty if skim does not need to be created
-flat_fare_rate: 1.60
+transit_fare_system:
+  # name: LTD
+  # flat_fare_rate: 1.75
+  # name: CHERRIOTS
+  # flat_fare_rate: 1.60
+  name: TRIMET
+  flat_fare_rate: 2.80
+  # name: RVTD
+  # flat_fare_rate: 2.00
+  # name: GRANTS_PASS
+  # flat_fare_rate: 1.00
+  
 
 # Land use settings
 nodes_file: C:\projects\odot_joint_estimation\pnr\SimOR\resident\model_data\metro\data_full\raw\Network_node.shp
