@@ -116,7 +116,7 @@ util_KNR_wait_egress_time_(at_attraction_end),KNR_LOC - Egress mt/nev wait time 
 util_KNR_Walk_other_time,KNR_LOC - Walk other time,@df.knr_other_walk_time*df.time_factor,,,,,,,,coef_xwalk,,,,,,,
 util_KNR_stop_type_constant,KNR_LOC - Stop type constant,@df.knr_stop_constant* df.time_factor,,,,,,,,coef_ivt,,,,,,,
 util_KNR_vehicle_type_constant,KNR_LOC - Vehicle type constant,@df.knr_veh_constant* df.time_factor,,,,,,,,coef_ivt,,,,,,,
-util_KNR_Fare_and_operating_cost,KNR_LOC - Fare ,@df.transitSubsidyPassDiscount*df.get('TRANSIT_FF', 1)*(odt_skims['fare'] + dot_skims['fare'])*100*df.num_participants/df.cost_sensitivity,,,,,,,,coef_income,,,,,,,
+util_KNR_Fare_and_operating_cost,KNR_LOC - Fare ,"@df.transitSubsidyPassDiscount*df.get('TRANSIT_FF', 1)*(odt_skims['fare'] + dot_skims['fare'])*100*df.num_participants/df.cost_sensitivity",,,,,,,,coef_income,,,,,,,
 util_KNR_LOC - Age 16 to 24,KNR_LOC - Age 16 to 24,@(df.age > 15) & (df.age < 25),,,,,,,,coef_age1624_tran,,,,,,,
 util_KNR_LOC - Age 41 to 55,KNR_LOC - Age 41 to 55,@(df.age > 40) & (df.age < 56),,,,,,,,coef_age4155_tran,,,,,,,
 util_KNR_LOC - Age 56 to 64,KNR_LOC - Age 56 to 64,@(df.age > 55) & (df.age < 65),,,,,,,,coef_age5664_tran,,,,,,,
