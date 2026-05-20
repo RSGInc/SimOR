@@ -32,7 +32,12 @@ bundles:
   - external_non_mandatory_identification
   - external_non_mandatory_destination
   - non_mandatory_tour_destination
-  - non_mandatory_tour_scheduling
+  - non_mandatory_tour_scheduling_escort
+  - non_mandatory_tour_scheduling_shopping
+  - non_mandatory_tour_scheduling_eatout
+  - non_mandatory_tour_scheduling_othdiscr
+  - non_mandatory_tour_scheduling_othmaint
+  - non_mandatory_tour_scheduling_social
   - vehicle_allocation
   # - park_and_ride_lot_choice
   - tour_mode_choice
@@ -95,7 +100,13 @@ estimation_table_types:
   external_non_mandatory_identification: simple_simulate
   non_mandatory_tour_destination: interaction_sample_simulate
   external_non_mandatory_destination: interaction_sample_simulate
-  non_mandatory_tour_scheduling: interaction_sample_simulate
+  # non_mandatory_tour_scheduling: interaction_sample_simulate
+  non_mandatory_tour_scheduling_escort: interaction_sample_simulate
+  non_mandatory_tour_scheduling_shopping: interaction_sample_simulate
+  non_mandatory_tour_scheduling_eatout: interaction_sample_simulate
+  non_mandatory_tour_scheduling_othdiscr: interaction_sample_simulate
+  non_mandatory_tour_scheduling_othmaint: interaction_sample_simulate
+  non_mandatory_tour_scheduling_social: interaction_sample_simulate
   vehicle_allocation: simple_simulate
   tour_mode_choice: simple_simulate
   atwork_subtour_frequency: simple_simulate

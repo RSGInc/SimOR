@@ -18,7 +18,7 @@
             ]
         },
         {
-            "name": "Run Estimation Mode",
+            "name": "Metro Estimation Mode",
             "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}/resident",
@@ -28,7 +28,22 @@
                 "-c", "configs_estimation", // check the settings.yaml file for run settings!
                 "-c", "configs",
                 "-d", "model_data/metro/data_full",
-                "-o", "outputs/estimation",
+                "-o", "outputs/estimation_metro",
+            ]
+        },
+        {
+            "name": "SKATS Estimation Mode",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs_skats",
+                "-c", "configs_estimation", // check the settings.yaml file for run settings!
+                "-c", "configs",
+                "-d", "model_data/skats/data_full",
+                "-o", "outputs/estimation_skats",
             ]
         },
         {
