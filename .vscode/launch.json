@@ -94,5 +94,33 @@
                 "-o", "outputs/skats_cropped",
             ]
         },
+        {
+            "name": "Run LCOG",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs_lcog",
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/lcog/data_full",
+                "-o", "outputs/lcog",
+            ]
+        },
+        {
+            "name": "Run LCOG Cropped",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/resident",
+            "program": "simulation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c", "configs_skats",
+                "-c", "configs", // check the settings.yaml file for run settings!
+                "-d", "model_data/skats/data_cropped",
+                "-o", "outputs/skats_cropped",
+            ]
+        },
     ]
 }
