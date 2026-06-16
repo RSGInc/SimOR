@@ -180,7 +180,7 @@ Determining Tour Destination,destination,df.destination if 'destination' in df.c
 ,dest_walk_premium_time,dest_premium_dist * 60/walkSpeed
 ,origin_closest_walk_time,"min(origin_walk_local_time,origin_walk_premium_time) if origin_walk_local_time and origin_walk_premium_time else max(origin_walk_local_time,origin_walk_premium_time)"
 ,dest_closest_walk_time,"min(dest_walk_local_time,dest_walk_premium_time) if dest_walk_local_time and dest_walk_premium_time else max(dest_walk_local_time,dest_walk_premium_time)"
-#,,
+# transit mode availabilities,,
 ,walk_transit_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0)
 ,knr_transit_available,(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0) if KNR_available else 0
 ,bike_transit_available,(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0)
@@ -197,11 +197,12 @@ Determining Tour Destination,destination,df.destination if 'destination' in df.c
 ,walk_transit_walk_time_inb,"np.where((WLK_BUS_IVT_INB > 0) & (WLK_PRM_IVT_INB == 0), origin_walk_local_time+dest_walk_local_time, np.where((WLK_BUS_IVT_INB == 0) & (WLK_PRM_IVT_INB > 0), origin_walk_premium_time+dest_walk_premium_time, np.where( (WLK_BUS_IVT_INB > 0) & (WLK_PRM_IVT_INB > 0), origin_closest_walk_time+dest_closest_walk_time, 0 ) ) )"
 ,knr_transit_walk_time_out,"np.where((KNR_BUS_IVT_OUT > 0) & (KNR_PRM_IVT_OUT == 0), dest_walk_local_time, np.where((KNR_BUS_IVT_OUT == 0) & (KNR_PRM_IVT_OUT > 0), dest_walk_premium_time, np.where( (KNR_BUS_IVT_OUT > 0) & (KNR_PRM_IVT_OUT > 0), dest_closest_walk_time, 0 ) ) )"
 ,knr_transit_walk_time_inb,"np.where((KNR_BUS_IVT_INB > 0) & (KNR_PRM_IVT_INB == 0), dest_walk_local_time, np.where((KNR_BUS_IVT_INB == 0) & (KNR_PRM_IVT_INB > 0), dest_walk_premium_time, np.where( (KNR_BUS_IVT_INB > 0) & (KNR_PRM_IVT_INB > 0),dest_closest_walk_time, 0 ) ) )"
-,,
+#lookup KNR skims since they are currently used for both KNR_TRANSIT and BIKE_TRANSIT modes,,
 ,knr_total_tiv,(odt_skims['KTW_TIV'] + dot_skims['WTK_TIV']) if KNR_available else 0
 ,knr_total_fwt,(odt_skims['KTW_FWT']) + (dot_skims['WTK_FWT']) if KNR_available else 0
 ,knr_total_xwt,(odt_skims['KTW_XWT'] + dot_skims['WTK_XWT']) if KNR_available else 0
-,knr_acc_egg_time,(odt_skims['KTW_ACC'] + dot_skims['WTK_EGR']) if KNR_available else 0
+,knr_drive_time,(odt_skims['KTW_ACC'] + dot_skims['WTK_EGR']) if KNR_available else 0
+,knr_drive_dist,(odt_skims['KTW_TDD'] + dot_skims['WTK_TDD']) if KNR_available else 0
 ,knr_other_walk_time,(odt_skims['KTW_AUX'] + dot_skims['WTK_AUX']) if KNR_available else 0
 ,ktw_odt_xfr,odt_skims['KTW_XFR'] if KNR_available else 0
 ,wtk_odt_xfr,dot_skims['WTK_XFR'] if KNR_available else 0
@@ -245,4 +246,4 @@ E-bike max distance availability,ebikeMaxDistance,"(od_skims[('SOV_M_DIST', 'MD'
 # transit subsidi pass discount,,
 transit pas subsidy,transit_pass_subsidy,"df.get('transit_pass_subsidy', False)"
 transit pass ownership,transit_pass_ownership,"df.get('transit_pass_ownership', False)"
-transit subsidy pass discount, transitSubsidyPassDiscount,"np.where(transit_pass_subsidy | transit_pass_ownership,0,1)"
+transit subsidy pass discount,transitSubsidyPassDiscount,"np.where(transit_pass_subsidy | transit_pass_ownership,0,1)"
