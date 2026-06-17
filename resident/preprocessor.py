@@ -759,7 +759,7 @@ def create_flat_fare_skim(settings: PreprocessorSettings, land_use: pd.DataFrame
     
 def add_exp_costs(land_use: pd.DataFrame, settings: PreprocessorSettings, ) -> pd.DataFrame:
     """
-    Adds expected parking costs exp_hourly, exp_daily, exp_monthly,
+    Adds expected parking costs EXPPRK_HR, EXPPRK_DAY, EXPPRK_MNTH,
     if file is provided.
     
     Parameters
@@ -772,7 +772,7 @@ def add_exp_costs(land_use: pd.DataFrame, settings: PreprocessorSettings, ) -> p
     Returns
     -------
     land_use:
-        Updated dataframe with [exp_hourly, exp_daily, exp_monthly]
+        Updated dataframe with [EXPPRK_HR, EXPPRK_DAY, EXPPRK_MNTH]
     """
     
     if settings.exp_parking_costs_file is None:
