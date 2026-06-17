@@ -116,10 +116,10 @@
             "program": "simulation.py",
             "console": "integratedTerminal",
             "args": [
-                "-c", "configs_skats",
+                "-c", "configs_lcog",
                 "-c", "configs", // check the settings.yaml file for run settings!
-                "-d", "model_data/skats/data_cropped",
-                "-o", "outputs/skats_cropped",
+                "-d", "model_data/lcog/data_cropped",
+                "-o", "outputs/lcog_cropped",
             ]
         },
     ]
