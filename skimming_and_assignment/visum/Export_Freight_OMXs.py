@@ -33,11 +33,10 @@ def omx_export(x, mtx_code, corename, mtx_dseg, omx_fn):
 
     # Create mapping to TAZ numbers
     zones = np.array(h.GetMulti(Visum.Net.Zones,r"NO", activeOnly = True))
-    #taz_equivs = np.arange(1, len(zones) + 1)                  # 1-number of zones inclusive
-    #taz_equivs = zones.copy()
+    taz_equivs = np.arange(1, len(zones) + 1)                  # 1-number of zones inclusive
 
     try:
-        omx_file.create_mapping('taz', zones)
+        omx_file.create_mapping('taz', taz_equivs)
         omx_file.close()
     except Exception as e:
         omx_file.close()
@@ -65,5 +64,5 @@ for x in range(len(procedure_codes)):
     filename = procedure_codes[x][3]
 
 
-    omx_export(x, code, core, dsegcode, proj_dir + "outputs\\skims\\" + filename)
+    omx_export(x, code, core, dsegcode, proj_dir + filename)
 
