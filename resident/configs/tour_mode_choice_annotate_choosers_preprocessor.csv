@@ -72,9 +72,9 @@ popempdenpermi calculated in preprocessor and input via landuse file,_origin_den
 ,free_parking_available,(tour_type == 'work') & df.free_parking_at_work if _DF_IS_TOUR else False,
 person has free on-site parking at workplace,freeOnsite,"(free_parking_available)*np.where(is_indiv,1,0)",
 # new reimbursement amount,reimburseProportion,"df.reimburseProportion*np.where(is_indiv,1,0)",
-new daily parking cost with reimbursement in cents,parkingCostDay,"reindex(land_use.exp_daily, df[dest_col_name])",
-new hourly parking cost with reimbursement in cents,parkingCostHour,"reindex(land_use.exp_hourly, df[dest_col_name])",
-new monthly parking cost with reimbursement in cents,parkingCostMonth,"reindex(land_use.exp_monthly, df[dest_col_name])",
+new daily parking cost with reimbursement in cents,parkingCostDay,"reindex(land_use.EXPPRK_DAY, df[dest_col_name])",
+new hourly parking cost with reimbursement in cents,parkingCostHour,"reindex(land_use.EXPPRK_HR, df[dest_col_name])",
+new monthly parking cost with reimbursement in cents,parkingCostMonth,"reindex(land_use.EXPPRK_MNTH, df[dest_col_name])",
 ,_telecommute_freq,"df.telecommute_frequency if 'telecommute_frequency' in df.columns else pd.Series('No_Telecommute', index=df.index)",
 Tour parking cost for full-time workers and university students that telecommute less than 2 days,_parkingCostBeforeReimb,"df.ptype.isin([1,3]) * _telecommute_freq.isin(['No_Telecommute', '1_day_week']) * is_indiv * np.minimum(parkingCostMonth, parkingCostDay)"
 Tour parking cost for full-time workers and university students that telecommute less than 2 days,_parkingCostBeforeReimb,"df.ptype.isin([1,3]) * _telecommute_freq.isin(['No_Telecommute', '1_day_week']) * is_indiv * np.minimum(_parkingCostBeforeReimb, parkingCostHour * tourDuration)"
