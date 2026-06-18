@@ -780,15 +780,16 @@ def add_exp_costs(land_use: pd.DataFrame, settings: PreprocessorSettings, ) -> p
         return land_use
     
     exp_costs = pd.read_csv(settings.exp_parking_costs_file).rename(columns = {'mgra': 'MAZ'}).set_index('MAZ')
-    cost_cols = [col for col in exp_costs.columns if 'exp' in col]
+    exp_costs.index = exp_costs.index.astype(int)
+    keep_cols = [col for col in exp_costs.columns if 'EXPPRK' in col] + ['PARKAREA']
     land_use = pd.merge(
         land_use, 
-        exp_costs[cost_cols], 
+        exp_costs[keep_cols], 
         left_index=True,
         right_index=True, 
         how='left',
         validate='1:1')
-    print(f"Added columns to land_use: {cost_cols}")
+    print(f"Added columns to land_use: {keep_cols}")
     return land_use
     
 def preprocess(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
