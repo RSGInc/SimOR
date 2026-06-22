@@ -74,40 +74,65 @@ def load_data(settings: PreprocessorSettings) -> tuple[pd.DataFrame, pd.DataFram
 
 
 def set_land_use_maz_index(land_use: pd.DataFrame) -> pd.DataFrame:
-    """Infer the MAZ column, rename it to 'MAZ', and set it as the index.
+    """Infer the MAZ and TAZ columns, rename them, and set MAZ as the index.
     
-    Searches for MAZ column name in land_use and sets 'MAZ' as the DataFrame index.
+    Searches for common MAZ column name variations (MAZ, MAZ_ID, MAZ_NO)
+    and TAZ column name variations (TAZ, TAZ_ID, TAZ_NO), standardizes
+    their names to 'MAZ' and 'TAZ', and sets 'MAZ' as the DataFrame index.
     
     Parameters
     ----------
     land_use : pd.DataFrame
-        Land use table with an 'MAZ' column or MAZ-like index
+        Land use table with MAZ-like and optionally TAZ-like columns
         
     Returns
     -------
     pd.DataFrame
-        Land use table with 'MAZ' as the index
+        Land use table with 'MAZ' as the index and 'TAZ' column renamed
     """
+    # --- MAZ ---
     # If MAZ is already the index, just ensure the name
-    if land_use.index.name and land_use.index.name.upper() in ['MAZ', 'MAZ_ID', 'MAZ_NO']:
+    if land_use.index.name and land_use.index.name == 'MAZ':
         land_use.index.name = 'MAZ'
         print("land_use index already set to MAZ")
-        return land_use
-    
-    # IF MAZ is not already the index, ensure MAZ is a column
-    maz_cols = [col for col in land_use.columns if 'MAZ' in col.upper()]
-    
-    if 'MAZ' not in land_use.columns:
-        raise RuntimeError(
-            f"'MAZ' column not in land_use. Must add 'MAZ' column.\n"
-            + (f"Available MAZ columns are: {maz_cols}. Change MAZ column name to 'MAZ'." if maz_cols else "")
-        )
+    else:
+        # Search for a MAZ-like column
+        maz_col = None
+        for col in land_use.columns:
+            if col.upper() in ['MAZ', 'MAZ_ID', 'MAZ_NO']:
+                maz_col = col
+                break
         
-    if 'MAZ' in land_use.columns and len(maz_cols) > 1:
-        print(f"Warning: Multiple MAZ columns identified in land use csv: {maz_cols}. Defaulting to 'MAZ'.")
+        if maz_col is None:
+            raise RuntimeError(
+                f"Could not identify MAZ column in land_use. "
+                f"Available columns: {list(land_use.columns)}"
+            )
+        
+        # Rename to 'MAZ' if needed, then set as index
+        if maz_col != 'MAZ':
+            land_use = land_use.rename(columns={maz_col: 'MAZ'})
+            print(f"Renamed land_use column '{maz_col}' to 'MAZ'")
+        
+        land_use = land_use.set_index('MAZ')
+        print(f"Set land_use index to 'MAZ' ({len(land_use)} zones)")
     
-    land_use = land_use.set_index('MAZ')
-    print(f"Set land_use index to 'MAZ' ({len(land_use)} zones)")
+    # --- TAZ ---
+    if 'TAZ' in land_use.columns:
+        print("TAZ column already exists in land_use")
+    else:
+        taz_col = None
+        for col in land_use.columns:
+            if col.upper() in ['TAZ', 'TAZ_ID', 'TAZ_NO']:
+                taz_col = col
+                break
+        
+        if taz_col is None:
+            print("Warning: Could not identify TAZ column in land_use, skipping TAZ rename")
+        else:
+            land_use = land_use.rename(columns={taz_col: 'TAZ'})
+            print(f"Renamed land_use column '{taz_col}' to 'TAZ'")
+    
     return land_use
 
 
