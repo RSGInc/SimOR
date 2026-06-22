@@ -12,12 +12,23 @@ maz_maz_walk_file:  ..\skimming_and_assignment\maz_maz_stop_skims\output\lcog_2w
 
 # Variable-fare transit skims
 # Non-TOD segmented transit fare skim file processed into fares.omx segmented by TOD with matrices fare__[time_of_day]
+# If None, fare skims will be created with a flat fare rate for all time periods as defined below in the transit_fare_system section
 fare_skim_input_file: 
 times_of_day: ["EA", "AM", "MD", "PM", "EV"]
 
 # Flat-fare transit skims
-# Add value to create flat-rate fares.omx, leave empty if skim does not need to be created
-flat_fare_rate: 1.75 # 1.60 skats, 1.75 lcog
+transit_fare_system:
+  # name: LTD
+  # flat_fare_rate: 1.75
+  # name: CHERRIOTS
+  # flat_fare_rate: 1.60
+  name: TRIMET
+  flat_fare_rate: 2.80
+  # name: RVTD
+  # flat_fare_rate: 2.00
+  # name: GRANTS_PASS
+  # flat_fare_rate: 1.00
+  
 
 # Land use settings
 nodes_file: ..\skimming_and_assignment\maz_maz_stop_skims\Visum_Outputs_LCOG\AllStreets_Network_node.shp
