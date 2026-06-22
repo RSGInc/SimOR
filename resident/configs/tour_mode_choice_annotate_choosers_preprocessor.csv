@@ -172,7 +172,7 @@ Determining Tour Destination,destination,df.destination if 'destination' in df.c
 ,origin_local_dist,"reindex(land_use.walk_dist_local_bus, origin)",
 ,origin_premium_dist,"reindex(land_use.walk_dist_premium_transit, origin)",
 ,dest_local_dist,"reindex(land_use.walk_dist_local_bus, destination)",
-,dest_premium_dist,"reindex(land_use.micro_dist_premium, destination)",
+,dest_premium_dist,"reindex(land_use.micro_dist_premium_transit, destination)",
 #access egress times,,,
 ,origin_walk_local_time,origin_local_dist * 60/walkSpeed,
 ,dest_walk_local_time,dest_local_dist * 60/walkSpeed,
