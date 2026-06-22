@@ -170,7 +170,7 @@ Determining Tour Origin,origin,df.origin if 'origin' in df.columns else df.home_
 Determining Tour Destination,destination,df.destination if 'destination' in df.columns else df.alt_dest,
 #access egress distances,,,
 ,origin_local_dist,"reindex(land_use.walk_dist_local_bus, origin)",
-,origin_premium_dist,"reindex(land_use.walk_dist_premium, origin)",
+,origin_premium_dist,"reindex(land_use.walk_dist_premium_transit, origin)",
 ,dest_local_dist,"reindex(land_use.walk_dist_local_bus, destination)",
 ,dest_premium_dist,"reindex(land_use.micro_dist_premium, destination)",
 #access egress times,,,
