@@ -99,7 +99,6 @@ occupation_xwalk:
   5: nat_res_cnstr_maint
   6: prod_trans_move
   999: missing # no occupation 
-  -1: missing # no occupation
 
 # RIDEHAIL Settings - all costs in dollars, times in minutes
 Taxi_baseFare: 3.00

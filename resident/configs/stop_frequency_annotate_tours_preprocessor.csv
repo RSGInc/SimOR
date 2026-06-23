@@ -21,7 +21,7 @@ Number of Adults (>= 16 years old),num_adult,"reindex_i(_HH_PERSON_COUNT('age >=
 ,tour_mode_is_drive_transit,df.tour_mode.isin(DRIVE_TO_TRANSIT_MODES)
 ,tour_mode_is_non_motorized,df.tour_mode.isin(NONMOTORIZED_MODES)
 ,tour_mode_is_schbus,df.tour_mode.isin(['SCH_BUS'])
-
+#,,
 #,,
 #num_work_tours already defined,,
 ,num_total_tours,"reindex_i(df.groupby('person_id').size(), df.person_id)"
