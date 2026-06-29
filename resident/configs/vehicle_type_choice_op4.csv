@@ -127,13 +127,13 @@ util_age18,Age 18 ASC,(age==18),coef_age18
 util_age19,Age 19 ASC,(age==19),coef_age19
 util_age20,Age 20 ASC,(age==20),coef_age20
 #,rural household coefficients,,
-util_rural_van,Household is in Rural Area - Van,home_is_rural & (body_type_num_coded==5),coef_rural_van
-util_rural_suv,Household is in Rural Area - SUV,home_is_rural & (body_type_num_coded==4),coef_rural_suv
-util_rural_pu,Household is in Rural Area - Pickup,home_is_rural & (body_type_num_coded==3),coef_rural_pu
-util_rural_mc,Household is in Rural Area - Motorcycle,home_is_rural & (body_type_num_coded==2),coef_rural_mc
-util_rural_hyb,Household is in Rural Area - Hybrid,home_is_rural & (fuel_type_num_coded==4),coef_rural_hyb
-util_rural_ev,Household is in Rural Area - Electric,home_is_rural & ((fuel_type_num_coded==5) | (fuel_type_num_coded==1)),coef_rural_ev
-util_rural_age,Household is in Rural Area - Age,home_is_rural * age,coef_rural_age
+util_rural_van,Household is in Rural Area - Van,rural & (body_type_num_coded==5),coef_rural_van
+util_rural_suv,Household is in Rural Area - SUV,rural & (body_type_num_coded==4),coef_rural_suv
+util_rural_pu,Household is in Rural Area - Pickup,rural & (body_type_num_coded==3),coef_rural_pu
+util_rural_mc,Household is in Rural Area - Motorcycle,rural & (body_type_num_coded==2),coef_rural_mc
+util_rural_hyb,Household is in Rural Area - Hybrid,rural & (fuel_type_num_coded==4),coef_rural_hyb
+util_rural_ev,Household is in Rural Area - Electric,rural & ((fuel_type_num_coded==5) | (fuel_type_num_coded==1)),coef_rural_ev
+util_rural_age,Household is in Rural Area - Age,rural * age,coef_rural_age
 #,Region Specific Constants,,
 util_san_van,San Diego - Van,@(df.SAN) & (df.body_type_num_coded==5),coef_san_van
 util_san_suv,San Diego - SUV,@(df.SAN) & (df.body_type_num_coded==4),coef_san_suv
