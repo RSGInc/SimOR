@@ -1,12 +1,12 @@
-Description,Target,Expression,
-density_index,density_index,(land_use['duden'] * land_use['empden']) / (land_use['duden'] + land_use['empden']).clip(lower=1),
-# FIXME need to decide on what the preschool target looks like,,,
-preschool target for mandatory constraint - sum of all size terms,preschool_target,land_use['TOTPOP'] + land_use.EMP_TOTAL,
-Is a zone with parking used to apply parking location choice model,is_parking_zone,"np.where(land_use.PARKAREA==1, True, False)",
-# Starting points for density bins based on density_index,,,
-Rural zone,rural,"np.where((density_index< 10), TRUE, FALSE)",
-Exurban zone,exurban,"np.where((density_index>=10) & (density_index<50), TRUE, FALSE)",
-Lowsuburban zone,lowsuburban,"np.where((density_index>=50) & (density_index<250), TRUE, FALSE)",
-Suburban zone,suburban,"np.where((density_index>=250) & (density_index<1000), TRUE, FALSE)",
-Urban zone,urban,"np.where((density_index>=1000) & (density_index<5000), TRUE, FALSE)",
-Cbd zone,cbd,"np.where((density_index>=5000), TRUE, FALSE)",
+Description,Target,Expression
+density_index,density_index,(land_use['duden'] * land_use['empden']) / (land_use['duden'] + land_use['empden']).clip(lower=1)
+# FIXME need to decide on what the preschool target looks like,,
+preschool target for mandatory constraint - sum of all size terms,preschool_target,land_use['TOTPOP'] + land_use.EMP_TOTAL
+Is a zone with parking used to apply parking location choice model,is_parking_zone,"np.where(land_use.PARKAREA==1, True, False)"
+# Starting points for density bins based on density_index,,
+Rural zone,rural,"np.where((density_index< 10), True, False)"
+Exurban zone,exurban,"np.where((density_index>=10) & (density_index<50), True, False)"
+Lowsuburban zone,lowsuburban,"np.where((density_index>=50) & (density_index<250), True, False)"
+Suburban zone,suburban,"np.where((density_index>=250) & (density_index<1000), True, False)"
+Urban zone,urban,"np.where((density_index>=1000) & (density_index<5000), True, False)"
+Cbd zone,cbd,"np.where((density_index>=5000), True, False)"
