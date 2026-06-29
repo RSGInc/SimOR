@@ -65,7 +65,7 @@ util_WALK_TRANSIT_iwait_time,WALK_TRANSIT - wait time,@(odt_skims['WTW_FWT'] + d
 util_WALK_TRANSIT_transfer_wait_time,WALK_TRANSIT - transfer wait time,@(odt_skims['WTW_XWT'] + dot_skims['WTW_XWT'])* df.time_factor,,,,,,coef_xwait,,,,,,,,,
 util_WALK_TRANSIT_transfer_WALK_TRANSIT_time,WALK_TRANSIT - transfer walk time,@(odt_skims['WTW_AUX'] + dot_skims['WTW_AUX'])* df.time_factor,,,,,,coef_xwalk,,,,,,,,,
 util_WALK_TRANSIT_transfers_penalty,WALK_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(odt_skims['WTW_XFR'], a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(dot_skims['WTW_XFR'], a_min=None,a_max=4)))*df.time_factor",,,,,,coef_xfer,,,,,,,,,
-util_WALK_TRANSIT_walk_time,WALK_TRANSIT - walk time,@(walk_transit_walk_time_out + walk_transit_walk_time_inb) * df.time_factor,,,,,,coef_acctime,,,,,,,,,
+util_WALK_TRANSIT_walk_time,WALK_TRANSIT - walk time,@(df.walk_transit_walk_time_out + df.walk_transit_walk_time_inb) * df.time_factor,,,,,,coef_acctime,,,,,,,,,
 util_WALK_TRANSIT_stop_type_constant,WALK_TRANSIT - Stop type constant,@(odt_skims['WTW_RST'] + dot_skims['WTW_RST'])* df.time_factor,,,,,,coef_ivt,,,,,,,,,
 util_WALK_TRANSIT_vehicle_type_constant,WALK_TRANSIT - Vehicle type constant,@(odt_skims['WTW_VTC'] + dot_skims['WTW_VTC'])* df.time_factor,,,,,,coef_ivt,,,,,,,,,
 util_WALK_TRANSIT_FARE,WALK_TRANSIT - Fare,"@df.transitSubsidyPassDiscount*df.get('TRANSIT_FF', 1)*(odt_skims['fare'] + dot_skims['fare'])*100*df.num_participants/df.cost_sensitivity",,,,,,coef_income,,,,,,,,,
