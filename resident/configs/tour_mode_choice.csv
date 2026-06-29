@@ -64,7 +64,7 @@ util_WALK_TRANSIT_In_vehicle_time,WALK_TRANSIT - In-vehicle time,@(odt_skims['WT
 util_WALK_TRANSIT_iwait_time,WALK_TRANSIT - wait time,@(odt_skims['WTW_FWT'] + dot_skims['WTW_FWT']) * df.time_factor,,,,,,coef_wait,,,,,,,,,
 util_WALK_TRANSIT_transfer_wait_time,WALK_TRANSIT - transfer wait time,@(odt_skims['WTW_XWT'] + dot_skims['WTW_XWT'])* df.time_factor,,,,,,coef_xwait,,,,,,,,,
 util_WALK_TRANSIT_transfer_WALK_TRANSIT_time,WALK_TRANSIT - transfer walk time,@(odt_skims['WTW_AUX'] + dot_skims['WTW_AUX'])* df.time_factor,,,,,,coef_xwalk,,,,,,,,,
-util_WALK_TRANSIT_transfers_penalty,WALK_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(odt_skims['WTW_XFR'] + df.mtnev_egr_xfer, a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(dot_skims['WTW_XFR'] + df.mtnev_egr_xfer, a_min=None,a_max=4)))*df.time_factor",,,,,,coef_xfer,,,,,,,,,
+util_WALK_TRANSIT_transfers_penalty,WALK_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(odt_skims['WTW_XFR'], a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(dot_skims['WTW_XFR'], a_min=None,a_max=4)))*df.time_factor",,,,,,coef_xfer,,,,,,,,,
 util_WALK_TRANSIT_walk_time,WALK_TRANSIT - walk time,(walk_transit_walk_time_out + walk_transit_walk_time_inb) * df.time_factor,,,,,,coef_acctime,,,,,,,,,
 util_WALK_TRANSIT_stop_type_constant,WALK_TRANSIT - Stop type constant,@(odt_skims['WTW_RST'] + dot_skims['WTW_RST'])* df.time_factor,,,,,,coef_ivt,,,,,,,,,
 util_WALK_TRANSIT_vehicle_type_constant,WALK_TRANSIT - Vehicle type constant,@(odt_skims['WTW_VTC'] + dot_skims['WTW_VTC'])* df.time_factor,,,,,,coef_ivt,,,,,,,,,
@@ -84,7 +84,7 @@ util_PNR_TRANSIT_Unavailable_for_persons_less_than_16,PNR_TRANSIT - Unavailable 
 util_PNR_TRANSIT_In_vehicle_time,PNR_TRANSIT - In-vehicle time,@df.transit_time_pnr * df.time_factor,,,,,,,coef_ivt,,,,,,,,
 util_PNR_TRANSIT_iwait_time,PNR_TRANSIT - First iwait time,@df.iwait_pnr * df.time_factor,,,,,,,coef_wait,,,,,,,,
 util_PNR_TRANSIT_transfer_wait_time,PNR_TRANSIT - transfer wait time,@df.xfer_wait_pnr * df.time_factor,,,,,,,coef_xwait,,,,,,,,
-util_PNR_TRANSIT_number_of_transfers,PNR_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(df.xfer_walk_pnr + df.mtnev_egr_xfer, a_min=None,a_max=4))) * df.time_factor",,,,,,,coef_xferdrive,,,,,,,,
+util_PNR_TRANSIT_number_of_transfers,PNR_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(df.xfer_walk_pnr, a_min=None,a_max=4))) * df.time_factor",,,,,,,coef_xferdrive,,,,,,,,
 util_PNR_TRANSIT_PNR_TRANSIT_time,PNR_TRANSIT - PNR time,@(df.auto_time_pnr_out + df.auto_time_pnr_inb) * df.time_factor,,,,,,,coef_acctime,,,,,,,,
 util_PNR_TRANSIT_PNR_TRANSIT_cost,PNR_TRANSIT - PNR cost,@df.sov_auto_op_cost * (df.auto_dist_pnr_out + df.auto_dist_pnr_inb) * 100 / df.cost_sensitivity,,,,,,,coef_income,,,,,,,,
 util_PNR_TRANSIT_Walk_time_(at_attraction_end),PNR_TRANSIT - Walk time (at attraction end),(pnr_transit_walk_time_out + pnr_transit_walk_time_inb) * df.time_factor,,,,,,,coef_acctime,,,,,,,,
@@ -104,7 +104,7 @@ util_KNR_TRANSIT_Unavailable,KNR_TRANSIT - Unavailable,"@(df.knr_transit_availab
 util_KNR_TRANSIT_In_vehicle_time,KNR_TRANSIT - In-vehicle time,@df.knr_total_tiv *df.time_factor,,,,,,,,coef_ivt,,,,,,,
 util_KNR_TRANSIT_iwait_time,KNR_TRANSIT - First iwait time,@df.knr_total_fwt*df.time_factor,,,,,,,,coef_wait,,,,,,,
 util_KNR_TRANSIT_transfer_wait_time,KNR_TRANSIT - transfer wait time,@df.knr_total_xwt*df.time_factor,,,,,,,,coef_xwait,,,,,,,
-util_KNR_TRANSIT_number_of_transfers,KNR_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(df.ktw_odt_xfr + df.mtnev_egr_xfer, a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(df.wtk_odt_xfr + df.mtnev_egr_xfer, a_min=None,a_max=4))) *df.time_factor",,,,,,,,coef_xferdrive,,,,,,,
+util_KNR_TRANSIT_number_of_transfers,KNR_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(df.ktw_odt_xfr, a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(df.wtk_odt_xfr, a_min=None,a_max=4))) *df.time_factor",,,,,,,,coef_xferdrive,,,,,,,
 util_KNR_TRANSIT_walk_time (at_attraction_end),KNR_TRANSIT - walk time,@((knr_transit_walk_time_out + knr_transit_walk_time_inb) * df.time_factor),,,,,,,,coef_acctime,,,,,,,
 util_KNR_TRANSIT_drive_time (at access end),KNR_TRANSIT - drive time,@((knr_transit_drive_time) * df.time_factor),,,,,,,,coef_acctime,,,,,,,
 util_KNR_TRANSIT_cost,KNR_TRANSIT - cost,@(df.sr2_auto_op_cost * knr_drive_dist*100)/df.cost_sensitivity,,,,,,,,coef_income,,,,,,,
@@ -124,7 +124,7 @@ util_BIKE_TRANSIT_Unavailable_for_persons_less_than_16,BIKE_TRANSIT - Unavailabl
 util_BIKE_TRANSIT_In_vehicle_time,BIKE_TRANSIT - In-vehicle time,@df.knr_total_tiv *df.time_factor,,,,,,,,,coef_ivt,,,,,,
 util_BIKE_TRANSIT_iwait_time,BIKE_TRANSIT - First iwait time,@(df.knr_total_fwt)*df.time_factor,,,,,,,,,coef_wait,,,,,,
 util_BIKE_TRANSIT_transfer_wait_time,BIKE_TRANSIT - transfer wait time,@(df.knr_total_xwt) *df.time_factor,,,,,,,,,coef_xwait,,,,,,
-util_BIKE_TRANSIT_number_of_transfers,BIKE_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(df.ktw_odt_xfr + df.mtnev_acc_xfer + df.mtnev_egr_xfer, a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(df.wtk_odt_xfr + df.mtnev_acc_xfer + df.mtnev_egr_xfer, a_min=None,a_max=4))) *df.time_factor",,,,,,,,,coef_xferdrive,,,,,,
+util_BIKE_TRANSIT_number_of_transfers,BIKE_TRANSIT - number of transfers,"@(-23+23*np.exp(0.414*np.clip(df.ktw_odt_xfr, a_min=None,a_max=4))) + (-23+23*np.exp(0.414*np.clip(df.wtk_odt_xfr, a_min=None,a_max=4))) *df.time_factor",,,,,,,,,coef_xferdrive,,,,,,
 util_BIKE_TRANSIT_Walk_time_(at_attraction_end),BIKE_TRANSIT - walk time,@((knr_transit_walk_time_out + knr_transit_walk_time_inb) * df.time_factor),,,,,,,,,coef_acctime,,,,,,
 util_BIKE_TRANSIT_bike_time_(at_production_end),BIKE_TRANSIT - bike time,@(knr_transit_drive_dist * 60/10 * df.time_factor),,,,,,,,,coef_acctime,,,,,,
 util_BIKE_TRANSIT_Walk_other_time,BIKE_TRANSIT - Walk other time,@(df.knr_other_walk_time) *df.time_factor,,,,,,,,,coef_xwalk,,,,,,
@@ -161,19 +161,19 @@ util_School Bus - Female,School Bus - Female,@(df.female),,,,,,,,,,,,,coef_femal
 #,ebike,,,,,,,,,,,,,,,,
 util_ebike - Unavailable,ebike - Unavailable,ebike_available==0,,,,,,,,,,,,,,-999,
 util_ebike_long_trip,Shut off ebike if distance > threshold,ebikeMaxDistance,,,,,,,,,,,,,,-999,
-util_ebike_long_access,Shut off ebike if access time > threshold,"@(((df.micro_access_out > microAccessThreshold) | (df.micro_access_inb > microAccessThreshold)) & (~df.ebike_owner)) | (df.get('num_escortees', 0)>0)",,,,,,,,,,,,,,-999,
+util_ebike_long_access,Shut off ebike if access time > threshold,"@(((df.ebike_access_out > microAccessThreshold) | (df.ebike_access_inb > microAccessThreshold)) & (~df.ebike_owner)) | (df.get('num_escortees', 0)>0)",,,,,,,,,,,,,,-999,
 util_ebike_ivt,Ebike utility for in-vehicle time,@(df.ebike_time_inb + df.ebike_time_out)*df.time_factor,,,,,,,,,,,,,,coef_ivt,
-util_ebike_access,Ebike utility for access/egress time,"@(np.where(df.ebike_owner, 0, microRentTime + df.micro_access_inb + df.micro_access_out))*df.time_factor",,,,,,,,,,,,,,coef_acctime,
-util_ebike_cost_inb,Ebike utility for inbound cost,@((~df.ebike_owner)&((microFixedCost + microVarCost*df.ebike_time_inb)*100/df.cost_sensitivity)),,,,,,,,,,,,,,coef_income,
-util_ebike_cost_out,Ebike utility for outbound cost,@((~df.ebike_owner)&((microFixedCost + microVarCost*df.ebike_time_out)*100/df.cost_sensitivity)),,,,,,,,,,,,,,coef_income,
+util_ebike_access,Ebike utility for access/egress time,"@(np.where(df.ebike_owner, 0, ebikeRentTime + df.ebike_access_inb + df.ebike_access_out))*df.time_factor",,,,,,,,,,,,,,coef_acctime,
+util_ebike_cost_inb,Ebike utility for inbound cost,@((~df.ebike_owner)&((ebikeFixedCost + ebikeVarCost*df.ebike_time_inb)*100/df.cost_sensitivity)),,,,,,,,,,,,,,coef_income,
+util_ebike_cost_out,Ebike utility for outbound cost,@((~df.ebike_owner)&((ebikeFixedCost + ebikeVarCost*df.ebike_time_out)*100/df.cost_sensitivity)),,,,,,,,,,,,,,coef_income,
 #,escooter,,,,,,,,,,,,,,,,
 util_escooter - Unavailable,escooter - Unavailable,escooter_available==0,,,,,,,,,,,,,,,-999
 util_micromobility_long_trip,Shut off escooter if distance > threshold,escooterMaxDistance,,,,,,,,,,,,,,,-999
-util_escooter_long_access,Shut off escooter if access time > threshold,"@((df.micro_access_out > microAccessThreshold) | (df.micro_access_inb > microAccessThreshold) | (df.get('num_escortees', 0)>0))",,,,,,,,,,,,,,,-999
+util_escooter_long_access,Shut off escooter if access time > threshold,"@((df.escooter_access_out > microAccessThreshold) | (df.escooter_access_inb > microAccessThreshold) | (df.get('num_escortees', 0)>0))",,,,,,,,,,,,,,,-999
 util_escooter_ivt,escooter utility for in-vehicle time,@(df.escooter_time_inb + df.escooter_time_out)*df.time_factor,,,,,,,,,,,,,,,coef_ivt
-util_escooter_access,escooter utility for in-vehicle time,@(microRentTime + df.micro_access_inb + df.micro_access_out)*df.time_factor,,,,,,,,,,,,,,,coef_acctime
-util_escooter_cost_inb,escooter utility for inbound cost,@((microFixedCost + microVarCost*df.escooter_time_inb)*100/df.cost_sensitivity),,,,,,,,,,,,,,,coef_income
-util_escooter_cost_out,escooter utility for outbound cost,@((microFixedCost + microVarCost*df.escooter_time_out)*100/df.cost_sensitivity),,,,,,,,,,,,,,,coef_income
+util_escooter_access,escooter utility for in-vehicle time,@(escooterRentTime + df.escooter_access_inb + df.escooter_access_out)*df.time_factor,,,,,,,,,,,,,,,coef_acctime
+util_escooter_cost_inb,escooter utility for inbound cost,@((escooterFixedCost + escooterVarCost*df.escooter_time_inb)*100/df.cost_sensitivity),,,,,,,,,,,,,,,coef_income
+util_escooter_cost_out,escooter utility for outbound cost,@((escooterFixedCost + escooterVarCost*df.escooter_time_out)*100/df.cost_sensitivity),,,,,,,,,,,,,,,coef_income
 #constants,,,,,,,,,,,,,,,,,
 util_calib_zeroautohhindiv,abm2+ calibration constant,@(df.is_indiv & (df.auto_ownership == 0)),,coef_calib_zeroautohhindivtou_SHARED2,coef_calib_zeroautohhindivtou_SHARED3,coef_calib_zeroautohhindivtou_WALK,coef_calib_zeroautohhindivtou_BIKE,coef_calib_zeroautohhindivtou_WALK_TRANSIT,coef_calib_zeroautohhindivtou_PNR_TRANSIT,coef_calib_zeroautohhindivtou_KNR_TRANSIT,coef_calib_zeroautohhindivtou_BIKE_TRANSIT,coef_calib_zeroautohhindivtou_TAXI,coef_calib_zeroautohhindivtou_TNC_SINGLE,coef_calib_zeroautohhindivtou_TNC_SHARED,coef_calib_zeroautohhindivtou_SCH_BUS,coef_calib_zeroautohhindivtou_EBIKE,coef_calib_zeroautohhindivtou_ESCOOTER
 util_calib_autodeficienthh,abm2+ calibration constant,@(df.is_indiv & (df.auto_ownership < df.num_adults) & (df.auto_ownership > 0)),,coef_calib_autodeficienthhind_SHARED2,coef_calib_autodeficienthhind_SHARED3,coef_calib_autodeficienthhind_WALK,coef_calib_autodeficienthhind_BIKE,coef_calib_autodeficienthhind_WALK_TRANSIT,coef_calib_autodeficienthhind_PNR_TRANSIT,coef_calib_autodeficienthhind_KNR_TRANSIT,coef_calib_autodeficienthhind_BIKE_TRANSIT,coef_calib_autodeficienthhind_TAXI,coef_calib_autodeficienthhind_TNC_SINGLE,coef_calib_autodeficienthhind_TNC_SHARED,coef_calib_autodeficienthhind_SCH_BUS,coef_calib_autodeficienthhind_EBIKE,coef_calib_autodeficienthhind_ESCOOTER
