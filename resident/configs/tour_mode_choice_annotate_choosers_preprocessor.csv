@@ -127,21 +127,21 @@ Person age,age,df.age
 #,,
 Joint tour,is_joint,"df.get('tour_category', default=False) == 'joint'"
 Determining Tour Destination,destination,df.destination if 'destination' in df.columns else df.alt_dest
-Origin MGRA Dwelling Unit Density,oMGRADUDen,"reindex(land_use.duden,origin).clip(upper=300)"
-Origin MGRA Employment Density,oMGRAEmpDen,"reindex(land_use.empden,origin).clip(upper=300)"
-Origin MGRA Total Intersections,oMGRATotInt,"reindex(land_use.totint,origin).clip(upper=300)"
-Destination MGRA Dwelling Unit Density,dMGRADUDen,"reindex(land_use.duden,destination).clip(upper=300)"
-Destination MGRA Employment Density,dMGRAEmpDen,"reindex(land_use.empden,destination).clip(upper=300)"
-Destination MGRA Total Intersections,dMGRATotInt,"reindex(land_use.totint,destination).clip(upper=300)"
-Origin MGRA Mix,oMGRAMix,"np.where(oMGRADUDen+oMGRAEmpDen > 0, (oMGRADUDen*oMGRAEmpDen)/(oMGRADUDen+oMGRAEmpDen),0)"
-Destination MGRA Mix,dMGRAMix,"np.where(dMGRADUDen+dMGRAEmpDen > 0, (dMGRADUDen*dMGRAEmpDen)/(dMGRADUDen+dMGRAEmpDen),0)"
-Origin MGRA Dwelling Unit Density Normalized by Average in Bike Estimation Sample,oMGRADUDenNorm_bike,oMGRADUDen/6.77
-Origin MGRA Employment Density Normalized by Average in Bike Estimation Sample,oMGRAEmpDenNorm_bike,oMGRAEmpDen/6.47
-Origin MGRA Dwelling Unit Density Normalized by Average in Walk Estimation Sample,oMGRADUDenNorm_walk,oMGRADUDen/7.18
-Origin MGRA Total Intersections Normalized by Average in Walk Estimation Sample,oMGRATotIntNorm_walk,oMGRATotInt/56.19
-Destination MGRA Employment Density Normalized by Average in Walk Estimation Sample,dMGRAEmpDenNorm_walk,dMGRAEmpDen/13.16
-Normalized Landuse Variable Sum [Origin Employment + DU],LUVarsNormalized_bike,oMGRADUDenNorm_bike + oMGRAEmpDenNorm_bike
-Normalized Landuse Variable Sum [Origin Intersection + DU],LUVarsNormalized_walk,oMGRADUDenNorm_walk + oMGRATotIntNorm_walk
+Origin  Dwelling Unit Density,oDUDen,"reindex(land_use.duden,origin).clip(upper=300)"
+Origin  Employment Density,oEmpDen,"reindex(land_use.empden,origin).clip(upper=300)"
+Origin  Total Intersections,oTotInt,"reindex(land_use.totint,origin).clip(upper=300)"
+Destination  Dwelling Unit Density,dDUDen,"reindex(land_use.duden,destination).clip(upper=300)"
+Destination  Employment Density,dEmpDen,"reindex(land_use.empden,destination).clip(upper=300)"
+Destination  Total Intersections,dTotInt,"reindex(land_use.totint,destination).clip(upper=300)"
+Origin  Mix,oMix,"np.where(oDUDen+oEmpDen > 0, (oDUDen*oEmpDen)/(oDUDen+oEmpDen),0)"
+Destination  Mix,dMix,"np.where(dDUDen+dEmpDen > 0, (dDUDen*dEmpDen)/(dDUDen+dEmpDen),0)"
+Origin  Dwelling Unit Density Normalized by Average in Bike Estimation Sample,oDUDenNorm_bike,oDUDen/6.77
+Origin  Employment Density Normalized by Average in Bike Estimation Sample,oEmpDenNorm_bike,oEmpDen/6.47
+Origin  Dwelling Unit Density Normalized by Average in Walk Estimation Sample,oDUDenNorm_walk,oDUDen/7.18
+Origin  Total Intersections Normalized by Average in Walk Estimation Sample,oTotIntNorm_walk,oTotInt/56.19
+Destination  Employment Density Normalized by Average in Walk Estimation Sample,dEmpDenNorm_walk,dEmpDen/13.16
+Normalized Landuse Variable Sum [Origin Employment + DU],LUVarsNormalized_bike,oDUDenNorm_bike + oEmpDenNorm_bike
+Normalized Landuse Variable Sum [Origin Intersection + DU],LUVarsNormalized_walk,oDUDenNorm_walk + oTotIntNorm_walk
 persontype,personType,"df.ptype*np.where(is_indiv,1,0)"
 Origin Terminal Time,oTermTime,"reindex(land_use.TERMINALTIME,origin).fillna(0)"
 Destination Terminal Time,dTermTime,"reindex(land_use.TERMINALTIME,destination).fillna(0)"
