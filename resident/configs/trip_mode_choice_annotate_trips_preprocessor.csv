@@ -198,15 +198,12 @@ no long walks,walkAvailable,"np.where((walk_time_skims < max_walk_time),1,0) * n
 # added for school escorting model,,
 Number of school children in vehicle on trip,num_escortees,df.escort_participants.fillna('').apply(lambda x: len(x.split('_')) if len(x)>0 else 0)
 # Micromobility times,,
-# Micromobility times,,
-E-scooter access time,escooter_access,"reindex(land_use.ESCOOACCTIME,origin)"
+E-scooter access time,escooterAccessTime,"reindex(land_use.ESCOOACCTIME,origin)"
 E-scooter time,escooter_time,bike_time * bikeSpeed / escooterSpeed
-E-scooter available,escooter_available,(escooter_time>0) 
-E-scooter max distance availability,escooterMaxDistance,"(od_skims[('SOV_M_DIST', 'MD')] > escooterMaxDist)"
-E-bike access time outbound,ebike_access,"reindex(land_use.EBIKEACCTIME,origin)"
+E-scooter max distance availability,moreThanMaxEScooterDistance,"(od_skims[('SOV_M_DIST', 'MD')] > escooterMaxDist)"
+E-bike access time outbound,ebikeAccessTime,"reindex(land_use.EBIKEACCTIME,origin)"
 E-bike time outbound,ebike_time,bike_time * bikeSpeed / ebikeSpeed
-E-bike available,ebike_available,(ebike_time>0) 
-E-bike max distance availability,ebikeMaxDistance,"(od_skims[('SOV_M_DIST', 'MD')] > ebikeMaxDist)"
+E-bike max distance availability,moreThanMaxEBikeDistance,"(od_skims[('SOV_M_DIST', 'MD')] > ebikeMaxDist)"
 #,,
 transit subsidy pass discount,transitSubsidyPassDiscount,"np.where(df.transit_pass_subsidy | df.transit_pass_ownership,0,1)"
 #KNR times,,
