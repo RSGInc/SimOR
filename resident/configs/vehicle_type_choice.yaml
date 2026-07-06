@@ -1,14 +1,14 @@
 # vehicle_type_choice.yaml
 
-SPEC: vehicle_type_choice_op4.csv
-COEFFICIENTS: vehicle_type_choice_op4_coefficients.csv
+SPEC: vehicle_type_choice_op2.csv
+COEFFICIENTS: vehicle_type_choice_op2_coefficients.csv
+PROBS_SPEC: vehicle_type_choice_op2_fuel_type_probs.csv
 
 # SPEC: vehicle_type_choice_op2.csv
 # COEFFICIENTS: vehicle_type_choice_op2_coefficients.csv
 # ALTS: vehicle_type_choice_op2_alternatives.csv
 # # probs must have body_type and vehicle_year columns
 # # probs spec has vehicle age calculated from FLEET_YEAR
-# PROBS_SPEC: vehicle_type_choice_op2_fuel_type_probs.csv
 
 LOGIT_TYPE: MNL
 
@@ -70,15 +70,9 @@ combinatorial_alts:
     - 18
     - 19
     - 20
-  fuel_type:
-    - Gas
-    - Diesel
-    - Hybrid
-    - PEV
-    - BEV
 
 # will write out the created vehicle_type_model_alternatives.csv file
-#  to the base configs directory. Helpful for debugging alternaties.
+#  to the base configs directory. Helpful for debugging alternatives.
 WRITE_OUT_ALTS_FILE: False
 
 preprocessor:
@@ -96,15 +90,10 @@ alts_preprocessor:
 
 COLS_TO_INCLUDE_IN_ALTS_TABLE:
   - age
-  - fuel_type_num_coded
   - body_type_num_coded
   - Range
   - MPG
   - is_av
-  - logged_models
-  - logged_makes
-  - logged_chargers_per_capita
-  - SAN
   - NewPrice
 
 # annotate_persons:
@@ -125,9 +114,5 @@ annotate_households:
 #   TABLES:
 
 CONSTANTS:
-  # calculated using charger count / population
-  CHARGERS_PER_CAP: 0.00034592
-  # chargers per cap used in vehicle type model estimation
-  # CHARGERS_PER_CAP: 0.000721205
   scenarioYear: 2022
   chargerSensitivityDecayFactor: -0.08245202
