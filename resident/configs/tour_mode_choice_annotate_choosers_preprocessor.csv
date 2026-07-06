@@ -231,14 +231,14 @@ vehicle type constant pnr,vehicle_type_pnr,"0 if not _CALC_PNR else np.where(is_
 parking cost pnr,parking_cost_pnr,"0 if ((not _CALC_PNR) or ('PNR_PRKCST' not in land_use.columns)) else np.where(is_valid_pnr,reindex(land_use.PNR_PRKCST, df.pnr_zone_id), 0)"
 fare pnr,fare_pnr,"0 if not _CALC_PNR else np.where(is_valid_pnr, (ldt_skims['fare'] + dlt_skims['fare']), 0)"
 # Micromobility times,,
-E-scooter access time outbound,escooter_access_out,"reindex(land_use.ESCOOACCTIME,origin)"
-E-scooter access time inbound,escooter_access_inb,"reindex(land_use.ESCOOACCTIME,destination)"
+E-scooter access time outbound,escooter_access_out,"reindex(land_use.ESCOOACCTIME,origin).fillna(-1)"
+E-scooter access time inbound,escooter_access_inb,"reindex(land_use.ESCOOACCTIME,destination).fillna(-1)"
 E-scooter time outbound,escooter_time_out,bike_time_out * bikeSpeed / escooterSpeed
 E-scooter time inbound,escooter_time_inb,bike_time_inb * bikeSpeed / escooterSpeed
 E-scooter available,escooter_available,(escooter_time_inb>0) & (escooter_time_out>0)
 E-scooter max distance availability,escooterMaxDistance,"(od_skims[('SOV_M_DIST', 'MD')] > escooterMaxDist)"
-E-bike access time outbound,ebike_access_out,"reindex(land_use.EBIKEACCTIME,origin)"
-E-bike access time inbound,ebike_access_inb,"reindex(land_use.EBIKEACCTIME,destination)"
+E-bike access time outbound,ebike_access_out,"reindex(land_use.EBIKEACCTIME,origin).fillna(-1)"
+E-bike access time inbound,ebike_access_inb,"reindex(land_use.EBIKEACCTIME,destination).fillna(-1)"
 E-bike time outbound,ebike_time_out,bike_time_out * bikeSpeed / ebikeSpeed
 E-bike time inbound,ebike_time_inb,bike_time_inb * bikeSpeed / ebikeSpeed
 E-bike available,ebike_available,(ebike_time_inb>0) & (ebike_time_out>0)
