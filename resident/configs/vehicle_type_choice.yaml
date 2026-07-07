@@ -37,7 +37,7 @@ COLS_TO_INCLUDE_IN_VEHICLE_TABLE:
   - MPG
   - vehicle_year
 
-# If PROBS_SPEC is supplied, fuel_type will be ignored
+# If PROBS_SPEC is supplied, fuel_type will be ignored (but is still needed below)
 combinatorial_alts:
   body_type:
     - Car
@@ -70,6 +70,12 @@ combinatorial_alts:
     - 18
     - 19
     - 20
+  fuel_type:
+    - Gas
+    - Diesel
+    - Hybrid
+    - PEV
+    - BEV
 
 # will write out the created vehicle_type_model_alternatives.csv file
 #  to the base configs directory. Helpful for debugging alternatives.
