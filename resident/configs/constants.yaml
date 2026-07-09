@@ -326,3 +326,4 @@ OpVTCr: 0.1442
 # model region constants
 KNR_available: True  # SKATS does not have KNR, so set to False in configs_skats/constants.yaml
 model_region_name: "Metro"
+MSA_POP: 2500000  # used in vehicle type choice model
