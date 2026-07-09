@@ -1,4 +1,5 @@
 coefficient_name,value,constrain
+coef_unavail,-999,T
 coef_i025_age,0.102,F
 coef_i2550_age,0.044,F
 coef_i100_age,-0.034,F

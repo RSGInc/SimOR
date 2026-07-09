@@ -1,4 +1,7 @@
 Label,Description,Expression,Coefficient
+#,av availability,,
+util_must_select_av,Must select autonomous vehicle if hh owns one,av_ownership & ~is_av & (num_hh_veh_owned == 0),coef_unavail
+util_no_av,Cannot select AV if hh does not own one,~av_ownership & is_av,coef_unavail
 #,income,,
 util_i025_age,Income $0-25k - Age,((income < 25000) & (income > -1)) * age,coef_i025_age
 util_i2550_age,Income $25-50k - Age,((income < 50000) & (income >= 25000)) * age,coef_i2550_age
