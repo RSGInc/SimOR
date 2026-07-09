@@ -48,3 +48,7 @@ workplace_segmentation_targets:
   prod_trans_move: EMP_TOTAL
   missing: EMP_TOTAL
 
+# map model selectors to chooser segment columns used by shadow pricing simulation
+SEGMENT_TO_NAME:
+  school: school_segment
+  workplace: occupation
