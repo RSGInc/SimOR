@@ -11,5 +11,4 @@ Activity duration,activity_duration,"np.where(_next_trip_depart.isna(), 0, _next
 ,_cost_parking,"_cost_parking + df.trip_mode.isin(['DRIVEALONE']) * (df.parkingCost * df.autoParkingCostFactor)"
 ,_cost_parking,"_cost_parking + df.trip_mode.isin(['SHARED2']) * (df.parkingCost * df.autoParkingCostFactor)/np.where(_is_joint,_tour_participants,OCC_SHARED2)"
 ,cost_parking,"_cost_parking + df.trip_mode.isin(['SHARED3']) * (df.parkingCost * df.autoParkingCostFactor)/np.where(_is_joint,_tour_participants,OCC_SHARED3)"
-# FIXME better way to determine parking eligibility?,,
-Parking eligible trip,is_park_eligible,"drive_trip & (df.purpose != 'home') & (cost_parking > 0)"
+Parking eligible trip,is_park_eligible,"drive_trip & (df.purpose != 'home') & (land_use.PARKAREA == 1)"
