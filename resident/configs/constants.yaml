@@ -92,12 +92,11 @@ indivTour: 1.00000
 
 ### Crosswalk between OCCP and size terms
 occupation_xwalk:
-  1: mngt_busi_scic_arts
-  2: white_collar
-  3: blue_collar
-  4: sales_office
-  5: nat_res_cnstr_maint
-  6: prod_trans_move
+  1: mngt_busi_sci_health
+  2: services
+  3: sales_retail
+  4: nat_res_cnstr_maint
+  5: prod_trans_move
   999: missing # no occupation 
   -1: missing # no occupation
 
