@@ -16,17 +16,15 @@ util_calib_2025,scenario year is 2025,@scenarioYear==2025,,coef_calib_2025_1day,
 util_calib_2035,scenario year is 2035,@scenarioYear==2035,,coef_calib_2035_1day,coef_calib_2035_23day,coef_calib_2035_23day,coef_calib_2035_4day
 util_calib_2050,scenario year is 2050,@scenarioYear==2050,,coef_calib_2050_1day,coef_calib_2050_23day,coef_calib_2050_23day,coef_calib_2050_4day
 util_2016,Model year is 2016,@PRE_COVID,,coef_2016_1day,coef_2016_23day,coef_2016_23day,coef_2016_4day
-util_accomodation,Accomodation industry,@df.naics_code==721,,coef_accomodation_1234day,coef_accomodation_1234day,coef_accomodation_1234day,coef_accomodation_1234day
-util_agriculture,Agriculture industry,@df.naics_code==11,,coef_agriculture_1234day,coef_agriculture_1234day,coef_agriculture_1234day,coef_agriculture_1234day
-util_business_srv,Business services industry,@df.naics_code==54,,coef_business_srv_1day,coef_business_srv_23day,coef_business_srv_23day,coef_business_srv_4day
-util_construction,Construction industry,@df.naics_code==23,,coef_construction_1day,coef_construction_234day,coef_construction_234day,coef_construction_234day
-util_education,Education industry,@df.naics_code==61,,coef_education_1234day,coef_education_1234day,coef_education_1234day,coef_education_1234day
-util_entertainment,Entertainment industry,@df.naics_code==71,,coef_entertainment_1day,coef_entertainment_23day,coef_entertainment_23day,coef_entertainment_4day
-util_food_srv,Food services industry,@df.naics_code==722,,coef_food_srv_1234day,coef_food_srv_1234day,coef_food_srv_1234day,coef_food_srv_1234day
-util_government,Government industry,@df.naics_code==92,,coef_government_1day,coef_government_234day,coef_government_234day,coef_government_234day
-util_healthcare,Healthcare industry,@df.naics_code==62,,coef_healthcare_1234day,coef_healthcare_1234day,coef_healthcare_1234day,coef_healthcare_1234day
-util_manufacturing,Manufacturing industry,"@df.naics_code.isin([31,32,33])",,coef_manufacturing_1day,coef_manufacturing_234day,coef_manufacturing_234day,coef_manufacturing_234day
-util_mgmt_srv,Management services industry,@df.naics_code==55,,coef_mgmt_srv_1day,coef_mgmt_srv_23day,coef_mgmt_srv_23day,coef_mgmt_srv_4day
-util_military,Miliary industry,@df.naics_code==9000,,coef_military_1day,coef_military_234day,coef_military_234day,coef_military_234day
-util_retail,Retail industry,"@df.naics_code.isin([44,45])",,coef_retail_1day,coef_retail_23day,coef_retail_23day,coef_retail_4day
+_food,Accomodation and food industry,@df.industry==8,,coef_accomodation_1234day,coef_accomodation_1234day,coef_accomodation_1234day,coef_accomodation_1234day
+util_agriculture,Agriculture industry,@df.industry==12,,coef_agriculture_1234day,coef_agriculture_1234day,coef_agriculture_1234day,coef_agriculture_1234day
+util_business_srv,Business services industry,@df.industry==5,,coef_business_srv_1day,coef_business_srv_23day,coef_business_srv_23day,coef_business_srv_4day
+util_construction,Construction industry,@df.industry==3,,coef_construction_1day,coef_construction_234day,coef_construction_234day,coef_construction_234day
+util_education,Education industry,@df.industry==4,,coef_education_1234day,coef_education_1234day,coef_education_1234day,coef_education_1234day
+util_entertainment,Entertainment industry,@df.industry==10,,coef_entertainment_1day,coef_entertainment_23day,coef_entertainment_23day,coef_entertainment_4day
+util_government,Government industry,@df.industry==6,,coef_government_1day,coef_government_234day,coef_government_234day,coef_government_234day
+util_healthcare,Healthcare industry,@df.industry==7,,coef_healthcare_1234day,coef_healthcare_1234day,coef_healthcare_1234day,coef_healthcare_1234day
+util_manufacturing,Manufacturing industry,@df.industry==9,,coef_manufacturing_1day,coef_manufacturing_234day,coef_manufacturing_234day,coef_manufacturing_234day
+util_mgmt_srv,Management services industry,@df.industry==14,,coef_mgmt_srv_1day,coef_mgmt_srv_23day,coef_mgmt_srv_23day,coef_mgmt_srv_4day
+util_retail,Retail industry,@df.industry==16,,coef_retail_1day,coef_retail_23day,coef_retail_23day,coef_retail_4day
 util_asc,Alternative specific constant,1,,asc_1day,asc_23day,asc_23day,asc_4day

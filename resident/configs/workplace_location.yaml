@@ -48,7 +48,7 @@ CHOOSER_TABLE_NAME: persons_merged
 MODEL_SELECTOR: workplace
 
 # column in persons table used to segment choosers
-CHOOSER_SEGMENT_COLUMN_NAME: occupation
+CHOOSER_SEGMENT_COLUMN_NAME: work_segment
 
 # boolean column to filter choosers (True means keep)
 CHOOSER_FILTER_COLUMN_NAME: is_internal_worker

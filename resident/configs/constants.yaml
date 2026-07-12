@@ -90,7 +90,7 @@ escooterSpeed: 6.70
 driveSpeed: 25.00
 indivTour: 1.00000
 
-### Crosswalk between OCCP and size terms
+### Crosswalk between occupation and size terms
 occupation_xwalk:
   1: mngt_busi_sci_health
   2: services
