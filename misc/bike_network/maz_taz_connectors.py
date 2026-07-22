@@ -5,16 +5,24 @@ import numpy as np
 import os
 from shapely import LineString
 
-# Define directories
+# Settings
 root_dir ="../../skimming_and_assignment/maz_maz_stop_skims"
-mpo = "LCOG" #LCOG, SKATS
+mpo = "SKATS" #LCOG, SKATS
 maz_output_file = os.path.join(root_dir, f"Visum_Outputs_{mpo}", "bike_maz_connectors.shp")
 taz_output_file = os.path.join(root_dir, f"Visum_Outputs_{mpo}", "bike_taz_connectors.shp")
 
 # Load network
+network_files = {
+    "SKATS": ["Network_link.shp", "Network_node.shp"],
+    "LCOG": ["AllStreets_Network_link.shp", "AllStreets_Network_node.shp"]
+}
+
+link_file = network_files[mpo][0]
+node_file = network_files[mpo][1]
+
 mazs = gpd.read_file(os.path.join(root_dir, f"Visum_Outputs_{mpo}", "MAZ_poi_surface.shp"))
-network = gpd.read_file(os.path.join(root_dir, f"Visum_Outputs_{mpo}", "Network_link.shp"))
-nodes = gpd.read_file(os.path.join(root_dir, f"Visum_Outputs_{mpo}", "Network_node.shp"))
+network = gpd.read_file(os.path.join(root_dir, f"Visum_Outputs_{mpo}", link_file))
+nodes = gpd.read_file(os.path.join(root_dir, f"Visum_Outputs_{mpo}", node_file))
 
 # External stations
 ext_stations = np.arange(1,31,1) if mpo == 'SKATS' else [None]
@@ -108,7 +116,7 @@ def add_connectors(centroids, nodes, zone_id):
         ignore_index=True
         ).sort_values(by=["ZONENO", "NODENO"])
     
-    return maz_connectors_final
+    return maz_connectors_final.reset_index(drop=True)
 
 maz_connectors = add_connectors(maz_centroids, bike_nodes, 'MAZ')
 taz_connectors = add_connectors(taz_centroids, bike_nodes, 'TAZ')
