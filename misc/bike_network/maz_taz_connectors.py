@@ -7,7 +7,7 @@ from shapely import LineString
 
 # Settings
 root_dir ="../../skimming_and_assignment/maz_maz_stop_skims"
-mpo = "SKATS" #LCOG, SKATS
+mpo = "LCOG" #LCOG, SKATS
 maz_output_file = os.path.join(root_dir, f"Visum_Outputs_{mpo}", "bike_maz_connectors.shp")
 taz_output_file = os.path.join(root_dir, f"Visum_Outputs_{mpo}", "bike_taz_connectors.shp")
 
@@ -17,6 +17,12 @@ network_files = {
     "LCOG": ["AllStreets_Network_link.shp", "AllStreets_Network_node.shp"]
 }
 
+mode_code = {
+    "SKATS": "k",
+    "LCOG": "BIKE"
+}
+
+bike_code = mode_code[mpo]
 link_file = network_files[mpo][0]
 node_file = network_files[mpo][1]
 
@@ -31,10 +37,12 @@ ext_stations = np.arange(1,31,1) if mpo == 'SKATS' else [None]
 assert (mazs.crs == nodes.crs == network.crs), "crs is not the equal for MAZs, nodes, and network"
 assert (mazs.crs.is_projected), "MAZ crs is not projected"
 
+if mazs.crs != nodes.crs and mazs.crs.is_projected:
+    nodes = nodes.to_crs(mazs.crs)
+    network = network.to_crs(mazs.crs)
+
 # Filter bike links
-bike_modes = "k"
-bike_modes = "|".join(bike_modes)
-bike_links = network[network['TSYSSET'].str.contains(bike_modes, na=False)]
+bike_links = network[network['TSYSSET'].str.contains(bike_code, na=False)]
 
 # Extract bike nodes
 bike_nodes = nodes[
@@ -54,7 +62,7 @@ pairs['has_reverse'] = pairs['reverse'].isin(all_pairs)
 # Note links missing a reverse direction (for information only)
 missing_reverse = pairs[~pairs['has_reverse']]
 print(f"{len(missing_reverse)} links missing reverse direction")
-print(missing_reverse[['FROMNODENO', 'TONODENO']]).head()
+print(missing_reverse[['FROMNODENO', 'TONODENO']].head())
 
 # Get TAZ centroids
 tazs = mazs[['TAZ', 'geometry']].dissolve('TAZ', aggfunc='first').reset_index()
