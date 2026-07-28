@@ -92,13 +92,19 @@ indivTour: 1.00000
 
 ### Crosswalk between occupation and size terms
 occupation_xwalk:
-  1: mngt_busi_sci_health
-  2: services
-  3: sales_retail
-  4: nat_res_cnstr_maint
-  5: prod_trans_move
-  999: missing # no occupation 
-  -1: missing # no occupation
+  1: 1 # Business, healthcare, or education -> mngt_busi_sci_health
+  2: 2 # Food prep/hospitality/lodging/arts/media/personal care -> services
+  3: 3 # Landscaping/building maintenance/grounds cleaning/protective services -> nat_res_cnstr_maint
+  4: 4 # Sales and retail -> sales_retail
+  5: 1 # Life and physical sciences -> mngt_busi_scic_arts
+  6: 3 # Farming/environmental science/forestry -> nat_res_cnstr_maint
+  7: 3 # Construction/installations/repair occupations -> nat_res_cnstr_maint
+  8: 5 # Production/transportation/material moving -> prod_trans_move
+  9: 5 # Active military -> prod_trans_move
+  995: 999 # Missing Response -> missing
+  997: 999 # Other -> missing
+  999: 999 # no occupation -> missing
+  -1: 999 # no occupation -> missing
 
 # RIDEHAIL Settings - all costs in dollars, times in minutes
 Taxi_baseFare: 3.00
