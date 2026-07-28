@@ -55,5 +55,4 @@ home_zone_id,home_zone_id,"reindex(households.home_zone_id, persons.household_id
 travel time sensitivity factor for work travel,time_factor_work,"np.minimum(_max_time_factor, np.maximum(rng.lognormal_for_df(persons, mu=_mean_work, sigma=_stddev_work, scale=True), _min_time_factor))"
 travel time sensitivity factor for non-work travel,time_factor_nonwork,"np.minimum(_max_time_factor, np.maximum(rng.lognormal_for_df(persons, mu=_mean_nonwork, sigma=_stddev_nonwork, scale=True), _min_time_factor))  "
 #,,
-# FIXME does filling with -1 make sense here? depends on what the missing values mean,,
-occupation categories mapped to workplace segments,work_segment,persons.occupation.fillna(-1).map(occupation_xwalk)
+occupation categories mapped to workplace segments,work_segment,persons.occupation.fillna(999).map(occupation_xwalk)
