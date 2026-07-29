@@ -3,66 +3,40 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 import os
-from shapely import LineString
+from shapely import LineString, wkt
 
 # Settings
-root_dir ="../../skimming_and_assignment/maz_maz_stop_skims"
-mpo = "LCOG" #LCOG, SKATS
-maz_output_file = os.path.join(root_dir, f"Visum_Outputs_{mpo}", "bike_maz_connectors.shp")
-taz_output_file = os.path.join(root_dir, f"Visum_Outputs_{mpo}", "bike_taz_connectors.shp")
+mpo = "SKATS" #LCOG, SKATS
+maz_output_file = os.path.join(f"LinkNodeTurns_{mpo}", "maz_connectors.shp")
+taz_output_file = os.path.join(f"LinkNodeTurns_{mpo}", "taz_connectors.shp")
+maz_output_csv = os.path.join(f"LinkNodeTurns_{mpo}", "maz_connectors.csv")
+taz_output_csv = os.path.join(f"LinkNodeTurns_{mpo}", "taz_connectors.csv")
 
-# Load network
-network_files = {
-    "SKATS": ["Network_link.shp", "Network_node.shp"],
-    "LCOG": ["AllStreets_Network_link.shp", "AllStreets_Network_node.shp"]
-}
+# Load links
+link_file = f"LinkNodeTurns_{mpo}/links.csv"
+node_file = f"LinkNodeTurns_{mpo}/nodes.csv"
+maz_file = f"C:/Users/edna.aguilar/Documents/git_locals/SimOR/skimming_and_assignment/maz_maz_stop_skims/Visum_Outputs_{mpo}/MAZ_poi_surface.shp"
 
-mode_code = {
-    "SKATS": "k",
-    "LCOG": "BIKE"
-}
-
-bike_code = mode_code[mpo]
-link_file = network_files[mpo][0]
-node_file = network_files[mpo][1]
-
-mazs = gpd.read_file(os.path.join(root_dir, f"Visum_Outputs_{mpo}", "MAZ_poi_surface.shp"))
-network = gpd.read_file(os.path.join(root_dir, f"Visum_Outputs_{mpo}", link_file))
-nodes = gpd.read_file(os.path.join(root_dir, f"Visum_Outputs_{mpo}", node_file))
+mazs = gpd.read_file(os.path.join(maz_file))
+links = gpd.read_file(link_file)
+nodes = gpd.read_file(node_file)
 
 # External stations
 ext_stations = np.arange(1,31,1) if mpo == 'SKATS' else [None]
 
 # Convert to same crs
-assert (mazs.crs == nodes.crs == network.crs), "crs is not the equal for MAZs, nodes, and network"
 assert (mazs.crs.is_projected), "MAZ crs is not projected"
 
-if mazs.crs != nodes.crs and mazs.crs.is_projected:
-    nodes = nodes.to_crs(mazs.crs)
-    network = network.to_crs(mazs.crs)
+# Create links and nodes
+nodes['geometry'] = nodes['WKTLOCWGS84'].apply(wkt.loads)
+nodes = gpd.GeoDataFrame(nodes, geometry="geometry", crs="4326")
+nodes.to_file(os.path.join(f"LinkNodeTurns_{mpo}", "bike_nodes.shp"))
+nodes = nodes.to_crs(mazs.crs)
 
-# Filter bike links
-bike_links = network[network['TSYSSET'].str.contains(bike_code, na=False)]
-
-# Extract bike nodes
-bike_nodes = nodes[
-    (nodes['NO'].isin(bike_links['FROMNODENO'])) |
-    (nodes['NO'].isin(bike_links['TONODENO']))
-]
-
-# Check if for each link there is a duplicate in the opposite direction
-pairs = bike_links[['FROMNODENO', 'TONODENO']].copy()
-pairs['forward'] = list(zip(pairs['FROMNODENO'], pairs['TONODENO']))
-pairs['reverse'] = list(zip(pairs['TONODENO'], pairs['FROMNODENO']))
-
-# Check if the reverse direction exists in the set of all links
-all_pairs = set(pairs['forward'])
-pairs['has_reverse'] = pairs['reverse'].isin(all_pairs)
-
-# Note links missing a reverse direction (for information only)
-missing_reverse = pairs[~pairs['has_reverse']]
-print(f"{len(missing_reverse)} links missing reverse direction")
-print(missing_reverse[['FROMNODENO', 'TONODENO']].head())
+links['geometry'] = links['WKTPOLYWGS84'].apply(wkt.loads)
+links = gpd.GeoDataFrame(links, geometry="geometry", crs="4326")
+links.to_file(os.path.join(f"LinkNodeTurns_{mpo}", "bike_links.shp"))
+links = links.to_crs(mazs.crs)
 
 # Get TAZ centroids
 tazs = mazs[['TAZ', 'geometry']].dissolve('TAZ', aggfunc='first').reset_index()
@@ -108,6 +82,9 @@ def add_connectors(centroids, nodes, zone_id):
         geometry="geometry", 
         crs=centroids.crs)
     
+    # Add length
+    maz_connectors["LENGTH"] = maz_connectors["geometry"].length
+    
     # Duplicate connectors to create second direction
     maz_connectors['DIRECTION'] = 1
     maz_connectors2 = maz_connectors.copy()
@@ -117,18 +94,25 @@ def add_connectors(centroids, nodes, zone_id):
     maz_connectors2['geometry'] = maz_connectors2['geometry'].apply(
     lambda geom: LineString(list(geom.coords)[::-1])
     )
-
+    
     maz_connectors_final = pd.concat(
         [maz_connectors, maz_connectors2],
         axis=0,
         ignore_index=True
         ).sort_values(by=["ZONENO", "NODENO"])
     
+    # Add wkt geometry
+    maz_connectors_final = maz_connectors_final.to_crs(4326)
+    maz_connectors_final["WKTLOCWGS84"] = maz_connectors_final.geometry.to_wkt()
+
     return maz_connectors_final.reset_index(drop=True)
 
-maz_connectors = add_connectors(maz_centroids, bike_nodes, 'MAZ')
-taz_connectors = add_connectors(taz_centroids, bike_nodes, 'TAZ')
+maz_connectors = add_connectors(maz_centroids, nodes, 'MAZ')
+taz_connectors = add_connectors(taz_centroids, nodes, 'TAZ')
 
 # Export
 maz_connectors.to_file(maz_output_file)
 taz_connectors.to_file(taz_output_file)
+
+maz_connectors.drop(columns=["geometry"]).to_csv(maz_output_csv, index = False)
+taz_connectors.drop(columns=["geometry"]).to_csv(taz_output_csv, index = False)
