@@ -146,17 +146,14 @@ persontype,personType,"df.ptype*np.where(is_indiv,1,0)"
 Origin Terminal Time,oTermTime,"reindex(land_use.TERMINALTIME,origin).fillna(0)"
 Destination Terminal Time,dTermTime,"reindex(land_use.TERMINALTIME,destination).fillna(0)"
 #,,
-# FIXME need bike logsums and times,,
 Person is female,female,(df.SEX == 2)
-#bike logsum inbound,bikeLSI,odt_skims['BIKE_LOGSUM']
-#bike logsum outbound (same as inbound),bikeLSO,dot_skims['BIKE_LOGSUM']
-#bike time inbound,bike_time_inb,dot_skims['BIKE_TIME']
-#bike time outbound,bike_time_out,odt_skims['BIKE_TIME']
-bike logsum inbound,bikeLSI,0
-bike logsum outbound (same as inbound),bikeLSO,0
-bike time inbound,bike_time_inb,do_skims['DISTWALK'] / bikeSpeed * 60
-bike time outbound,bike_time_out,od_skims['DISTWALK'] / bikeSpeed * 60
-bike availability,bikeAvailable,(bikeLSI > -300) & (bikeLSO > -300) & (od_skims['DISTWALK']>0)
+,od_bike_logsum,"np.where(is_mandatory, od_skims['logsum_commute'], od_skims['logsum_noncommute'])"
+,do_bike_logsum,"np.where(is_mandatory, do_skims['logsum_commute'], do_skims['logsum_noncommute'])"
+,od_bike_dist,"np.where(is_mandatory, od_skims['distance_commute'], od_skims['distance_noncommute'])"
+,do_bike_dist,"np.where(is_mandatory, do_skims['distance_commute'], do_skims['distance_noncommute'])"
+bike time inbound,bike_time_inb,od_bike_dist / bikeSpeed * 60
+bike time outbound,bike_time_out,do_bike_dist / bikeSpeed * 60
+bike availability,bikeAvailable,(od_bike_logsum > -500) & (od_bike_logsum > -500)
 #,,
 #,,
 "Cost factor for shared 2 tours, 1/(2^0.8)",costFactorS2,0.57
