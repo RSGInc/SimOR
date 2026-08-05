@@ -148,8 +148,8 @@ Final parking cost,parkingCost,parkCostTourDestContrib + parkCostTripOrigContrib
 Origin Terminal Time,oTermTime,"reindex(land_use.TERMINALTIME,origin).fillna(0)"
 Destination Terminal Time,dTermTime,"reindex(land_use.TERMINALTIME,destination).fillna(0)"
 #,,
-,bike_logsum,"np.where(is_mandatory, od_skims['logsum_commute'], od_skims['logsum_noncommute'])"
-,bike_dist,"np.where(is_mandatory, od_skims['bike_commute'], od_skims['bike_noncommute'])"
+,bike_logsum,"np.where(df.tour_category == 'mandatory', od_skims['logsum_commute'], od_skims['logsum_noncommute'])"
+,bike_dist,"np.where(df.tour_category == 'mandatory', od_skims['distance_commute'], od_skims['distance_noncommute'])"
 bike time,bike_time,bike_dist / bikeSpeed * 60
 #,,
 "Cost factor for shared 2 tours, 1/(2^0.8)",costFactorS2,0.57
