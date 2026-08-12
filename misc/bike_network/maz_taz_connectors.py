@@ -7,6 +7,7 @@ from shapely import LineString, wkt
 
 # Settings
 mpo = "SKATS" #LCOG, SKATS
+visum_outputs_dir = f"C:/Users/edna.aguilar/Documents/git_locals/SimOR/skimming_and_assignment/maz_maz_stop_skims/Visum_Outputs_{mpo}"
 maz_output_file = os.path.join(f"LinkNodeTurns_{mpo}", "maz_connectors.shp")
 taz_output_file = os.path.join(f"LinkNodeTurns_{mpo}", "taz_connectors.shp")
 maz_output_csv = os.path.join(f"LinkNodeTurns_{mpo}", "maz_connectors.csv")
@@ -15,20 +16,23 @@ taz_output_csv = os.path.join(f"LinkNodeTurns_{mpo}", "taz_connectors.csv")
 # Load links
 link_file = f"LinkNodeTurns_{mpo}/links.csv"
 node_file = f"LinkNodeTurns_{mpo}/nodes.csv"
-maz_file = f"C:/Users/edna.aguilar/Documents/git_locals/SimOR/skimming_and_assignment/maz_maz_stop_skims/Visum_Outputs_{mpo}/MAZ_poi_surface.shp"
+maz_file = f"{visum_outputs_dir}/MAZ_poi_surface.shp"
 
-mazs = gpd.read_file(os.path.join(maz_file))
+# External station are points for LCOG, load separately
+if mpo == "LCOG":
+    ext_points = gpd.read_file(f"{visum_outputs_dir}/MAZ_poi_centroid.shp")
+    ext_points = ext_points[ext_points["NO"] >= 5000]
+
+mazs = gpd.read_file(maz_file)
 links = gpd.read_file(link_file)
 nodes = gpd.read_file(node_file)
-
-# External stations
-ext_stations = np.arange(1,31,1) if mpo == 'SKATS' else [None]
 
 # Convert to same crs
 assert (mazs.crs.is_projected), "MAZ crs is not projected"
 
 # Create links and nodes
 nodes['geometry'] = nodes['WKTLOCWGS84'].apply(wkt.loads)
+nodes["NO"] = pd.to_numeric(nodes["NO"], errors="coerce")
 nodes = gpd.GeoDataFrame(nodes, geometry="geometry", crs="4326")
 nodes.to_file(os.path.join(f"LinkNodeTurns_{mpo}", "bike_nodes.shp"))
 nodes = nodes.to_crs(mazs.crs)
@@ -39,15 +43,27 @@ links.to_file(os.path.join(f"LinkNodeTurns_{mpo}", "bike_links.shp"))
 links = links.to_crs(mazs.crs)
 
 # Get TAZ centroids
-tazs = mazs[['TAZ', 'geometry']].dissolve('TAZ', aggfunc='first').reset_index()
-tazs = tazs[~tazs['TAZ'].isin(ext_stations)] # remove externals
+tazs = mazs[['TAZ', 'geometry']].dissolve('TAZ').reset_index()
 taz_centroids = tazs.copy()
+
+if mpo == "LCOG":
+    taz_centroids = pd.concat(
+        [taz_centroids, ext_points[["TAZ", "geometry"]]], 
+        axis=0, ignore_index=True
+        ).reset_index()
+    
 taz_centroids["centroid_geom"] = taz_centroids['geometry'].centroid
 taz_centroids = taz_centroids[["TAZ", "centroid_geom"]].rename(columns={'centroid_geom':'geometry'})
 
 # Get MAZ centroids
 maz_centroids = mazs[['MAZ', "geometry"]].copy()
-maz_centroids = maz_centroids[~maz_centroids['MAZ'].isin(ext_stations)]
+
+if mpo == "LCOG":
+    maz_centroids = pd.concat(
+        [maz_centroids, ext_points[["MAZ", "geometry"]]], 
+        axis=0, ignore_index=True
+        ).reset_index()
+    
 maz_centroids['centroid_geom'] = maz_centroids['geometry'].centroid
 maz_centroids = maz_centroids[["MAZ", "centroid_geom"]].rename(columns={"centroid_geom":"geometry"}) 
 
