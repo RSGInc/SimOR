@@ -91,8 +91,7 @@ CREATE_TABLES:
                 DAP: # Mandatory, Non-mandatory
                     1: "M"
                     2: "N"
-                # FIXME this should be updated when occupation_xwalk is updated
-                OCCP: # occupation codes
+                occupation: # occupation codes
                     1: 1   # Management Occupations
                     2: 999    # Non-worker
 
