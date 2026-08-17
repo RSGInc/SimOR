@@ -149,8 +149,8 @@ Origin Terminal Time,oTermTime,"reindex(land_use.TERMINALTIME,origin).fillna(0)"
 Destination Terminal Time,dTermTime,"reindex(land_use.TERMINALTIME,destination).fillna(0)"
 #,,
 # can have nan logsums for O-D pairs outside the path threshold during logsum calculation so fill with -999 to avoid nan's propogating,,
-,bike_logsum,"np.where(df.tour_category == 'mandatory', od_skims['logsum_commute'], od_skims['logsum_noncommute']).fillna(-999)"
-,bike_dist,"np.where(df.tour_category == 'mandatory', od_skims['distance_commute'], od_skims['distance_noncommute']).fillna(999)"
+,bike_logsum,"np.nan_to_num(np.where(df.tour_category == 'mandatory', od_skims['logsum_commute'], od_skims['logsum_noncommute']), nan=-999)"
+,bike_dist,"np.nan_to_num(np.where(df.tour_category == 'mandatory', od_skims['distance_commute'], od_skims['distance_noncommute']), nan=999)"
 bike time,bike_time,bike_dist / bikeSpeed * 60
 #,,
 "Cost factor for shared 2 tours, 1/(2^0.8)",costFactorS2,0.57

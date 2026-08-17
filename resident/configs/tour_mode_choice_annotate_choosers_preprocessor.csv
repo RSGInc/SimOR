@@ -148,10 +148,10 @@ Destination Terminal Time,dTermTime,"reindex(land_use.TERMINALTIME,destination).
 #,,
 Person is female,female,(df.SEX == 2)
 # can have nan logsums for O-D pairs outside the path threshold during logsum calculation so fill with -999 to avoid nan's propogating,,
-,od_bike_logsum,"np.where(is_mandatory, od_skims['logsum_commute'], od_skims['logsum_noncommute']).fillna(-999)"
-,do_bike_logsum,"np.where(is_mandatory, do_skims['logsum_commute'], do_skims['logsum_noncommute']).fillna(-999)"
-,od_bike_dist,"np.where(is_mandatory, od_skims['distance_commute'], od_skims['distance_noncommute']).fillna(999)"
-,do_bike_dist,"np.where(is_mandatory, do_skims['distance_commute'], do_skims['distance_noncommute']).fillna(999)"
+,od_bike_logsum,"np.nan_to_num(np.where(is_mandatory, od_skims['logsum_commute'], od_skims['logsum_noncommute']), nan=-999)"
+,do_bike_logsum,"np.nan_to_num(np.where(is_mandatory, do_skims['logsum_commute'], do_skims['logsum_noncommute']), nan=-999)"
+,od_bike_dist,"np.nan_to_num(np.where(is_mandatory, od_skims['distance_commute'], od_skims['distance_noncommute']), nan=999)"
+,do_bike_dist,"np.nan_to_num(np.where(is_mandatory, do_skims['distance_commute'], do_skims['distance_noncommute']), nan=999)"
 bike time inbound,bike_time_inb,od_bike_dist / bikeSpeed * 60
 bike time outbound,bike_time_out,do_bike_dist / bikeSpeed * 60
 bike availability,bikeAvailable,(od_bike_logsum > -500) & (do_bike_logsum > -500)
