@@ -52,9 +52,10 @@ num_processes: 10
 want_dest_choice_sample_tables: False
 
 # number of households to simulate
+trace_hh_id: 123446633
 households_sample_size: 0
 
-resume_after:
+resume_after: trip_scheduling
 
 models:
   ### mp_init_proto_pop (single process)
