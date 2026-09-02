@@ -15,10 +15,10 @@ defaults:
     - 999999
 
 zone_mapping:
-  lookup_name: taz
+  lookup_name: ZONE
   file_lookup_names:
-    fares.omx: zone_number
-    'bike_taz_logsums_*.omx': TAZ
+    fares.omx: ZONE
+    'bike_taz_logsums_*.omx': ZONE
   missing_zone_policy: error
 
 dimensions:

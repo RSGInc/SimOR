@@ -206,7 +206,7 @@ prepare:
   validation:
     relationship_checks: warn
   distance_skim:
-    file: ../model_data/metro/data_cropped/autoSkims__MD.omx       # path relative to run directory, or absolute
+    file: ../../model_data/metro/data_cropped/autoSkims__MD.omx       # path relative to run directory, or absolute
     matrix: SOV_H_DIST__MD
   non_motorized_distance_skim:
     file: ../model_data/metro/data_cropped/maz_maz_walk.csv
