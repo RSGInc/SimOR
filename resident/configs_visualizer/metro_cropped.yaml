@@ -1,0 +1,404 @@
+# ActivitySim Visualizer Configuration
+# Adapt this file for each model deployment.
+# Only the sections you need are required — see comments for which are optional.
+
+name: "Default Settings"
+dashboard_title: "Metro Cropped Dataset Output Visualizer"
+
+processor:
+  root: artifacts/
+  weighting_modes: [unweighted, weighted]
+
+visualizer:
+  dashboard_pages:
+    - overview
+    - long_term_choices
+    - daily_travel
+    - joint_travel
+    - tour_summaries
+    - trip_summaries
+    - validation
+    # - skims
+    # - raw_trip_demo
+
+  run_colors:
+    - "#006FA1" # Marine
+    - "#63AF5E" # Leaf
+    - "#BA1222"  # Cherry
+    - "#524D85" # violet
+    - "#FFC20E"  # sunshine
+    - "#75BEE9"  # sky
+    # - "#ff7f0e"
+    # - "#2ca02c"
+    # - "#d62728"
+    # - "#9467bd"
+    # - "#8c564b"
+    # - "#e377c2"
+    # - "#7f7f7f"
+
+  export_html:
+    # enabled: true
+    # dashboard:
+    #   segmentation_type: signup_platform
+    #   segmentation_visibility: segments_only
+    # Export segmentation defaults to segmentation.dashboard when omitted.
+    # Use full_only, segments_only, or full_and_segments to choose which
+    # summary series are baked into one exported HTML file.
+  #   # Omit `pages` to mirror `dashboard_pages`.
+  #   # Omit selector overrides to export all widget states.
+  #   # Uncomment only when you want to narrow the default export:
+    dashboard:
+      weighting: [unweighted]
+    pages:
+      long_term_choices:
+        mandatory_location_choice:
+          parts:
+            commuting_flows:
+              enabled: false
+            
+        shadow_pricing:
+          # enabled: true
+          # geography_level: [all]
+          # student_type: [all]
+          parts:
+            workplace_table:
+              enabled: false
+            school_table:
+              enabled: false
+      tour_summaries:
+        internal_external_tours:
+          enabled: false
+      validation:
+        traffic:
+          enabled: false
+        transit:
+          enabled: false
+        vmt:
+          enabled: false
+
+# ---------------------------------------------------------------------------
+# ActivitySim output file names
+# Use stems (no extension) for automatic format detection: the reader will try
+# .parquet first, then .csv.  You may also specify an explicit extension to
+# force a particular format (e.g. final_households.csv or final_tours.parquet).
+# ---------------------------------------------------------------------------
+files:
+  households:              household
+  persons:                 person
+  tours:                   tour
+  trips:                   trip_linked
+  joint_tour_participants: joint_tour_participants
+  land_use:                land_use
+
+# Optional shared fallback files for optional inputs that may be missing in some
+# run folders. These must be explicit .csv or .parquet paths.
+# fallback_files:
+#   land_use: C:\Users\wesley.darling\Downloads\dataset_2026-05-21\unfiltered\land_use.csv
+
+# ---------------------------------------------------------------------------
+# Runs to compare
+# Each entry specifies a run directory, a display label, and optional overrides.
+#
+# Weight columns (all optional — leave as null or omit to use default rules):
+#   hh_weight_col:     explicit household weight column in final_households
+#   person_weight_col: explicit person weight column in final_persons
+#   trip_weight_col:   explicit trip weight column in final_trips
+#                      (tour weight = average of its trips' weights when set)
+#
+# If none of the above are set and sample_rate is not in columns, all weights = 1.
+# ---------------------------------------------------------------------------
+runs:
+  # - dir:              ~/Desktop/oregon/viz/metro/unfiltered
+  #   label:            Unfiltered
+  #   # skim_file:        null
+  #   # hh_weight_col:    null
+  #   # person_weight_col: null
+  #   # trip_weight_col:  null
+  # - dir:              ~/Desktop/oregon/viz/metro/filtered
+  #   label:            Filtered
+  #   # skim_file:        null
+  #   # hh_weight_col:    null
+  #   # person_weight_col: null
+  #   # trip_weight_col:  null
+  # - dir:              ~/Desktop/oregon/viz/metro/override
+  #   label:            Override
+  #   skim_file:        null
+  #   hh_weight_col:    null
+  #   person_weight_col: null
+  #   trip_weight_col:  null
+  - dir:              outputs/cropped
+    label:            Cropped Metro Output
+    # skim_file:        null
+    # hh_weight_col:    null
+    # person_weight_col: null
+    # trip_weight_col:  null
+    
+# ---------------------------------------------------------------------------
+# Skim file (global default — can be overridden per run below)
+# ---------------------------------------------------------------------------
+skim:
+  file: resident/model_data/metro/data_cropped/autoSkims__MD.omx       # path relative to run directory, or absolute
+  matrix: SOV_H_DIST__MD    # matrix name inside the OMX file
+
+skimjoin:
+  enabled: true
+#   config_path: will_config_explicit_format.yaml
+
+prepare:
+  output:
+    file_format: parquet
+  validation:
+    relationship_checks: warn
+  # vot_bins:
+  #   output_column: vot_bin
+  #   source_column: income_segment
+  #   fallback_value: M
+  #   mappings:
+  #     new-estimation-output:
+  #       1: L
+  #       2: M
+  #       3: M
+  #       4: H
+  #     estimation-output:
+  #       1: L
+  #       2: M
+  #       3: M
+  #       4: H
+  #     filtered:
+  #       1: L
+  #       2: L
+  #       3: M
+  #       4: M
+  #       5: H
+  #       6: H
+  #     override:
+  #       1: L
+  #       2: L
+  #       3: M
+  #       4: M
+  #       5: H
+  #       6: H
+  #     unfiltered:
+  #       1: L
+  #       2: L
+  #       3: M
+  #       4: M
+  #       5: H
+  #       6: H
+
+
+# ---------------------------------------------------------------------------
+# Zone system
+# Set use_maz: false for TAZ-only models (zone IDs in outputs are already TAZs).
+# For 2-zone (MAZ+TAZ) models, specify which columns in final_land_use
+# hold the MAZ and TAZ IDs.
+# ---------------------------------------------------------------------------
+zones:
+  use_maz:  true          # false = TAZ-only model, no MAZ→TAZ conversion needed
+  maz_col:  [MAZ, zone_id]      # column in final_land_use containing MAZ IDs
+  taz_col:  TAZ           # column in final_land_use containing TAZ IDs
+
+
+
+
+# ---------------------------------------------------------------------------
+# Column names in the ActivitySim output files
+# Change only if your outputs use non-standard column names.
+# ---------------------------------------------------------------------------
+columns:
+  ptype:          ptype           # person type column in persons file
+  hhsize:         hhsize          # HH size column in households file
+  auto_ownership: auto_ownership  # vehicle count column in households file
+  num_workers:    num_workers     # workers per HH in households file
+  num_adults:     num_adults      # adults per HH in households file
+  # income_segment: [income_segment, income_broad]  # OPTIONAL household income segment/level column for trip enrichment
+  tour_type:      primary_purpose # tour type column in tours file
+  # tour_purpose: [primary_purpose, tour_type, purpose]
+  # sample_rate: sample_rate     # OPTIONAL override; if omitted, code auto-detects
+                                 # a households column literally named 'sample_rate'.
+                                 # finalweight = 1/sample_rate (unless explicit run weight columns are provided)
+  # school_esc_outbound: [school_esc_outbound, out_escort_type]
+  # school_esc_inbound: [school_esc_inbound, inb_escort_type]
+
+# OPTIONAL person type display labels used in dropdowns/charts
+# Keys should match raw ptype values in outputs
+person_types:
+  1: Full-time worker
+  2: Part-time worker
+  3: University student
+  4: Non-worker adult
+  5: Retired
+  6: Driving-age student
+  7: Non-driving-age student
+  8: Preschool
+
+  transit_subsidy:
+    mapping:
+      0: No subsidy
+      1: Discounted
+      2: Free
+
+  # geography:
+  #   mapping:
+  #     1: County_name1
+  #     2: County_name2
+  #     3: County_name3
+
+  mode:
+    mapping:
+      SOV: Drive Alone
+      HOV2: Shared Ride 2
+      HOV3: Shared Ride 3+
+      WALK: Walk
+      BIKE: Bike
+      EBIKE: E-Bike
+      ESCOOTER: E-Scooter
+      WALK_TRANSIT: Walk-Transit
+      BIKE_TRANSIT: Bike-Transit
+      PNR_TRANSIT: PNR-Transit
+      KNR_TRANSIT: KNR-Transit
+      TAXI: Taxi
+      TNC_SINGLE: TNC-Single
+      TNC_SHARED: TNC-Pool
+      SCHOOLBUS: School Bus
+
+
+  # escort:
+  #   mapping:
+  #     not_escorted: No Escort
+  #     pure_escort: Pure Escort
+  #     ride_share: Ride Share
+  #     0: No Escort
+  #     1: Pure Escort
+  #     2: Ride Share
+  #     "": No Escort
+
+  tour_purpose:
+    mapping:
+      all_tour_purposes: All Tour Purposes
+      work: Work
+      school: School
+      joint: Joint
+      escort: Escort
+      shopping: Shopping
+      othmaint: Other Maintenance
+      eatout: Eat Out
+      social: Social
+      othdiscr: Other Discretionary
+      atwork: At-Work
+  
+  mandatory_tour_frequency:
+    mapping:
+      work1: Work
+      school1: School
+      work2: 2 Work
+      school2: 2 School
+      work_and_school: 1 Work + 1 School
+
+  daily_activity_pattern:
+    mapping:
+      M : M
+      N : N
+      H : H
+
+# # OPTIONAL transit subsidy display labels used in charts
+# # Keys should match raw transit_pass_subsidy values in the persons table
+# transit_subsidies:
+#   0: No subsidy
+#   1: Discounted
+#   2: Free
+
+# OPTIONAL summary-time grouping for outputs with a tour_purpose dimension
+# group_joint_tour_purposes: true
+# group_atwork_tour_purposes: true
+# group_school_tour_purposes: true
+
+# ---------------------------------------------------------------------------
+# Geography grouping (OPTIONAL)
+# Enables district/county/zone-group level breakdowns.
+# Remove this section (or set enabled: false) to disable geographic summaries.
+# ---------------------------------------------------------------------------
+geography:
+  enabled: false
+  # aggregations:
+  #   school_district:
+  #     source_zone_system: maz
+  #     file: C:\Users\wesley.darling\Downloads\viz\viz\new_output\land_use.csv
+  #     zone_id_col: zone_id
+  #     geography_col: DIST_9to12
+
+
+segmentation:
+  enabled: false
+  dashboard:
+    segmentation_type: signup_platform
+    visibility: segments_only   # full_only | segments_only | full_and_segments
+  definitions:
+    signup_platform:
+      include_full: true
+      persist_segmented_prepared_tables: false
+      allow_overlapping: false
+      on_empty_segment: warn
+      source:
+        type: prepared_column 
+        source_table: hh
+        column: signup_platform
+      segments:
+        - id: rmove
+          label: RMove
+          values: ["rmove"]
+        - id: browser
+          label: Browser
+          values: ["browser"]
+        - id: call
+          label: Call
+          values: ["call"]
+
+    person_sex:
+      include_full: false
+      persist_segmented_prepared_tables: false
+      allow_overlapping: false
+      on_empty_segment: warn
+      source:
+        type: prepared_column
+        source_table: per
+        column: SEX
+      segments:
+        - id: male
+          label: Male
+          values: [1]
+        - id: female
+          label: Female
+          values: [2]
+
+# ---------------------------------------------------------------------------
+# Mode display (OPTIONAL)
+# order: controls the display order for mode charts.
+# groups: rolls up individual modes into aggregate categories for summary charts.
+# If omitted, modes appear in the order found in the data with no grouping.
+# ---------------------------------------------------------------------------
+# modes:
+#   order:
+#     - DRIVEALONE
+#     - SHARED2
+#     - SHARED3
+#     - WALK
+#     - BIKE
+#     - WALK_LOC
+#     - WALK_MIX
+#     - WALK_PRM
+#     - PNR_LOC
+#     - PNR_MIX
+#     - PNR_PRM
+#     - KNR_LOC
+#     - KNR_MIX
+#     - KNR_PRM
+#     - SCHOOLBUS
+#     - TAXI
+#     - TNC_SINGLE
+#     - TNC_SHARED
+#   groups:
+#     Auto:           [DRIVEALONE, SHARED2, SHARED3]
+#     Transit:        [WALK_LOC, WALK_MIX, WALK_PRM, PNR_LOC, PNR_MIX, PNR_PRM, KNR_LOC, KNR_MIX, KNR_PRM]
+#     Non-Motorized:  [WALK, BIKE]
+#     Other:          [SCHOOLBUS, TAXI, TNC_SINGLE, TNC_SHARED]
