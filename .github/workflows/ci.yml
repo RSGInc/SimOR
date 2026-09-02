@@ -48,6 +48,15 @@ jobs:
           uv pip install -e . --no-deps
           uv pip list
 
+      # Clone the ActivitySim visualizer and build its virtual environment
+      - name: Set up ActivitySim visualizer
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/ext_dependencies
+          cd $GITHUB_WORKSPACE/ext_dependencies
+          git clone --branch main https://github.com/RSGInc/activitysim_visualizer.git
+          cd activitysim_visualizer
+          uv sync
+
       # Run the test
       - name: Run Metro cropped example test
         run: |
