@@ -30,7 +30,7 @@ files:
 
 # Required: replace these example directories. Add or remove runs as needed.
 runs:
-  - dir: ../outputs/test
+  - dir: resident/outputs/test
     label: Cropped Outputs
 
 

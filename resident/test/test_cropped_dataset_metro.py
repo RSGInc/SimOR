@@ -70,6 +70,7 @@ def test_cropped_visualizer():
         "--export-html", "metro_cropped.html",
     ]
 
+    print(f"Running from directory {os.getcwd()}")
     try:
         result = subprocess.run(
             [python_exe, run_script] + run_args,
