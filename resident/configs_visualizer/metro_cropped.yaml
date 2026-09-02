@@ -20,7 +20,7 @@ pipeline:
     # - segment
     - summarize # will automatically overwrite summaries with a stale cache
     - dashboard
-  dashboard_mode: live
+  dashboard_mode: export
   refresh: []
 
 # These are the default ActivitySim file stems. Edit only names that differ in
@@ -206,13 +206,13 @@ prepare:
   validation:
     relationship_checks: warn
   distance_skim:
-    file: resident/model_data/metro/data_cropped/autoSkims__MD.omx       # path relative to run directory, or absolute
+    file: ../model_data/metro/data_cropped/autoSkims__MD.omx       # path relative to run directory, or absolute
     matrix: SOV_H_DIST__MD
   non_motorized_distance_skim:
-    file: resident/model_data/metro/data_cropped/maz_maz_walk.csv
+    file: ../model_data/metro/data_cropped/maz_maz_walk.csv
     matrix: null
   time_periods:
-    network_los_file: resident/configs/network_los.yaml
+    network_los_file: ../configs/network_los.yaml
     trip_period_number_column: depart
     tour_start_period_number_column: start
     tour_end_period_number_column: end
@@ -263,12 +263,12 @@ skimjoin:
   defaults:
     config_path: metro_skimjoin_config.yaml
     skim_files:
-      - 'resident/model_data/metro/data_cropped/*.omx'
-      - resident/model_data/metro/data_cropped/maz_stop_walk.csv
-      - resident/model_data/metro/data_cropped/maz_maz_walk.csv
-      - resident/model_data/metro/data_cropped/bike_maz_logsums_commute.csv
-      - resident/model_data/metro/data_cropped/bike_maz_logsums_noncommute.csv
-    network_los_file: resident/configs/network_los.yaml
+      - '../model_data/metro/data_cropped/*.omx'
+      - ../model_data/metro/data_cropped/maz_stop_walk.csv
+      - ../model_data/metro/data_cropped/maz_maz_walk.csv
+      - ../model_data/metro/data_cropped/bike_maz_logsums_commute.csv
+      - ../model_data/metro/data_cropped/bike_maz_logsums_noncommute.csv
+    network_los_file: ../configs/network_los.yaml
 
 
 
@@ -290,17 +290,17 @@ summarize:
     aggregations:
       regional_district:
         source_zone_system: maz
-        file: resident/model_data/metro/data_cropped/land_use.csv
+        file: ../model_data/metro/data_cropped/land_use.csv
         zone_id_col: MAZ
         geography_col: DISTRICT9
       school_district_k8:
         source_zone_system: maz
-        file: resident/model_data/metro/data_cropped/land_use.csv
+        file: ../model_data/metro/data_cropped/land_use.csv
         zone_id_col: MAZ
         geography_col: DIST_Kto8
       school_district_9_12:
         source_zone_system: maz
-        file: resident/model_data/metro/data_cropped/land_use.csv
+        file: ../model_data/metro/data_cropped/land_use.csv
         zone_id_col: MAZ
         geography_col: DIST_9to12
 
