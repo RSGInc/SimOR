@@ -77,7 +77,7 @@ IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 ECHO Non-motorized skims complete.
 
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-:: Run ActivitySim -- full integration not yet implemented
+:: Run ActivitySim -- full integration not yet implemented. This will only run the small cropped metro example dataset.
 :: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ECHO.
 ECHO Running ActivitySim preprocessor.

@@ -27,7 +27,7 @@ SET "INSTALL_PARKING=N"
 
 :: Set to Y to clone and install the ActivitySim visualizer, N to skip
 :: (optional dependency, only needed for producing model summary dashboards)
-SET "INSTALL_VISUALIZER=N"
+SET "INSTALL_VISUALIZER=Y"
 
 :: ---------------------------------------------------------------------------
 :: Repository URLs and branches

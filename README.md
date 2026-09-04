@@ -54,7 +54,7 @@ Before running the model, make sure the following are available:
 
    `sandag_parking` is not required for a typical model run. It is only needed when preparing land use inputs that require expected parking costs. In that workflow, it can be run once to generate the parking cost input file used by the preprocessor.
 
-   If permissions errors arise, try running the setup with Administrator privileges. The Visum Python package install in particular may require elevated permissions.
+   **If permissions errors arise, try running the setup with Administrator privileges. The Visum Python package install in particular may require elevated permissions.**
 
 2. **Place the Visum version file**
 
