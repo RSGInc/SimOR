@@ -93,7 +93,7 @@ CREATE_TABLES:
                     2: "N"
                 occupation: # occupation codes
                     1: 1   # Management Occupations
-                    2: -1    # Non-worker
+                    2: 999    # Non-worker
 
     PROTO_TOURS:
         index_col: proto_tour_id

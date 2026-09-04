@@ -15,7 +15,7 @@ logging:
   loggers:
 
     activitysim:
-      level: DEBUG
+      level: INFO
       handlers: [console, logfile]
       propagate: false
 
@@ -57,3 +57,4 @@ logging:
       (): activitysim.core.tracing.ElapsedTimeFormatter
       format: '[{elapsedTime}] {levelname:s}: {message:s}'
       style: '{'
+      datefmt: '%Y-%m-%dT%H:%M:%S%z'
