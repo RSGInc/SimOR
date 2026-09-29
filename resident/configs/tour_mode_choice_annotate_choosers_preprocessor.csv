@@ -87,7 +87,7 @@ Effective parking cost applied to tour purpose,parkingCost,"np.where(is_joint+is
 # cost coef,,
 ,_income_exponent,"np.where(tour_type == 'work', 0.6, 0.5)"
 ,cost_sensitivity,"np.maximum(df.income,1000).pow(_income_exponent)"
-,c_cost,coef_income / cost_sensitivity
+,c_cost,coef_cost / cost_sensitivity
 # ivt coef,,
 ,time_factor,"np.where(tour_type=='work', df.time_factor_work, df.time_factor_nonwork)"
 ,c_ivt,coef_ivt * time_factor
