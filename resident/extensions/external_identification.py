@@ -278,12 +278,19 @@ def set_external_tour_variables(state, tours, choices, model_settings, trace_lab
     external_col_name = model_settings.EXTERNAL_COL_NAME
     internal_col_name = model_settings.INTERNAL_COL_NAME
 
+    # Preserve flags set by identification steps for other tour categories.
     if external_col_name is not None:
-        tours[external_col_name] = (
-            (choices == model_settings.EXTERNAL_TOUR_ALT).reindex(tours.index).fillna(False).astype(bool)
-        )
+        if external_col_name not in tours.columns:
+            tours[external_col_name] = False
+        tours.loc[choices.index, external_col_name] = (
+            choices == model_settings.EXTERNAL_TOUR_ALT
+        ).astype(bool)
     if internal_col_name is not None:
-        tours[internal_col_name] = ~tours[external_col_name]
+        if internal_col_name not in tours.columns:
+            tours[internal_col_name] = ~tours[external_col_name]
+        tours.loc[choices.index, internal_col_name] = ~tours.loc[
+            choices.index, external_col_name
+        ]
 
     # - annotate tours table
     if "annotate_tours" in model_settings:
@@ -305,7 +312,7 @@ def external_non_mandatory_identification(
     network_los: los.Network_LOS,
     model_settings: ExternalIdentificationSettings | None = None,
     model_settings_file_name: str = "external_non_mandatory_identification.yaml",
-    trace_label: str = "external_non_mandatory_tour_identification",
+    trace_label: str = "external_non_mandatory_identification",
     trace_hh_id: bool = False,
 ) -> None:
     """
