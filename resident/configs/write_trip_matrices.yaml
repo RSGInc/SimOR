@@ -390,17 +390,17 @@ MATRICES:
 CONSTANTS:
   time_periods:
     EA:
-      first_hour: 1
+      first_hour: 43
       last_hour: 6
     AM:
       first_hour: 7
       last_hour: 12
     MD:
       first_hour: 13
-      last_hour: 25
+      last_hour: 24
     PM:
-      first_hour: 26
+      first_hour: 25
       last_hour: 32
     EV:
       first_hour: 33
-      last_hour: 48
+      last_hour: 42
