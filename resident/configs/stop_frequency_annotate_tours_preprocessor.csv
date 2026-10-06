@@ -3,7 +3,7 @@ Description,Target,Expression
 # define primary_purpose to use for slicing choosers with a value that identifies the spec to be used ,,
 # e.g. univ segment means there will be a spec called stop_frequency_univ.csv,,
 # so the 'school' tour_type can treat univ and non-univ school tours differently,,
-,primary_purpose,"df.tour_type.where((df.tour_type != 'school') | ~(df.pstudent == PSTUDENT_UNIVERSITY), 'univ')"
+,primary_purpose,"df.tour_type.where((df.tour_type != 'school') | ~(df.is_university), 'univ')"
 ,primary_purpose,"primary_purpose.where(df.tour_category!='atwork', 'atwork')"
 #,,
 ,distance_in_miles,"od_skims[('SOV_M_DIST', 'MD')]"
@@ -12,7 +12,7 @@ Description,Target,Expression
 ,_HH_PERSON_COUNT,"lambda exp, persons: persons.query(exp).groupby('household_id').size()"
 ,num_full,"reindex_i(_HH_PERSON_COUNT('ptype == %s' % PEMPLOY_FULL, persons), df.household_id)"
 ,num_part,"reindex_i(_HH_PERSON_COUNT('ptype == %s' % PEMPLOY_PART, persons), df.household_id)"
-,num_student,"reindex_i(_HH_PERSON_COUNT('pstudent != %s' % PSTUDENT_NOT, persons), df.household_id)"
+,num_student,"reindex_i(_HH_PERSON_COUNT('school_segment != %s' % SCHOOL_SEGMENT_NONE, persons), df.household_id)"
 Num Kids between 0 and 4 (including) years old,num_age_0_4,"reindex_i(_HH_PERSON_COUNT('age < 5', persons), df.household_id)"
 Num kids between 4 and 15 (including) years old,num_age_5_15,"reindex_i(_HH_PERSON_COUNT('(age >= 5) & (age <16)', persons), df.household_id)"
 Number of Adults (>= 16 years old),num_adult,"reindex_i(_HH_PERSON_COUNT('age >= 16', persons), df.household_id)"
@@ -25,7 +25,7 @@ Number of Adults (>= 16 years old),num_adult,"reindex_i(_HH_PERSON_COUNT('age >=
 #num_work_tours already defined,,
 ,num_total_tours,"reindex_i(df.groupby('person_id').size(), df.person_id)"
 school but not university,num_school_tours,"reindex_i(df[primary_purpose==SCHOOL_TOUR].groupby('person_id').size(), df.person_id)"
-,num_univ_tours,(df.pstudent == PSTUDENT_UNIVERSITY) * num_school_tours
+,num_univ_tours,(df.is_university) * num_school_tours
 #num_escort_tours already defined,,
 # indiv tour counts should not include joint tours by point_person,,
 ,num_shop_tours,"reindex_i(df[~is_joint & (df.tour_type==SHOP_TOUR)].groupby('person_id').size(), df.person_id)"
@@ -49,8 +49,8 @@ AccesibilityADestination peak transit,_dest_trPkRetail,"reindex(accessibility.tr
 AccesibilityADestination off-peak transit,_dest_trOpRetail,"reindex(accessibility.trOpRetail, df.destination)"
 AccesibilityAtDestination if transit,pracc,"pracc.where(~tour_mode_is_transit, _dest_trPkRetail.where(_tour_starts_in_peak, _dest_trOpRetail))"
 AccesibilityAtDestination if non_motorized,pracc,"pracc.where(~tour_mode_is_non_motorized, reindex(accessibility.nmRetail, df.destination))"
-,tour_mode_is_sov,df.tour_mode == 'SOV'
-,tour_mode_is_hov,"df.tour_mode.isin(['HOV2', 'HOV3'])"
+,tour_mode_is_sov,df.tour_mode == 'DRIVEALONE'
+,tour_mode_is_hov,"df.tour_mode.isin(['SHARED2', 'SHARED3'])"
 ,tour_mode_is_taxi,"df.tour_mode.isin(['TAXI', 'TNC_SINGLE', 'TNC_SHARED'])"
 presence of non_worker other than self in household,has_non_worker,"df.person_id.map(other_than(persons.household_id, persons.ptype == PTYPE_NONWORK))"
 presence of retiree other than self in household,has_retiree,"df.person_id.map(other_than(persons.household_id, persons.ptype == PTYPE_RETIRED))"

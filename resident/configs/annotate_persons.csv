@@ -3,42 +3,34 @@ Description,Target,Expression
 age_16_to_19,age_16_to_19,"persons.age.between(16, 19)"
 age_16_p,age_16_p,persons.age >= 16
 adult,adult,persons.age >= 18
-# FIXME --are these SEX categories correct?,,
+# ODOT survey coding also has an addition SEX == 3 option for other / non-binary ,,
 male,male,persons.SEX == 1
 female,female,persons.SEX == 2
-employment status type,pemploy,"pd.Series(np.zeros(len(persons)), index=persons.index)"
+#,,
+# worker status,,
+employment status type,pemploy,"pd.Series(PEMPLOY_NOT, index=persons.index)"
 ,pemploy,"np.where(persons.age < 16, PEMPLOY_CHILD, PEMPLOY_PART)"
 ,pemploy,"np.where((persons.age >= 16) & ((persons.ESR == 3) | (persons.ESR == 6)), PEMPLOY_NOT, pemploy)"
 ,pemploy,"np.where((persons.age>=16) & (persons.ESR != 3) & (persons.ESR != 6) & (persons.WKHP >= 35) & (persons.WKW >= 1) & (persons.WKW <= 4), PEMPLOY_FULL, pemploy)"
-student category,pstudent,"pd.Series(np.zeros(len(persons)), index=persons.index)"
-,pstudent,"np.where((pemploy == PEMPLOY_FULL) & (persons.age >= 16), PSTUDENT_NOT, pstudent)"
-,pstudent,"np.where((pemploy == PEMPLOY_FULL) & (persons.age < 16), PSTUDENT_GRADE_OR_HIGH, pstudent)"
-,pstudent,"np.where((persons.SCHG < 1) & (persons.age >= 16), PSTUDENT_NOT, pstudent)"
-,pstudent,"np.where((persons.SCHG < 1) & (persons.age < 16), PSTUDENT_GRADE_OR_HIGH, pstudent)"
-,pstudent,"np.where((persons.SCHG >= 15) & (persons.age >= 16), PSTUDENT_UNIVERSITY, pstudent)"
-,pstudent,"np.where((persons.SCHG >= 15) & (persons.age < 16), PSTUDENT_GRADE_OR_HIGH, pstudent)"
-,pstudent,"np.where((persons.age <= 19) & (persons.SCHG >=1) & (persons.SCHG<=14), PSTUDENT_GRADE_OR_HIGH, pstudent)"
-,pstudent,"np.where((persons.age > 19) & (persons.SCHG >=1) & (persons.SCHG<=14),  PSTUDENT_UNIVERSITY, pstudent)"
-,pstudent,"np.where(pstudent == 0, 3, pstudent)"
+is_worker,is_worker,"np.isin(pemploy, [PEMPLOY_FULL, PEMPLOY_PART])"
+#,,
+## student status,,
+Nursery school / preschool,is_preschool,persons.SCHG == 1
+Kindergarten through 8th grade,is_gradeschool,(persons.SCHG >= 2) & (persons.SCHG <= 10)
+9th through 12th grade,is_highschool,(persons.SCHG >= 11) & (persons.SCHG <= 14)
+college or graduate / professional school,is_university,(persons.SCHG >= 15)
+,is_student,"np.isin(is_preschool | is_gradeschool | is_highschool | is_university, True, False)"
+school_segment,school_segment,"np.select([is_preschool, is_gradeschool, is_highschool, is_university], [SCHOOL_SEGMENT_PREK, SCHOOL_SEGMENT_GRADE, SCHOOL_SEGMENT_HIGH, SCHOOL_SEGMENT_UNIV], default=SCHOOL_SEGMENT_NONE).astype(np.int8)"
+#,,
+## person type,,
 person type,ptype,"pd.Series(PTYPE_NONWORK, index=persons.index)"
 ,ptype,"np.where(persons.age >= 65, PTYPE_RETIRED, ptype)"
 ,ptype,"np.where(pemploy == 2, PTYPE_PART, ptype)"
 ,ptype,"np.where(pemploy == 1,  PTYPE_FULL, ptype)"
-,ptype,"np.where(((persons.age >= 5) & (persons.age < 18)) | (persons.age.isin([18,19]) & (pstudent == PSTUDENT_GRADE_OR_HIGH)), PTYPE_SCHOOL, ptype)"
 ,ptype,"np.where(persons.age < 5, PTYPE_PRESCHOOL, ptype)"
-,ptype,"np.where(pstudent == 2, PTYPE_UNIVERSITY, ptype)"
-is_student,is_student,"np.isin(pstudent, [PSTUDENT_GRADE_OR_HIGH, PSTUDENT_UNIVERSITY])"
-is_preschool,_is_preschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age <= GRADE_SCHOOL_MIN_AGE)
-is_gradeschool,_is_gradeschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age <= GRADE_SCHOOL_MAX_AGE) & (persons.age > GRADE_SCHOOL_MIN_AGE)
-is_highschool,_is_highschool,(pstudent == PSTUDENT_GRADE_OR_HIGH) & (persons.age > GRADE_SCHOOL_MAX_AGE)
-# is_university is actually hard coded in mandatory scheduling(!) so need it here,,
-is_university,is_university,pstudent == PSTUDENT_UNIVERSITY
-school_segment preschool,school_segment,"np.where(_is_preschool, SCHOOL_SEGMENT_PREK, SCHOOL_SEGMENT_NONE)"
-school_segment gradeschool,school_segment,"np.where(_is_gradeschool, SCHOOL_SEGMENT_GRADE, school_segment)"
-school_segment highschool,school_segment,"np.where(_is_highschool, SCHOOL_SEGMENT_HIGH, school_segment)"
-school_segment university,school_segment,"np.where(is_university, SCHOOL_SEGMENT_UNIV, school_segment).astype(np.int8)"
+,ptype,"np.where(((persons.age >= 5) & (persons.age < 18)) | is_gradeschool | is_highschool, PTYPE_SCHOOL, ptype)"
+,ptype,"np.where(is_university, PTYPE_UNIVERSITY, ptype)"
 #,,
-is_worker,is_worker,"np.isin(pemploy, [PEMPLOY_FULL, PEMPLOY_PART])"
 #extrnal model variable initialization treating everyone as internal initially,,
 ,is_internal_worker,is_worker
 ,is_external_worker,0

@@ -22,9 +22,8 @@ CONSTANTS:
   UNIVERSITY: 3
   NONWORK: 4
   RETIRED: 5
-  DRIVING: 6
-  SCHOOL: 7
-  PRESCHOOL: 8
+  SCHOOL: 6
+  PRESCHOOL: 7
 
 PERSON_TYPE_MAP:
   WORKER:
@@ -33,7 +32,6 @@ PERSON_TYPE_MAP:
   CHILD:
     - 6
     - 7
-    - 8
 
 annotate_persons:
   SPEC: annotate_persons_cdap
