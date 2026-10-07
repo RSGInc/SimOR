@@ -126,6 +126,7 @@ Person age,age,df.age
 # Household income (in dollars),income,df.incomeInDollars
 #,,
 Joint tour,is_joint,"df.get('tour_category', default=False) == 'joint'"
+At-work subtour,is_atwork,"df.get('tour_category', default=False) == 'atwork'"
 Determining Tour Destination,destination,df.destination if 'destination' in df.columns else df.alt_dest
 Origin  Dwelling Unit Density,oDUDen,"reindex(land_use.duden,origin).clip(upper=300)"
 Origin  Employment Density,oEmpDen,"reindex(land_use.empden,origin).clip(upper=300)"
