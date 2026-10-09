@@ -38,7 +38,7 @@ bundles:
   - non_mandatory_tour_scheduling_othdiscr
   - non_mandatory_tour_scheduling_othmaint
   - non_mandatory_tour_scheduling_social
-  - vehicle_allocation
+  # - vehicle_allocation
   # - park_and_ride_lot_choice
   - tour_mode_choice
   - atwork_subtour_frequency
