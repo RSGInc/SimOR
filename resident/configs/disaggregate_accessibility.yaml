@@ -65,6 +65,7 @@ CREATE_TABLES:
             PERSON_NUM: [1, 2]                # Person number
             MIL: 4                 # Not military
             SCHG: -1               # Not attending school
+            school_zone_id : -1
         mapped_fields:
             PERSON_NUM:
                 age:
