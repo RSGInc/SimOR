@@ -25,7 +25,8 @@ SR2 AV Auto Terminal Time Factor,autoCPMFactor_SR2,"np.where(sr2_tour_uses_av, a
 SR3+ AV Auto Terminal Time Factor,autoCPMFactor_SR3,"np.where(sr3_tour_uses_av, autoCostPerMileFactorAV, 1.0)"
 AV Min Age to Drive Alone,minimumAgeDA,"np.where(sov_tour_uses_av, minAgeDriveAloneAV, 16)"
 reimburseProportion placeholder,reimburseProportion,0
-"Tour duration, in hours",tourDuration,df.duration/2
+Override negative durations,duration,"np.where(df.duration < 0, df.duration + 48, df.duration)"
+"Tour duration, in hours",tourDuration,duration/2
 #,,
 ,num_participants,df.number_of_participants if _DF_IS_TOUR else 1
 ,is_joint,(df.tour_category=='joint') if _DF_IS_TOUR else False
