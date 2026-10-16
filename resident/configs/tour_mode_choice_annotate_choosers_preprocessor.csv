@@ -181,9 +181,9 @@ Determining Tour Destination,destination,df.destination if 'destination' in df.c
 ,origin_closest_walk_time,"np.where((origin_walk_local_time > 0) & (origin_walk_premium_time > 0), np.minimum(origin_walk_local_time,origin_walk_premium_time), np.maximum(origin_walk_local_time,origin_walk_premium_time))"
 ,dest_closest_walk_time,"np.where((dest_walk_local_time > 0) & (dest_walk_premium_time > 0), np.minimum(dest_walk_local_time,dest_walk_premium_time), np.maximum(dest_walk_local_time,dest_walk_premium_time))"
 # transit mode availabilities,,
-,walk_transit_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0)
-,knr_transit_available,(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0) if KNR_available else 0
-,bike_transit_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0)
+,walk_transit_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0) & (odt_skims['WTW_TIV']<999) & (dot_skims['WTW_TIV']<999)
+,knr_transit_available,(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0) & (odt_skims['KTW_TIV']<999) & (dot_skims['WTK_TIV']<999) if KNR_available else 0
+,bike_transit_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0) & (odt_skims['WTW_TIV']<999) & (dot_skims['WTW_TIV']<999)
 #determine walk times for each transit mode,,
 ,WLK_BUS_IVT_OUT,(odt_skims['WTW_BUS'] )
 ,WLK_BUS_IVT_INB,(dot_skims['WTW_BUS'] )
@@ -210,7 +210,7 @@ Determining Tour Destination,destination,df.destination if 'destination' in df.c
 ,knr_veh_constant,(odt_skims['KTW_VTC'] + dot_skims['WTK_VTC']) if KNR_available else 0
 # PNR with lot choice known -- needs to preface expressions on available lot since -1 index on skims returns error,,
 park and ride zone id,_CALC_PNR,'pnr_zone_id' in df.columns
-has valid pnr lot choice,is_valid_pnr,((df.pnr_zone_id > 0) & (ldt_skims['WTW_TIV']>0) & (dlt_skims['WTW_TIV']>0)) if _CALC_PNR else False
+has valid pnr lot choice,is_valid_pnr,((df.pnr_zone_id > 0) & (ldt_skims['WTW_TIV']>0) & (dlt_skims['WTW_TIV']>0) & (ldt_skims['WTW_TIV']<999) & (dlt_skims['WTW_TIV']<999)) if _CALC_PNR else False
 outbound auto time for pnr,auto_time_pnr_out,"0 if not _CALC_PNR else np.where(is_valid_pnr, (olt_skims['SOV_L_TIME'] * (_vot_bin_da == 1)) + (olt_skims['SOV_M_TIME'] * (_vot_bin_da == 2)) + (olt_skims['SOV_H_TIME'] * (_vot_bin_da == 3)), 0)"
 inbound auto time for pnr,auto_time_pnr_inb,"0 if not _CALC_PNR else np.where(is_valid_pnr, (lot_skims['SOV_L_TIME'] * (_vot_bin_da == 1)) + (lot_skims['SOV_M_TIME'] * (_vot_bin_da == 2)) + (lot_skims['SOV_H_TIME'] * (_vot_bin_da == 3)), 0)"
 outbound auto dist for pnr,auto_dist_pnr_out,"0 if not _CALC_PNR else np.where(is_valid_pnr, (olt_skims['SOV_L_DIST'] * (_vot_bin_da == 1)) + (olt_skims['SOV_M_DIST'] * (_vot_bin_da == 2)) + (olt_skims['SOV_H_DIST'] * (_vot_bin_da == 3)), 0)"
