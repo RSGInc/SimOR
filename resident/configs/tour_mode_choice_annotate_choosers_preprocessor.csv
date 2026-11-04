@@ -156,15 +156,15 @@ Person is female,female,(df.SEX == 2)
 ,do_bike_dist,"np.nan_to_num(np.where(is_mandatory, do_skims['distance_commute'], do_skims['distance_noncommute']), nan=999)"
 bike time inbound,bike_time_inb,od_bike_dist / bikeSpeed * 60
 bike time outbound,bike_time_out,do_bike_dist / bikeSpeed * 60
-bike availability,bikeAvailable,(od_bike_logsum > -500) & (do_bike_logsum > -500)
+bike availability,bikeAvailable,(od_bike_logsum > -500) & (do_bike_logsum > -500) & (od_bike_dist < max_bike_distance) & (od_bike_dist > 0)
 #,,
 #,,
 "Cost factor for shared 2 tours, 1/(2^0.8)",costFactorS2,0.57
 "Cost factor for shared 3+ tours, 1/(3.5^0.8)",costFactorS3,0.37
 ,sov_available,"(age>=minimumAgeDA) * np.where(is_joint,0,1) * np.where(is_atwork_subtour==0,1,np.where(_parent_tour_mode=='DRIVEALONE',1,0))"
 ,sr2_available,"np.where(is_joint==0,1,np.where(num_participants>=3,0,1))"
-,walkAvailable,"np.where(walk_time_skims_out < max_walk_time, 1,0) * np.where(walk_time_skims_inb < max_walk_time, 1,0)"
-,SCHBUS_available,(tour_type =='school') & (personType!=3)
+,walkAvailable,"np.where(walk_time_skims_out < max_walk_time, 1,0) * np.where(walk_time_skims_inb < max_walk_time, 1,0) * np.where(walk_time_skims_inb > 0, 1,0) * np.where(walk_time_skims_out > 0, 1,0)"
+,SCHBUS_available,(tour_type =='school') & (personType == PTYPE_SCHOOL)
 #,,
 Determining Tour Origin,origin,df.origin if 'origin' in df.columns else df.home_zone_id if 'home_zone_id' in df.columns else df.workplace_zone_id
 Determining Tour Destination,destination,df.destination if 'destination' in df.columns else df.alt_dest
@@ -181,7 +181,7 @@ Determining Tour Destination,destination,df.destination if 'destination' in df.c
 ,origin_closest_walk_time,"np.where((origin_walk_local_time > 0) & (origin_walk_premium_time > 0), np.minimum(origin_walk_local_time,origin_walk_premium_time), np.maximum(origin_walk_local_time,origin_walk_premium_time))"
 ,dest_closest_walk_time,"np.where((dest_walk_local_time > 0) & (dest_walk_premium_time > 0), np.minimum(dest_walk_local_time,dest_walk_premium_time), np.maximum(dest_walk_local_time,dest_walk_premium_time))"
 # transit mode availabilities,,
-,walk_transit_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0) & (odt_skims['WTW_TIV']<999) & (dot_skims['WTW_TIV']<999)
+,walk_transit_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0) & (odt_skims['WTW_TIV']<999) & (dot_skims['WTW_TIV']<999) & (origin_closest_walk_time > 0 ) & (dest_closest_walk_time > 0) & (origin_closest_walk_time < 999 ) & (dest_closest_walk_time < 999)
 ,knr_transit_available,(odt_skims['KTW_TIV']>0) & (dot_skims['WTK_TIV']>0) & (odt_skims['KTW_TIV']<999) & (dot_skims['WTK_TIV']<999) if KNR_available else 0
 ,bike_transit_available,(odt_skims['WTW_TIV']>0) & (dot_skims['WTW_TIV']>0) & (odt_skims['WTW_TIV']<999) & (dot_skims['WTW_TIV']<999)
 #determine walk times for each transit mode,,
@@ -235,13 +235,13 @@ E-scooter access time outbound,escooter_access_out,"reindex(land_use.ESCOOACCTIM
 E-scooter access time inbound,escooter_access_inb,"reindex(land_use.ESCOOACCTIME,destination).fillna(-1)"
 E-scooter time outbound,escooter_time_out,bike_time_out * bikeSpeed / escooterSpeed
 E-scooter time inbound,escooter_time_inb,bike_time_inb * bikeSpeed / escooterSpeed
-E-scooter available,escooter_available,(escooter_time_inb>0) & (escooter_time_out>0)
+E-scooter available,escooter_available,(escooter_time_inb>0) & (escooter_time_out>0) & (escooter_time_inb<999) & (escooter_time_out<999)
 E-scooter max distance availability,escooterMaxDistance,"(od_skims[('SOV_M_DIST', 'MD')] > escooterMaxDist)"
 E-bike access time outbound,ebike_access_out,"reindex(land_use.EBIKEACCTIME,origin).fillna(-1)"
 E-bike access time inbound,ebike_access_inb,"reindex(land_use.EBIKEACCTIME,destination).fillna(-1)"
 E-bike time outbound,ebike_time_out,bike_time_out * bikeSpeed / ebikeSpeed
 E-bike time inbound,ebike_time_inb,bike_time_inb * bikeSpeed / ebikeSpeed
-E-bike available,ebike_available,(ebike_time_inb>0) & (ebike_time_out>0)
+E-bike available,ebike_available,(ebike_time_inb>0) & (ebike_time_out>0) & (ebike_time_inb<999) & (ebike_time_out<999)
 E-bike max distance availability,ebikeMaxDistance,"(od_skims[('SOV_M_DIST', 'MD')] > ebikeMaxDist)"
 # transit subsidi pass discount,,
 transit pas subsidy,transit_pass_subsidy,"df.get('transit_pass_subsidy', False)"

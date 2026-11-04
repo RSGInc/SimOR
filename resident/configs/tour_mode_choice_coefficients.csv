@@ -108,11 +108,16 @@ coef_female_sr3p_work,0.848064,F
 coef_female_tran_work,0.157786,F
 coef_female_nmot_work,0,F
 coef_ageund16_bike_work,0,F
+coef_ageund16_tran_work,0,F
+coef_ageund16_nmot_work,0,F
+coef_ageund16_sr2_work,0,F
+coef_ageund16_sr3p_work,0,F
 coef_age1624_bike_work,0,F
 coef_age4155_bike_work,-0.73111,F
 coef_age5664_bike_work,-0.64352,F
 coef_age65pl_bike_work,-1.54867,F
 coef_female_bike_work,-1.19364,F
+coef_female_bike_atwork,0,F
 coef_inc100plus_bike_work,0.641381,F
 coef_LUnorm_bike_work,0.083266,F
 coef_oMlCoast_bike_work,-1.42018,F
@@ -124,6 +129,7 @@ coef_age4155_walk_work,-0.43207,F
 coef_age5664_walk_work,-0.51999,F
 coef_age65pl_walk_work,-0.83162,F
 coef_female_walk_work,0,F
+coef_female_walk_atwork,0,F
 coef_inc60100_walk_work,-0.20839,F
 coef_LUnorm_walk_work,0.009309,F
 coef_dEmpNorm_walk_work,0.099811,F
@@ -161,6 +167,10 @@ coef_female_sr3p_univ,0,F
 coef_female_tran_univ,0,F
 coef_female_nmot_univ,0,F
 coef_ageund16_bike_univ,0,F
+coef_ageund16_tran_univ,0,F
+coef_ageund16_nmot_univ,0,F
+coef_ageund16_sr2_univ,0,F
+coef_ageund16_sr3p_univ,0,F
 coef_age1624_bike_univ,0,F
 coef_age4155_bike_univ,-0.73111,F
 coef_age5664_bike_univ,-0.64352,F
@@ -208,6 +218,10 @@ coef_female_tran_school,0.609312,F
 coef_female_nmot_school,0,F
 coef_female_schb_school,0,F
 coef_ageund16_bike_school,0,F
+coef_ageund16_tran_school,0,F
+coef_ageund16_nmot_school,0,F
+coef_ageund16_sr2_school,0,F
+coef_ageund16_sr3p_school,0,F
 coef_age1624_bike_school,0,F
 coef_age4155_bike_school,-1.16978,F
 coef_age5664_bike_school,-1.02963,F
@@ -261,6 +275,10 @@ coef_female_sr3p_maint,0.34258,F
 coef_female_tran_maint,0,F
 coef_female_nmot_maint,0,F
 coef_ageund16_bike_maint,0,F
+coef_ageund16_tran_maint,0,F
+coef_ageund16_nmot_maint,0,F
+coef_ageund16_sr2_maint,0,F
+coef_ageund16_sr3p_maint,0,F
 coef_age1624_bike_maint,0,F
 coef_age4155_bike_maint,-0.68811,F
 coef_age5664_bike_maint,-0.60566,F
@@ -315,6 +333,10 @@ coef_female_tran_disc,-0.23309,F
 coef_female_nmot_disc,0,F
 coef_beachParkBikeConstant,0.7,F
 coef_ageund16_bike_disc,0,F
+coef_ageund16_tran_disc,0,F
+coef_ageund16_nmot_disc,0,F
+coef_ageund16_sr2_disc,0,F
+coef_ageund16_sr3p_disc,0,F
 coef_age1624_bike_disc,0,F
 coef_age4155_bike_disc,-0.77985,F
 coef_age5664_bike_disc,-0.68642,F
@@ -611,3 +633,5 @@ coef_calib_ebike_owner_EBIKE,0.942,F
 coef_calib_ebike_shared,-4.139014766,F
 
 coef_escooter_diff,0,F
+coef_tnc_shared_diff,0,F
+coef_taxi_diff,0,F
